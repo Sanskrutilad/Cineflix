@@ -28,14 +28,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.cineflix.R
 
-
 @Composable
 fun WhosWatchingScreen() {
     val profiles = listOf(
         Profile("Shrikant S...", painterResource(R.drawable.prof)),
         Profile("Children", painterResource(R.drawable.child))
     )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -111,7 +109,6 @@ fun ProfileItem(profile: Profile) {
         )
     }
 }
-
 @Composable
 fun AddProfileButton() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
