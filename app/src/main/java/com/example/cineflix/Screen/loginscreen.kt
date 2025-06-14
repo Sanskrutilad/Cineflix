@@ -25,23 +25,23 @@ import com.example.cineflix.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetflixLoginScreen() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(16.dp)
-    ) {
-        NetflixTopAppBar()
+    Scaffold(
+        topBar = { NetflixTopAppBar() },
+        containerColor = Color.Black
+    ) { innerPadding ->
+
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .padding(innerPadding)
+                .padding(16.dp)
+                .fillMaxSize()
         ) {
-
-            Spacer(modifier = Modifier.height(48.dp))
-
             val emailState = remember { mutableStateOf("") }
             val passwordState = remember { mutableStateOf("") }
+
+            Spacer(modifier = Modifier.height(48.dp))
 
             OutlinedTextField(
                 value = emailState.value,
@@ -103,6 +103,23 @@ fun NetflixLoginScreen() {
                 Text("Sign In", fontWeight = FontWeight.SemiBold)
             }
 
+            Text("OR", color = Color.White, modifier = Modifier.padding(vertical = 8.dp))
+
+            Button(
+                onClick = { /* handle sign in with code */ },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Black,
+                    contentColor = Color.White
+                ),
+                border = BorderStroke(1.dp, Color.White),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text("Sign In With Code", fontWeight = FontWeight.SemiBold)
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
@@ -134,16 +151,17 @@ fun NetflixLoginScreen() {
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NetflixTopAppBar() {
     TopAppBar(
         title = {
             Image(
-                painter = painterResource(id = R.drawable.netflixlogo_no_bg), // replace with your actual logo resource
+                painter = painterResource(id = R.drawable.netflixlogo), // replace with your actual logo resource
                 contentDescription = "Netflix Logo",
                 modifier = Modifier
-                    .height(36.dp)
+                    .height(90.dp)
             )
         },
         navigationIcon = {
