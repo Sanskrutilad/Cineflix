@@ -7,10 +7,8 @@ import com.google.firebase.auth.FirebaseUser
 class FirebaseAuthViewModel : ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val _currentUser = MutableLiveData<FirebaseUser?>(auth.currentUser)
     val currentUser: LiveData<FirebaseUser?> = _currentUser
-
     private val _authError = MutableLiveData<String?>(null)
     val authError: LiveData<String?> = _authError
 
