@@ -17,38 +17,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.cineflix.R
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
+fun NetflixCreateAccountScreen(
+    navController: NavController,
+    loginViewModel: LoginScreenViewModel = viewModel()
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Image(
-                        painter = painterResource(id = R.drawable.netflixlogo), // your logo
+                        painter = painterResource(id = R.drawable.netflixlogo),
                         contentDescription = "Netflix",
-                        modifier = Modifier
-                            .size(130.dp)
+                        modifier = Modifier.size(130.dp)
                     )
                 },
+
                 actions = {
-                    TextButton(onClick = {  }) {
+                    TextButton(onClick = { }) {
                         Text("HELP", color = Color.Black)
                     }
-                    TextButton(onClick = { }) {
+                    TextButton(onClick = { navController.navigate("login") }) {
                         Text("SIGN IN", color = Color.Black)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
             )
         },
         containerColor = Color.White
@@ -76,7 +78,9 @@ fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
                 fontSize = 20.sp,
                 color = Color.DarkGray
             )
+
             Spacer(modifier = Modifier.height(32.dp))
+
             OutlinedTextField(
                 value = email,
                 onValueChange = {
@@ -85,14 +89,14 @@ fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
                 },
                 label = { Text("Email") },
                 isError = showEmailError,
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedTextColor = Color.Black,
                     focusedTextColor = Color.Black
                 )
             )
+
             if (showEmailError) {
                 Text(
                     text = "Email is required.",
@@ -110,8 +114,7 @@ fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
                 label = { Text("Password") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedTextColor = Color.Black,
                     focusedTextColor = Color.Black
@@ -124,10 +127,13 @@ fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
                 onClick = {
                     showEmailError = email.isBlank()
                     if (!showEmailError) {
-                      viewModel.createUserWithEmailAndPassword(
-                          email, password,
-                          home = TODO()
-                      )
+                        loginViewModel.createUserWithEmailAndPassword(
+                            email,
+                            password,
+                            home = {
+                                navController.navigate("home")
+                            }
+                        )
                     }
                 },
                 modifier = Modifier
@@ -143,13 +149,4 @@ fun NetflixCreateAccountScreen( viewModel: LoginScreenViewModel = viewModel()) {
             }
         }
     }
-}
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Netflix Create Account Preview"
-)
-@Composable
-fun NetflixCreateAccountScreenPreview() {
-    NetflixCreateAccountScreen()
 }
