@@ -20,11 +20,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cineflix.R
+import com.example.cineflix.Viewmodel.LoginScreenViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixLoginScreen() {
+fun NetflixLoginScreen(
+
+) {
     Scaffold(
         topBar = { NetflixTopAppBar() },
         containerColor = Color.Black
@@ -89,7 +92,7 @@ fun NetflixLoginScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* handle sign in */ },
+                onClick = { },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
