@@ -96,7 +96,6 @@ fun NetflixCreateAccountScreen(
                     focusedTextColor = Color.Black
                 )
             )
-
             if (showEmailError) {
                 Text(
                     text = "Email is required.",

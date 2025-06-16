@@ -32,10 +32,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadyToWatchScreen(
+    navController: NavController,
     onClose: () -> Unit = {},
     onGetStarted: (String) -> Unit = {}
 ) {
@@ -71,18 +73,14 @@ fun ReadyToWatchScreen(
                 fontSize = 22.sp,
                 color = Color.Black
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(
                 text = "Enter your email to create or sign in to your account.",
                 fontSize = 14.sp,
                 color = Color.Gray
             )
-
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Email Input Field
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
@@ -110,7 +108,7 @@ fun ReadyToWatchScreen(
 
             // Get Started Button
             Button(
-                onClick = { onGetStarted(emailState.value) },
+                onClick = { navController.navigate("Signupscreen") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -126,8 +124,3 @@ fun ReadyToWatchScreen(
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-fun ReadyToWatchScreenPreview() {
-    ReadyToWatchScreen()
-}

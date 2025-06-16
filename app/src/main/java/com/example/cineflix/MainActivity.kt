@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
+import com.example.cineflix.Navigation.Navigation
 import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.ui.theme.CineflixTheme
 
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CineflixTheme {
-                WhosWatchingScreen()
+                Navigation()
             }
         }
     }

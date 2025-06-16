@@ -83,7 +83,7 @@ fun WhosWatchingScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Fixed(2),
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(8.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
