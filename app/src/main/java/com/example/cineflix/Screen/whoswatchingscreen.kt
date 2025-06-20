@@ -20,8 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProfileScreen(navController: NavHostController) {
@@ -55,7 +53,7 @@ fun AddProfileScreen(navController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF121212)) // Ensure dark background throughout
+                .background(Color(0xFF121212))
                 .padding(innerPadding)
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
