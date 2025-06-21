@@ -36,7 +36,7 @@ fun ProfileScreen() {
         "My List" to Icons.Default.List,
         "App Settings" to Icons.Default.Settings,
         "Account" to Icons.Default.AccountCircle,
-        "Help" to  Icons.Default.Star
+        "Help" to  Icons.Default.Info
     )
     Column(
         modifier = Modifier
@@ -90,26 +90,26 @@ fun ProfileScreen() {
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             "Manage Profiles",
             color = Color.LightGray,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         menuItems.forEach { (label, icon) ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
-                    .background(Color.DarkGray, shape = RoundedCornerShape(8.dp))
+                    .background(Color(0xFF433C3C), shape = RoundedCornerShape(8.dp))
                     .clickable { }
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 15.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -124,7 +124,7 @@ fun ProfileScreen() {
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Text(label, color = Color.White, fontSize = 16.sp)
+                        Text(label, color = Color.White, fontSize = 20.sp)
                     }
 
                     Icon(
@@ -136,11 +136,11 @@ fun ProfileScreen() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
 
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(100.dp))
 
         Text(
             "Sign Out",
@@ -148,7 +148,8 @@ fun ProfileScreen() {
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontSize = 35.sp
         )
     }
 }

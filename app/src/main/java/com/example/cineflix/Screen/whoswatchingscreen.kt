@@ -2,6 +2,11 @@ package com.example.cineflix.Screen
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,9 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.Retrofit.ApiService
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -32,9 +40,20 @@ import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddProfileScreen(navController: NavHostController) {
+fun AddProfileScreen(navController: NavHostController, apiService: ApiService) {
+    val context = LocalContext.current
     var profileName by remember { mutableStateOf("") }
     var isChildrenProfile by remember { mutableStateOf(false) }
+    var logoUri by remember { mutableStateOf<Uri?>(null) }
+    var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        logoUri = uri
+    }
 
     Scaffold(
         containerColor = Color(0xFF121212),
@@ -48,7 +67,9 @@ fun AddProfileScreen(navController: NavHostController) {
                 },
                 actions = {
                     TextButton(
-                        onClick = {  },
+                        onClick = {
+                            // Save profile logic with uploadedLogoUrl
+                        },
                         enabled = profileName.isNotBlank()
                     ) {
                         Text("Save", color = if (profileName.isNotBlank()) Color.White else Color.Gray)
@@ -75,13 +96,25 @@ fun AddProfileScreen(navController: NavHostController) {
                     .background(Color(0xFFFFCC00)),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                Text("😊", fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
+                if (logoUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(logoUri),
+                        contentDescription = "Selected Logo",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                } else {
+                    Text("😊", fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
+                }
+
                 Box(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
                         .background(Color.Gray)
                         .clickable {
+                            imagePicker.launch("image/*")
                         }
                         .padding(4.dp)
                         .align(Alignment.BottomEnd),
@@ -95,7 +128,9 @@ fun AddProfileScreen(navController: NavHostController) {
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(24.dp))
+
             OutlinedTextField(
                 value = profileName,
                 onValueChange = { profileName = it },
@@ -115,7 +150,9 @@ fun AddProfileScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .height(52.dp)
             )
+
             Spacer(modifier = Modifier.height(24.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,21 +174,59 @@ fun AddProfileScreen(navController: NavHostController) {
                     )
                 }
 
-                Box(modifier = Modifier.padding(start = 16.dp)) {
-                    Switch(
-                        checked = isChildrenProfile,
-                        onCheckedChange = { isChildrenProfile = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF4CAF50),
-                            uncheckedThumbColor = Color.LightGray
-                        )
+                Switch(
+                    checked = isChildrenProfile,
+                    onCheckedChange = { isChildrenProfile = it },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color(0xFF4CAF50),
+                        uncheckedThumbColor = Color.LightGray
                     )
-                }
+                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    if (logoUri != null) {
+                        Log.d("Upload", "Starting upload...") // Log start
+                        isUploading = true
+                        coroutineScope.launch {
+                            uploadLogo(
+                                context = context,
+                                apiService = apiService,
+                                logoUri = logoUri!!,
+                                userId = "your_user_id_here"
+                            ) { success, imageUrl ->
+                                isUploading = false
+                                if (success) {
+                                    uploadedLogoUrl = imageUrl
+                                    Log.d("Upload", "Upload successful: $imageUrl")
+                                    Toast.makeText(context, "Upload successful", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Log.e("Upload", "Upload failed.")
+                                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    } else {
+                        Log.w("Upload", "No image selected")
+                        Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                enabled = logoUri != null && !isUploading,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
+                Text(if (isUploading) "Uploading..." else "Upload Logo")
+            }
+
         }
     }
 }
+
 
 fun uploadLogo(
     context: Context,
@@ -161,37 +236,44 @@ fun uploadLogo(
     onResult: (Boolean, String?) -> Unit
 ) {
     val contentResolver = context.contentResolver
-    val inputStream = contentResolver?.openInputStream(logoUri)
-    val bytes = inputStream?.readBytes()
-    val requestBody = bytes?.toRequestBody("image/*".toMediaTypeOrNull())
-    val logoPart = requestBody?.let {
-        MultipartBody.Part.createFormData("logo", "logo.png", it)
-    }
-    val companyIdPart = userId.toRequestBody("text/plain".toMediaTypeOrNull())
-    logoPart?.let {
-        apiService.uploadLogo(it, companyIdPart).enqueue(object : Callback<ResponseBody> {
+
+    try {
+        val inputStream = contentResolver.openInputStream(logoUri)
+        val bytes = inputStream?.readBytes()
+
+        if (bytes == null) {
+            Log.e("Upload", "Failed to read bytes from URI")
+            onResult(false, null)
+            return
+        }
+
+        val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
+        val logoPart = MultipartBody.Part.createFormData("logo", "logo.png", requestBody)
+        val companyIdPart = userId.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        Log.d("Upload", "Initiating API call to upload logo...")
+
+        apiService.uploadLogo(logoPart, companyIdPart).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                Log.d("Upload", "Response received: ${response.code()}")
                 if (response.isSuccessful) {
-                    onResult(true, response.body()?.string())
+                    val bodyString = response.body()?.string()
+                    Log.d("Upload", "Upload successful. Response body: $bodyString")
+                    onResult(true, bodyString)
                 } else {
+                    Log.e("Upload", "Upload failed. Code: ${response.code()}, Error: ${response.errorBody()?.string()}")
                     onResult(false, null)
                 }
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("Upload", "Upload error: ${t.localizedMessage}", t)
                 onResult(false, null)
             }
         })
+
+    } catch (e: Exception) {
+        Log.e("Upload", "Exception during upload: ${e.localizedMessage}", e)
+        onResult(false, null)
     }
-}
-
-@Composable
-fun AddProfileScreenPreview() {
-    AddProfileScreen(navController = rememberNavController())
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun PreviewAddProfileScreen() {
-    AddProfileScreenPreview()
 }
