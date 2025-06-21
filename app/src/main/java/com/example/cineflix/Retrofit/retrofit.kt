@@ -1,6 +1,5 @@
 package com.example.cineflix.Retrofit
 
-import com.google.firebase.appdistribution.gradle.ApiService
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -17,7 +16,9 @@ import retrofit2.http.Path
 data class PersonalData(
     val employee: String
 )
+
 interface ApiService {
+
     @Multipart
     @POST("/uploadLogo")
     fun uploadLogo(
@@ -25,14 +26,13 @@ interface ApiService {
         @Part("companyId") companyId: RequestBody
     ): Call<ResponseBody>
 
-
     @GET("getLogo/{companyId}")
     suspend fun getLogo(@Path("companyId") companyId: String): Response<ResponseBody>
-
 }
+
 fun createApiService(): ApiService {
     val retrofit = Retrofit.Builder()
-        .baseUrl("https://448b-122-252-228-30.ngrok-free.app/") // Updated URL
+        .baseUrl("http://10.0.2.2:3000/api/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     return retrofit.create(ApiService::class.java)
