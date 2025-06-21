@@ -8,12 +8,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.KeyboardArrowLeft
+import androidx.compose.material.icons.outlined.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,15 +30,44 @@ import com.example.cineflix.R
 @Composable
 fun ProfileScreen() {
     val profiles = listOf("Sanskruti" to R.drawable.prof, "Shrikant" to R.drawable.prof)
-    val menuItems = listOf("Notifications", "My List", "App Settings", "Account", "Help")
 
+    val menuItems = listOf(
+        "Notifications" to Icons.Default.Notifications,
+        "My List" to Icons.Default.List,
+        "App Settings" to Icons.Default.Settings,
+        "Account" to Icons.Default.AccountCircle,
+        "Help" to  Icons.Default.Star
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
             .padding(16.dp)
     ) {
-        Text("Profiles & More", color = Color.White, fontSize = 20.sp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowLeft,
+                contentDescription = "Back",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = "Profiles & More",
+                color = Color.White,
+                fontSize = 20.sp,
+                modifier = Modifier.weight(6f),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.weight(1f)) // for symmetry with the icon
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -58,23 +92,53 @@ fun ProfileScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text("Manage Profiles", color = Color.LightGray, fontSize = 16.sp , textAlign = TextAlign.Center)
+        Text(
+            "Manage Profiles",
+            color = Color.LightGray,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        menuItems.forEach { item ->
+        menuItems.forEach { (label, icon) ->
             Box(
                 modifier = Modifier
-                    .fillMaxWidth().height(70.dp)
+                    .fillMaxWidth()
+                    .height(70.dp)
                     .background(Color.DarkGray, shape = RoundedCornerShape(8.dp))
                     .clickable { }
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(item, color = Color.White , fontSize = 16.sp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = "$label icon",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(label, color = Color.White, fontSize = 16.sp)
+                    }
+
+                    Icon(
+                        imageVector = Icons.Outlined.KeyboardArrowRight,
+                        contentDescription = "Navigate",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
         }
+
 
         Spacer(modifier = Modifier.weight(1f))
 

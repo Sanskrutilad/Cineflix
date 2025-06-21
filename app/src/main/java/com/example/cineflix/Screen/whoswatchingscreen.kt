@@ -1,5 +1,7 @@
 package com.example.cineflix.Screen
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +21,14 @@ import androidx.navigation.NavHostController
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.cineflix.Retrofit.ApiService
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +37,7 @@ fun AddProfileScreen(navController: NavHostController) {
     var isChildrenProfile by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color(0xFF121212), // Dark background
+        containerColor = Color(0xFF121212),
         topBar = {
             TopAppBar(
                 title = { Text("Add Profile", color = Color.White) },
@@ -38,7 +48,7 @@ fun AddProfileScreen(navController: NavHostController) {
                 },
                 actions = {
                     TextButton(
-                        onClick = { /* Save logic */ },
+                        onClick = {  },
                         enabled = profileName.isNotBlank()
                     ) {
                         Text("Save", color = if (profileName.isNotBlank()) Color.White else Color.Gray)
@@ -66,7 +76,6 @@ fun AddProfileScreen(navController: NavHostController) {
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Text("😊", fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
-
                 Box(
                     modifier = Modifier
                         .size(32.dp)
@@ -86,10 +95,7 @@ fun AddProfileScreen(navController: NavHostController) {
                     )
                 }
             }
-
-
             Spacer(modifier = Modifier.height(24.dp))
-
             OutlinedTextField(
                 value = profileName,
                 onValueChange = { profileName = it },
@@ -107,11 +113,9 @@ fun AddProfileScreen(navController: NavHostController) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp) // Reduced height
+                    .height(52.dp)
             )
-
             Spacer(modifier = Modifier.height(24.dp))
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,10 +153,43 @@ fun AddProfileScreen(navController: NavHostController) {
     }
 }
 
+fun uploadLogo(
+    context: Context,
+    apiService: ApiService,
+    logoUri: Uri,
+    userId: String,
+    onResult: (Boolean, String?) -> Unit
+) {
+    val contentResolver = context.contentResolver
+    val inputStream = contentResolver?.openInputStream(logoUri)
+    val bytes = inputStream?.readBytes()
+    val requestBody = bytes?.toRequestBody("image/*".toMediaTypeOrNull())
+    val logoPart = requestBody?.let {
+        MultipartBody.Part.createFormData("logo", "logo.png", it)
+    }
+    val companyIdPart = userId.toRequestBody("text/plain".toMediaTypeOrNull())
+    logoPart?.let {
+        apiService.uploadLogo(it, companyIdPart).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    onResult(true, response.body()?.string())
+                } else {
+                    onResult(false, null)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                onResult(false, null)
+            }
+        })
+    }
+}
+
 @Composable
 fun AddProfileScreenPreview() {
     AddProfileScreen(navController = rememberNavController())
 }
+
 @Preview(showSystemUi = true)
 @Composable
 fun PreviewAddProfileScreen() {
