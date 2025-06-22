@@ -54,7 +54,7 @@ fun SplashScreen(navController: NavController) {
             modifier = Modifier
                 .scale(scale)
                 .alpha(alpha)
-                .size(200.dp)
+                .size(300.dp)
         )
     }
 }

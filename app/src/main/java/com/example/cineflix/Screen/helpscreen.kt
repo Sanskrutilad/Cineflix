@@ -3,9 +3,11 @@ package com.example.cineflix.Screen
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -31,6 +34,7 @@ fun HelpScreen(navController : NavController) {
     val context = LocalContext.current
 
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             TopAppBar(
                 title = {
@@ -60,6 +64,7 @@ fun HelpScreen(navController : NavController) {
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(20.dp)
+                .background(Color.White)
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -67,7 +72,7 @@ fun HelpScreen(navController : NavController) {
             // Help Section
             Text(
                 text = "Find Help Online",
-                fontSize = 20.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
@@ -89,40 +94,57 @@ fun HelpScreen(navController : NavController) {
             // Contact section
             Text(
                 text = "Contact\nNetflix Customer Services",
-                fontSize = 18.sp,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = "We’ll connect the call for free using your\ninternet connection.",
-                fontSize = 14.sp,
+                fontSize = 18.sp,
                 color = Color.Black,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
             // Call and Chat Buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(onClick = {
-                    val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:0000000000")) // replace with real number
-                    context.startActivity(intent)
-                },colors = ButtonDefaults.buttonColors(Color.Black)) {
-                    Icon(Icons.Default.Call, contentDescription = "Call")
+                val buttonModifier = Modifier
+                    .height(48.dp)
+
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:0000000000")) // Replace with real number
+                        context.startActivity(intent)
+                    },
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Icon(Icons.Default.Call, contentDescription = "Call", tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("CALL")
+                    Text("CALL", color = Color.White)
                 }
 
-                Button(onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://help.netflix.com/en/contactus"))
-                    context.startActivity(intent)
-                },colors = ButtonDefaults.buttonColors(Color.Black)) {
-                    Icon(Icons.Default.Email, contentDescription = "Chat")
+                Button(
+                    onClick = {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://help.netflix.com/en/contactus"))
+                        context.startActivity(intent)
+                    },
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+                    shape = RoundedCornerShape(4.dp)
+                ) {
+                    Icon(Icons.Default.Email, contentDescription = "Chat", tint = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("CHAT")
+                    Text("CHAT", color = Color.White)
                 }
             }
+
+
         }
     }
 }
@@ -151,3 +173,4 @@ fun HelpOption(text: String, icon: ImageVector, url: String) {
         Text(text, fontSize = 16.sp , color = Color(0xFF1976D2) )
     }
 }
+
