@@ -2,7 +2,6 @@ package com.example.cineflix.Screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,15 +18,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.cineflix.R
-import com.example.cineflix.Viewmodel.LoginScreenViewModel
+import com.example.cineflix.Retrofit.ApiService
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixLoginScreen(
-
-) {
+fun NetflixLoginScreen(navController: NavHostController, apiService: ApiService) {
     Scaffold(
         topBar = { NetflixTopAppBar() },
         containerColor = Color.Black
@@ -182,13 +180,3 @@ fun NetflixTopAppBar() {
     )
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun NetflixLoginScreenPreview() {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.Black
-        ) {
-            NetflixLoginScreen()
-        }
-}

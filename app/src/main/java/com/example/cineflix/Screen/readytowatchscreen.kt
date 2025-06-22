@@ -1,5 +1,6 @@
 package com.example.cineflix.Screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,14 +33,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.cineflix.Viewmodel.LoginScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadyToWatchScreen(
     navController: NavController,
     onClose: () -> Unit = {},
-    onGetStarted: (String) -> Unit = {}
+    loginViewModel: LoginScreenViewModel = viewModel()
 ) {
     val emailState = remember { mutableStateOf("") }
 
@@ -49,7 +52,6 @@ fun ReadyToWatchScreen(
             .background(Color.White)
             .padding(24.dp)
     ) {
-        // Close (X) Button
         IconButton(
             onClick = onClose,
             modifier = Modifier.align(Alignment.TopEnd)
@@ -88,7 +90,7 @@ fun ReadyToWatchScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .border(
-                        BorderStroke(1.dp, Color(0xFF00C853)), // green outline
+                        BorderStroke(1.dp, Color(0xFF00C853)),
                         shape = RoundedCornerShape(6.dp)
                     ),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -103,12 +105,25 @@ fun ReadyToWatchScreen(
                 ),
                 shape = RoundedCornerShape(6.dp)
             )
-
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Get Started Button
             Button(
-                onClick = { navController.navigate("Signupscreen") },
+                onClick = {
+                    val email = emailState.value.trim()
+                    if (email.isNotEmpty()) {
+                        loginViewModel.isUserRegistered(email) { isRegistered ->
+                            if (isRegistered) {
+                                Log.d("FB", "Navigating to loginscreen for: $email")
+                                navController.navigate("loginscreen")
+                            } else {
+                                Log.d("FB", "Navigating to signupscreen for: $email")
+                                navController.navigate("signupscreen")
+                            }
+                        }
+                    } else {
+                        Log.d("FB", "Email is empty.")
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),

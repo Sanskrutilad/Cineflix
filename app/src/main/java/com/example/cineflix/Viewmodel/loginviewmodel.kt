@@ -16,9 +16,7 @@ class LoginScreenViewModel() : ViewModel() {
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
-    /**
-     * Sign in user with email and password.
-     */
+
     fun signInWithEmailAndPassword(
         email: String,
         password: String,
@@ -39,9 +37,6 @@ class LoginScreenViewModel() : ViewModel() {
         }
     }
 
-    /**
-     * Create new user with email and password.
-     */
     fun createUserWithEmailAndPassword(
         email: String,
         password: String,
@@ -63,9 +58,6 @@ class LoginScreenViewModel() : ViewModel() {
         }
     }
 
-    /**
-     * Create user document in Firestore.
-     */
     private fun createUser(displayName: String?) {
         val userId = auth.currentUser?.uid ?: return
         val user = MUser(
@@ -86,6 +78,28 @@ class LoginScreenViewModel() : ViewModel() {
                 Log.e("FB", "Error creating user document: ${exception.message}")
             }
     }
+
+    fun isUserRegistered(
+        email: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        val cleanEmail = email.trim().lowercase()
+        auth.fetchSignInMethodsForEmail(cleanEmail)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val signInMethods = task.result?.signInMethods
+                    Log.d("FB", "SignInMethods for $cleanEmail: $signInMethods")
+
+                    val isRegistered = signInMethods?.contains("password") == true
+                    onResult(isRegistered)
+                } else {
+                    Log.e("FB", "Failed to fetch sign-in methods: ${task.exception?.message}")
+                    onResult(false)
+                }
+            }
+    }
+
+
 }
 data class MUser(val id: String?,
                  val userId: String,

@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
+import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
 
 
@@ -15,12 +16,15 @@ import com.example.cineflix.Screen.ReadyToWatchScreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "whoswatching") {
+    NavHost(navController = navController, startDestination = "ReadyToWatchScreen") {
         composable("ReadyToWatchScreen") {
             ReadyToWatchScreen(navController)
         }
         composable("Signupscreen") {
             NetflixCreateAccountScreen(navController)
+        }
+        composable("loginscreen") {
+            NetflixLoginScreen(navController,apiService)
         }
         composable("whoswatching") {
             AddProfileScreen(navController,apiService)
