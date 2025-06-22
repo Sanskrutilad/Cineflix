@@ -7,21 +7,29 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
+import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
+import com.example.cineflix.Screen.SplashScreen
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "ReadyToWatchScreen") {
+    NavHost(navController = navController, startDestination = "Splashscreen") {
+        composable("Splashscreen") {
+            SplashScreen(navController)
+        }
         composable("ReadyToWatchScreen") {
             ReadyToWatchScreen(navController)
         }
         composable("Signupscreen") {
             NetflixCreateAccountScreen(navController)
+        }
+        composable("Helpscreen") {
+            HelpScreen(navController)
         }
         composable("loginscreen") {
             NetflixLoginScreen(navController,apiService)

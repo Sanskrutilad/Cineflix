@@ -43,7 +43,7 @@ fun NetflixCreateAccountScreen(
                 },
 
                 actions = {
-                    TextButton(onClick = { }) {
+                    TextButton(onClick = {navController.navigate("Helpscreen") }) {
                         Text("HELP", color = Color.Black)
                     }
                     TextButton(onClick = { navController.navigate("login") }) {
