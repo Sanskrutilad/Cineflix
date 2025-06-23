@@ -66,4 +66,7 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation(libs.coil.compose)
+    implementation ("androidx.compose.material:material-icons-extended:1.6.0")
+    implementation("io.coil-kt:coil-compose:2.5.0") // Or latest
+
 }
