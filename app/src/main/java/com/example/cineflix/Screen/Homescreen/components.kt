@@ -1,5 +1,7 @@
 package com.example.cineflix.Screen.Homescreen
 
+import android.content.res.Resources
+import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -8,8 +10,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -41,7 +46,11 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Outline.Rectangle
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -68,9 +77,8 @@ fun NetflixTopBarScreen() {
             state = scrollState,
             modifier = Modifier.padding(paddingValues)
         ) {
-            item {
-                TopAppBarContent()
-            }
+            item { TopAppBarContent() }
+
             item {
                 AnimatedVisibility(
                     visible = showChips,
@@ -80,27 +88,16 @@ fun NetflixTopBarScreen() {
                     FilterChipsRow()
                 }
             }
-            item{
-                FeaturedBanner()
-            }
-            item{
-                MobileGamesSection()
-            }
 
-            items(50) { index ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .background(Color.DarkGray)
-                        .padding(8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
+            item { FeaturedBanner() }
 
-                    Text("Content #$index", color = Color.White)
-                }
+            item { MobileGamesSection() }
+
+            item {
+                NetflixHomeScreen() // This now just inserts composables, no inner LazyColumn
             }
         }
+
     }
 }
 
@@ -164,8 +161,9 @@ fun FeaturedBanner() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
-                .height(400.dp)
+                .clickable{ }
+                .padding(15.dp)
+                .height(500.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.DarkGray),
             contentAlignment = Alignment.BottomCenter
@@ -178,7 +176,7 @@ fun FeaturedBanner() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { /* Play action */ },
+                    onClick = {  },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
@@ -197,7 +195,7 @@ fun FeaturedBanner() {
                 Spacer(modifier = Modifier.width(12.dp))
 
                 OutlinedButton(
-                    onClick = { /* Add to list action */ },
+                    onClick = {  },
                     border = BorderStroke(1.dp, Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
@@ -215,10 +213,7 @@ fun FeaturedBanner() {
             }
 
         }
-
         Spacer(modifier = Modifier.height(12.dp))
-
-
     }
 }
 
@@ -242,8 +237,6 @@ fun MobileGamesSection() {
                 Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
             }
         }
-
-
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyRow {
@@ -326,6 +319,78 @@ fun BottomBar(selected: String = "Home") {
             }
         }
     }
+}
+
+@Composable
+fun MovieCard(
+    title: String,
+    imageRes: Int,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val safeImageRes = try {
+        context.resources.getResourceName(imageRes) // Just a check
+        imageRes
+    } catch (e: Resources.NotFoundException) {
+        Log.e("MovieCard", "Invalid image resource for $title: ${e.message}")
+        android.R.drawable.ic_menu_report_image
+    }
+
+    Column(
+        modifier = modifier
+            .width(140.dp)
+            .padding(8.dp)
+    ) {
+        Image(
+            painter = painterResource(id = safeImageRes),
+            contentDescription = title,
+            modifier = Modifier
+                .height(180.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray),
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+
+
+@Composable
+fun MovieSection(title: String, movies: List<Pair<String, Int>>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
+        )
+        LazyRow {
+            items(movies) { movie ->
+                MovieCard(title = movie.first, imageRes = movie.second)
+            }
+        }
+    }
+}
+
+@Composable
+fun NetflixHomeScreen() {
+    val bollywoodMovies = listOf(
+        "Zindagi Na Milegi Dobara" to R.drawable.prof,
+        "Kal Ho Naa Ho" to R.drawable.prof,
+        "Kabhi Khushi Kabhie Gham" to R.drawable.prof
+    )
+    MovieSection(title = "Bollywood Movies", movies = bollywoodMovies)
+
 }
 
 
