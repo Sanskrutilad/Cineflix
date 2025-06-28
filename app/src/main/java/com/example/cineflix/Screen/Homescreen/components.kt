@@ -168,7 +168,6 @@ fun FeaturedBanner() {
                 .background(Color.DarkGray),
             contentAlignment = Alignment.BottomCenter
         ) {
-
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier.fillMaxWidth().padding(10.dp),
@@ -182,30 +181,33 @@ fun FeaturedBanner() {
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
+                        .padding(start=10.dp,end=5.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Play",
-                        tint = Color.Black
+                        tint = Color.Black,
+                        modifier = Modifier.size(35.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Play", color = Color.Black, fontWeight = FontWeight.SemiBold)
+                    Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 23.sp)
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 OutlinedButton(
                     onClick = {  },
-                    border = BorderStroke(1.dp, Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
+                        .padding(start=5.dp,end=10.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add, // Or use Icons.Default.BookmarkBorder
+                        imageVector = Icons.Default.Add,
                         contentDescription = "+ My List",
-                        tint = Color.White
+                        tint = Color.White,
+                        modifier = Modifier.size(35.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(" My List", color = Color.White, fontWeight = FontWeight.SemiBold)
@@ -355,8 +357,9 @@ fun MovieCard(
 
         Text(
             text = title,
-            style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -370,8 +373,9 @@ fun MovieSection(title: String, movies: List<Pair<String, Int>>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.titleMedium,
+            color = Color.White,
+            fontWeight = FontWeight.Medium,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
         )
         LazyRow {
@@ -390,7 +394,6 @@ fun NetflixHomeScreen() {
         "Kabhi Khushi Kabhie Gham" to R.drawable.prof
     )
     MovieSection(title = "Bollywood Movies", movies = bollywoodMovies)
-
 }
 
 
