@@ -226,37 +226,87 @@ fun MobileGamesSection() {
         ) {
             Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold)
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("See All", color = Color.White)
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
             }
         }
+
         Spacer(modifier = Modifier.height(8.dp))
 
+        val gameList = listOf(
+            Game("https://i.imgur.com/WJ6mPci.png", "Squid Game: Unleashed", "Action"),
+            Game("https://i.imgur.com/WJ6mPci.png", "Stranger Things 3", "Adventure"),
+            Game("https://i.imgur.com/WJ6mPci.png", "Hextech Mayhem", "Music"),
+            Game("https://i.imgur.com/WJ6mPci.png", "Twelve Minutes", "Thriller"),
+            Game("https://i.imgur.com/WJ6mPci.png", "Before Your Eyes", "Narrative")
+        )
+
         LazyRow {
-            items(5) { index ->
+            items(gameList) { game ->
                 Card(
                     modifier = Modifier
-                        .size(120.dp)
-                        .padding(end = 8.dp)
-                        .clickable {
-
-                        },
-                    colors = CardDefaults.cardColors(containerColor = Color.Gray),
+                        .width(140.dp)
+                        .padding(end = 12.dp)
+                        .clickable {},
+                    colors = CardDefaults.cardColors(containerColor = Color.Black),
                     shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text("Game ${index + 1}", color = Color.White, fontSize = 14.sp)
+                    Column(
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Box(modifier = Modifier.height(100.dp)) {
+                            AsyncImage(
+                                model = game.imageUrl,
+                                contentDescription = game.title,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.DarkGray)
+                            )
+                            Text(
+                                text = "New Update",
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .background(Color.Red, shape = RoundedCornerShape(4.dp))
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    .offset(x = 6.dp, y = 6.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = game.title,
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+
+                        Text(
+                            text = game.genre,
+                            color = Color.Gray,
+                            fontSize = 11.sp
+                        )
                     }
                 }
             }
         }
     }
 }
+
+data class Game(
+    val imageUrl: String,
+    val title: String,
+    val genre: String
+)
 
 @Composable
 fun BottomBar(selected: String = "Home") {
