@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class FirebaseAuthViewModel : ViewModel() {
-
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val _currentUser = MutableLiveData<FirebaseUser?>(auth.currentUser)
     val currentUser: LiveData<FirebaseUser?> = _currentUser
@@ -27,6 +26,7 @@ class FirebaseAuthViewModel : ViewModel() {
                     _authError.value = task.exception?.localizedMessage ?: "Sign up failed"
                 }
             }
+
     }
 
     fun signIn(email: String, password: String) {

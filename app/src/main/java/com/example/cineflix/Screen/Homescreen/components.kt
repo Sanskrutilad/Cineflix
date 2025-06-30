@@ -3,7 +3,6 @@ package com.example.cineflix.Screen.Homescreen
 import android.content.res.Resources
 import android.util.Log
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,9 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -43,8 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Outline.Rectangle
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -53,9 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.R // update with your actual package
+import com.example.cineflix.Retrofit.MovieResponse
+import com.example.cineflix.Retrofit.NetflixViewModel
 
 @Composable
 fun NetflixTopBarScreen() {
@@ -94,7 +91,7 @@ fun NetflixTopBarScreen() {
             item { MobileGamesSection() }
 
             item {
-                NetflixHomeScreen() // This now just inserts composables, no inner LazyColumn
+                NetflixHomeScreen()
             }
         }
 
@@ -113,14 +110,14 @@ fun TopAppBarContent() {
         AsyncImage(
             model = R.drawable.netlogo,
             contentDescription = "Netflix Logo",
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier.size(86.dp)
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Icon(Icons.Default.Download, contentDescription = "Downloads", tint = Color.White)
+        Icon(Icons.Default.Download, contentDescription ="Downloads",tint = Color.White,modifier=Modifier.size(35.dp))
         Spacer(modifier = Modifier.width(16.dp))
-        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White)
+        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White,modifier=Modifier.size(35.dp))
     }
 }
 
@@ -189,12 +186,10 @@ fun FeaturedBanner() {
                         tint = Color.Black,
                         modifier = Modifier.size(35.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(1.dp))
                     Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 23.sp)
                 }
-
                 Spacer(modifier = Modifier.width(12.dp))
-
                 OutlinedButton(
                     onClick = {  },
                     shape = RectangleShape,
@@ -205,12 +200,12 @@ fun FeaturedBanner() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "+ My List",
+                        contentDescription = "+My List",
                         tint = Color.White,
                         modifier = Modifier.size(35.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(" My List", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Spacer(modifier = Modifier.width(1.dp))
+                    Text("My List", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -248,7 +243,7 @@ fun MobileGamesSection() {
                         .size(120.dp)
                         .padding(end = 8.dp)
                         .clickable {
-                            // Handle card click here
+
                         },
                     colors = CardDefaults.cardColors(containerColor = Color.Gray),
                     shape = RoundedCornerShape(12.dp),
@@ -262,7 +257,6 @@ fun MobileGamesSection() {
         }
     }
 }
-
 
 @Composable
 fun BottomBar(selected: String = "Home") {
@@ -325,51 +319,29 @@ fun BottomBar(selected: String = "Home") {
 
 @Composable
 fun MovieCard(
-    title: String,
-    imageRes: Int,
+    movie: MovieResponse,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val safeImageRes = try {
-        context.resources.getResourceName(imageRes) // Just a check
-        imageRes
-    } catch (e: Resources.NotFoundException) {
-        Log.e("MovieCard", "Invalid image resource for $title: ${e.message}")
-        android.R.drawable.ic_menu_report_image
-    }
-
     Column(
         modifier = modifier
             .width(140.dp)
             .padding(8.dp)
     ) {
-        Image(
-            painter = painterResource(id = safeImageRes),
-            contentDescription = title,
+        AsyncImage(
+            model = movie.Poster,
+            contentDescription = movie.Title,
             modifier = Modifier
                 .height(180.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.Gray),
+                .background(Color.DarkGray),
             contentScale = ContentScale.Crop
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.White,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 
-
-
 @Composable
-fun MovieSection(title: String, movies: List<Pair<String, Int>>) {
+fun MovieSection(title: String, movies: List<MovieResponse>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -380,20 +352,32 @@ fun MovieSection(title: String, movies: List<Pair<String, Int>>) {
         )
         LazyRow {
             items(movies) { movie ->
-                MovieCard(title = movie.first, imageRes = movie.second)
+                MovieCard(movie = movie)
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
 @Composable
 fun NetflixHomeScreen() {
-    val bollywoodMovies = listOf(
-        "Zindagi Na Milegi Dobara" to R.drawable.prof,
-        "Kal Ho Naa Ho" to R.drawable.prof,
-        "Kabhi Khushi Kabhie Gham" to R.drawable.prof
-    )
-    MovieSection(title = "Bollywood Movies", movies = bollywoodMovies)
+    val movieviewmodel: NetflixViewModel = viewModel()
+    val bollywood = movieviewmodel.bollywood
+    val onlyOnNetflix = movieviewmodel.onlyOnNetflix
+    val kDramas = movieviewmodel.kDramas
+
+    Column {
+        MovieSection(title = "Bollywood Movies", movies = bollywood)
+        MovieSection(title = "Top 10 Mobile Games", movies = kDramas.shuffled())
+        MovieSection(title = "Only on Netflix", movies = onlyOnNetflix)
+        MovieSection(title = "K-Dramas", movies = kDramas)
+        MovieSection(title = "New on Netflix", movies = kDramas.shuffled())
+        MovieSection(title = "Comedy Movies", movies = kDramas.shuffled())
+        MovieSection(title = "Only on Netflix", movies = kDramas.shuffled())
+        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = kDramas.shuffled())
+        MovieSection(title = "Top 10 Movies in India Today", movies = kDramas.shuffled())
+        MovieSection(title = "Hollywood Movies", movies = kDramas.shuffled())
+    }
 }
 
 

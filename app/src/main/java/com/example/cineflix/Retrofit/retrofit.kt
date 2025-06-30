@@ -17,6 +17,16 @@ data class PersonalData(
     val employee: String
 )
 
+data class MovieResponse(
+    val Title: String = "",
+    val Year: String = "",
+    val Poster: String = "",
+    val imdbID: String = "",
+    val Type: String = "",
+    val Response: String = ""
+)
+
+
 interface ApiService {
 
     @Multipart
@@ -28,6 +38,30 @@ interface ApiService {
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(@Path("companyId") companyId: String): Response<ResponseBody>
+}
+
+interface OmdbApiService {
+
+    @GET("/")
+    suspend fun getMovieByTitle(
+        @retrofit2.http.Query("t") title: String,
+        @retrofit2.http.Query("apikey") apiKey: String
+    ): MovieResponse
+
+    @GET("/")
+    suspend fun getMovieById(
+        @retrofit2.http.Query("i") imdbId: String,
+        @retrofit2.http.Query("apikey") apiKey: String
+    ): MovieResponse
+}
+
+object OmdbRetrofitInstance {
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://www.omdbapi.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val api: OmdbApiService = retrofit.create(OmdbApiService::class.java)
 }
 
 fun createApiService(): ApiService {
