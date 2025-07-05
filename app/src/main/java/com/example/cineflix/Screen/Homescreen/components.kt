@@ -415,18 +415,21 @@ fun NetflixHomeScreen() {
     val bollywood = movieviewmodel.bollywood
     val onlyOnNetflix = movieviewmodel.onlyOnNetflix
     val kDramas = movieviewmodel.kDramas
-
+    val comedyMovies = movieviewmodel.comedyMovies
+    val fantasyMovies = movieviewmodel.fantasyMovies
+    val susTvShows = movieviewmodel.susTvShows
+    val hollywoodMovies = movieviewmodel.hollywoodMovies
     Column {
         MovieSection(title = "Bollywood Movies", movies = bollywood)
         MovieSection(title = "Top 10 Mobile Games", movies = kDramas.shuffled())
+        MovieSection(title = "Top 10 Movies on Netflix", movies = kDramas.shuffled())
         MovieSection(title = "Only on Netflix", movies = onlyOnNetflix)
         MovieSection(title = "K-Dramas", movies = kDramas)
-        MovieSection(title = "New on Netflix", movies = kDramas.shuffled())
-        MovieSection(title = "Comedy Movies", movies = kDramas.shuffled())
-        MovieSection(title = "Only on Netflix", movies = kDramas.shuffled())
-        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = kDramas.shuffled())
-        MovieSection(title = "Top 10 Movies in India Today", movies = kDramas.shuffled())
-        MovieSection(title = "Hollywood Movies", movies = kDramas.shuffled())
+        MovieSection(title = "New on Netflix", movies = onlyOnNetflix.shuffled() )
+        MovieSection(title = "Comedy Movies", movies = comedyMovies)
+        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = fantasyMovies)
+        //MovieSection(title = "Hollywood Movies", movies = hollywoodMovies)
+        MovieSection(title = "Suspenseful Tv Shows", movies = susTvShows)
     }
 }
 
