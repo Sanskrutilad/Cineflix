@@ -21,16 +21,16 @@ class NetflixViewModel : ViewModel() {
 
     private fun fetchMovieList() {
         viewModelScope.launch {
-            bollywood = fetchMovies(listOf("Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2"))
-            onlyOnNetflix = fetchMovies(listOf("Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2"))
-            kDramas = fetchMovies(listOf("Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2"))
+            bollywood = fetchMovies(listOf("tt7286456", "tt7286456", "tt7286456"))
+//            onlyOnNetflix = fetchMovies(listOf("Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2"))
+//            kDramas = fetchMovies(listOf("Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2", "Guardians of the Galaxy Vol. 2"))
         }
     }
 
     private suspend fun fetchMovies(titles: List<String>): List<MovieResponse> {
         return titles.mapNotNull { title ->
             try {
-                val response = OmdbRetrofitInstance.api.getMovieByTitle(title, apiKey)
+                val response = OmdbRetrofitInstance.api.getMovieById(title, apiKey)
                 if (response.Response == "True") {
                     Log.d("NetflixViewModel", "Loaded movie: ${response.Title}")
                     response
