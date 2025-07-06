@@ -18,11 +18,16 @@ data class PersonalData(
 )
 
 data class MovieResponse(
-    val Title: String = "",
-    val Year: String = "",
+    val title: String,
+    val year: String,
+    val rating: String,
+    val duration: String,
+    val languages: List<String>,
+    val description: String,
+    val cast: List<String>,
+    val director: String,
     val Poster: String = "",
-    val imdbID: String = "",
-    val Type: String = "",
+    val thumbnailResId: Int, // Resource ID of the image
     val Response: String = ""
 )
 

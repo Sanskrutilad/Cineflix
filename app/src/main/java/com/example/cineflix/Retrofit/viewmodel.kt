@@ -42,7 +42,7 @@ class NetflixViewModel : ViewModel() {
             try {
                 val response = OmdbRetrofitInstance.api.getMovieById(title, apiKey)
                 if (response.Response == "True") {
-                    Log.d("NetflixViewModel", "Loaded movie: ${response.Title}")
+                    Log.d("NetflixViewModel", "Loaded movie: ${response.title}")
                     response
                 } else {
                     Log.e("NetflixViewModel", "Movie not found: $title")

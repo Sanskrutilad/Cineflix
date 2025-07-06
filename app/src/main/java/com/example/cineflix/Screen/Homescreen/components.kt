@@ -1,8 +1,10 @@
 package com.example.cineflix.Screen.Homescreen
 
 import android.content.res.Resources
+import android.graphics.Movie
 import android.util.Log
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,12 +13,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Cast
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
@@ -379,7 +386,7 @@ fun MovieCard(
     ) {
         AsyncImage(
             model = movie.Poster,
-            contentDescription = movie.Title,
+            contentDescription = movie.title,
             modifier = Modifier
                 .height(180.dp)
                 .clip(RoundedCornerShape(8.dp))
@@ -433,6 +440,102 @@ fun NetflixHomeScreen() {
     }
 }
 
+@Composable
+fun MovieDetailScreen(movie: MovieResponse) {
+    val scrollState = rememberScrollState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .background(Color.Black)
+            .padding(bottom = 60.dp)
+    ) {
+        // Thumbnail and header icons
+        Box {
+            Image(
+                painter = painterResource(id = movie.thumbnailResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                Row {
+                    Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White)
+                    Spacer(Modifier.width(16.dp))
+                    Icon(Icons.Default.FileDownload, contentDescription = "Download", tint = Color.White)
+                }
+            }
+        }
+
+        // Red progress bar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(4.dp)
+                .background(Color.DarkGray)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.2f)
+                    .height(4.dp)
+                    .background(Color.Red)
+            )
+        }
+
+        // Movie Info
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(movie.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(4.dp))
+            Text("${movie.year} • ${movie.rating} • ${movie.duration}", color = Color.Gray, fontSize = 14.sp)
+
+            Spacer(Modifier.height(8.dp))
+            Text("Watch in ${movie.languages.joinToString()}", color = Color.White, fontWeight = FontWeight.Medium)
+
+            Spacer(Modifier.height(16.dp))
+
+            Button(
+                onClick = { },
+                colors = ButtonDefaults.buttonColors( Color.White),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RectangleShape
+            ) {
+                Icon(Icons.Default.PlayArrow, modifier = Modifier.size(30.dp), contentDescription = null, tint = Color.Black)
+                Spacer(Modifier.width(6.dp))
+                Text("Play", color = Color.Black, fontSize = 20.sp)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedButton(
+                onClick = {  },
+                colors = ButtonDefaults.buttonColors( Color(0xFF1C1C1E)),
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                 shape = RectangleShape
+            ) {
+                Icon(Icons.Default.FileDownload, contentDescription = null, tint = Color.White)
+                Spacer(Modifier.width(8.dp))
+                Text("Download", color = Color.White, fontSize = 20.sp)
+            }
+
+            Spacer(Modifier.height(16.dp))
+            Text(movie.description, color = Color.White)
+
+            Spacer(Modifier.height(8.dp))
+            Text("Starring: ${movie.cast.joinToString()}", color = Color.Gray)
+            Text("Director: ${movie.director}", color = Color.Gray)
+        }
+    }
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
@@ -443,4 +546,21 @@ fun NetflixTopBarPreview() {
     ) {
         NetflixTopBarScreen()
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun PreviewMovieDetailScreen() {
+    val raid2 = MovieResponse(
+        title = "Raid 2",
+        year = "2025",
+        rating = "U/A 13+",
+        duration = "2h 17m",
+        languages = listOf("Hindi", "Portuguese", "Spanish"),
+        description = "Transferred to a small town in Rajasthan, an honest income tax officer pursues a beloved politician whose public good deeds conceal rampant corruption.",
+        cast = listOf("Ajay Devgn", "Riteish Deshmukh", "Vaani Kapoor"),
+        director = "Raj Kumar Gupta",
+        thumbnailResId = R.drawable.netflixlogo // Add this image to your drawable folder
+    )
+
+    MovieDetailScreen(movie = raid2)
 }
