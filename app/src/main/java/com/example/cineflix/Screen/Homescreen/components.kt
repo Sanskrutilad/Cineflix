@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Cast
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Home
@@ -38,6 +40,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -221,6 +224,116 @@ fun FeaturedBanner() {
         }
         Spacer(modifier = Modifier.height(12.dp))
     }
+}
+@Composable
+fun MovieDetailsScreen(
+    movieTitle: String,
+    cast: List<String>,
+    director: String,
+    writers: List<String>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        Spacer(modifier = Modifier.height(28.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF242426))
+//                .padding(24.dp)
+                .verticalScroll(rememberScrollState())
+                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Title
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+            ) {
+                // Title centered
+                Text(
+                    text = movieTitle,
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.15f)) 
+                ) {
+                    IconButton(
+                        onClick = { /* close action */ },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color.White
+                        )
+                    }
+                }
+
+            }
+
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Cast Header
+            SectionHeader(title = "Cast")
+            Spacer(modifier = Modifier.height(24.dp))
+            cast.forEach { actor ->
+                Text(
+                    text = actor,
+                    fontSize = 21.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(22.dp))
+            }
+
+
+            // Director
+            SectionHeader(title = "Director")
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = director,
+                fontSize = 24.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            SectionHeader(title = "Writers")
+            Spacer(modifier = Modifier.height(24.dp))
+            writers.forEach { writer ->
+                Text(
+                    text = writer,
+                    fontSize = 24.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.White
+    )
 }
 
 @Composable
@@ -577,18 +690,21 @@ fun NetflixTopBarPreview() {
 }
 @Preview(showBackground = true)
 @Composable
-fun PreviewMovieDetailScreen() {
-    val raid2 = MovieResponse(
-        title = "Raid 2",
-        year = "2025",
-        rating = "U/A 13+",
-        duration = "2h 17m",
-        languages = listOf("Hindi", "Portuguese", "Spanish"),
-        description = "Transferred to a small town in Rajasthan, an honest income tax officer pursues a beloved politician whose public good deeds conceal rampant corruption.",
-        cast = listOf("Ajay Devgn", "Riteish Deshmukh", "Vaani Kapoor"),
-        director = "Raj Kumar Gupta",
-        thumbnailResId = R.drawable.netflixlogo // Add this image to your drawable folder
+
+fun PreviewMovieDetails() {
+    val cast = listOf(
+        "Ajay Devgn", "Riteish Deshmukh", "Vaani Kapoor", "Saurabh Shukla",
+        "Supriya Pathak", "Rajat Kapoor", "Amit Sial", "Brijendra Kala",
+        "Yashpal Sharma", "Govind Namdeo"
     )
 
-    MovieDetailScreen(movie = raid2)
+    val director = "Raj Kumar Gupta"
+    val writers = listOf("Ritesh Shah")
+
+    MovieDetailsScreen(
+        movieTitle = "Raid 2",
+        cast = cast,
+        director = director,
+        writers = writers
+    )
 }
