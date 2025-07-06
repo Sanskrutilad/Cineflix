@@ -28,6 +28,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.BottomAppBar
@@ -533,6 +535,32 @@ fun MovieDetailScreen(movie: MovieResponse) {
             Spacer(Modifier.height(8.dp))
             Text("Starring: ${movie.cast.joinToString()}", color = Color.Gray)
             Text("Director: ${movie.director}", color = Color.Gray)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.Add, contentDescription = "My List", tint = Color.White,modifier = Modifier.size(35.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("My List", color = Color.White, fontSize = 12.sp)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.ThumbUp, contentDescription = "Rate", tint = Color.White,modifier = Modifier.size(30.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Rate", color = Color.White, fontSize = 12.sp)
+                }
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White,modifier = Modifier.size(30.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Share", color = Color.White, fontSize = 12.sp)
+                }
+            }
+
         }
     }
 }
