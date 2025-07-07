@@ -1,10 +1,6 @@
 package com.example.cineflix.Screen.Homescreen
 
-import android.content.res.Resources
-import android.graphics.Movie
-import android.util.Log
 import androidx.compose.animation.*
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,12 +35,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,20 +50,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R // update with your actual package
 import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Retrofit.NetflixViewModel
 
 @Composable
-fun NetflixTopBarScreen() {
+fun NetflixTopBarScreen(navController: NavHostController) {
     val scrollState = rememberLazyListState()
 
     val showChips by remember {
@@ -75,7 +71,6 @@ fun NetflixTopBarScreen() {
             scrollState.firstVisibleItemIndex == 0 && scrollState.firstVisibleItemScrollOffset < 20
         }
     }
-
     Scaffold(
         containerColor = Color.Black,
         bottomBar = {
@@ -103,7 +98,7 @@ fun NetflixTopBarScreen() {
             item { MobileGamesSection() }
 
             item {
-                NetflixHomeScreen()
+                NetflixHomeScreen(navController)
             }
         }
 
@@ -225,106 +220,133 @@ fun FeaturedBanner() {
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
-@Composable
-fun MovieDetailsScreen(
-    movieTitle: String,
-    cast: List<String>,
-    director: String,
-    writers: List<String>
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        Spacer(modifier = Modifier.height(28.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF242426))
-//                .padding(24.dp)
-                .verticalScroll(rememberScrollState())
-                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Title
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
-                // Title centered
-                Text(
-                    text = movieTitle,
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.15f)) 
-                ) {
-                    IconButton(
-                        onClick = { /* close action */ },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = Color.White
-                        )
-                    }
-                }
 
-            }
-
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Cast Header
-            SectionHeader(title = "Cast")
-            Spacer(modifier = Modifier.height(24.dp))
-            cast.forEach { actor ->
-                Text(
-                    text = actor,
-                    fontSize = 21.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                Spacer(modifier = Modifier.height(22.dp))
-            }
-
-
-            // Director
-            SectionHeader(title = "Director")
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = director,
-                fontSize = 24.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            SectionHeader(title = "Writers")
-            Spacer(modifier = Modifier.height(24.dp))
-            writers.forEach { writer ->
-                Text(
-                    text = writer,
-                    fontSize = 24.sp,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-        }
-    }
-}
+//@Composable
+//fun MovieDetailsScreen(
+//    movieTitle: String,
+//    cast: List<String>,
+//    director: String,
+//    writers: List<String>
+//) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.Black)
+//    ) {
+//        Spacer(modifier = Modifier.height(28.dp))
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(Color(0xFF242426))
+////                .padding(24.dp)
+//                .verticalScroll(rememberScrollState())
+//                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            // Title
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 20.dp, vertical = 16.dp)
+//            ) {
+//                // Title centered
+//                Text(
+//                    text = movieTitle,
+//                    fontSize = 25.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    color = Color.White,
+//                    modifier = Modifier.align(Alignment.Center)
+//                )
+//                Box(
+//                    modifier = Modifier
+//                        .align(Alignment.TopEnd)
+//                        .padding(8.dp)
+//                        .size(36.dp)
+//                        .clip(CircleShape)
+//                        .background(Color.White.copy(alpha = 0.15f))
+//                ) {
+//                    IconButton(
+//                        onClick = { /* close action */ },
+//                        modifier = Modifier.fillMaxSize()
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Close,
+//                            contentDescription = "Close",
+//                            tint = Color.White
+//                        )
+//                    }
+//                }
+//
+//            }
+//
+//
+//            Spacer(modifier = Modifier.height(4.dp))
+//
+//            // Cast Header
+//            SectionHeader(title = "Cast")
+//            Spacer(modifier = Modifier.height(24.dp))
+//            cast.forEach { actor ->
+//                Text(
+//                    text = actor,
+//                    fontSize = 21.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(vertical = 4.dp)
+//                )
+//                Spacer(modifier = Modifier.height(22.dp))
+//            }
+//
+//
+//            // Director
+//            SectionHeader(title = "Director")
+//            Spacer(modifier = Modifier.height(24.dp))
+//            Text(
+//                text = director,
+//                fontSize = 24.sp,
+//                color = Color.Gray,
+//                modifier = Modifier.padding(vertical = 4.dp)
+//            )
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            SectionHeader(title = "Writers")
+//            Spacer(modifier = Modifier.height(24.dp))
+//            writers.forEach { writer ->
+//                Text(
+//                    text = writer,
+//                    fontSize = 24.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(vertical = 4.dp)
+//                )
+//            }
+//
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            SectionHeader(title = "Maturity Rating")
+//            Spacer(modifier = Modifier.height(24.dp))
+//            writers.forEach { writer ->
+//                Text(
+//                    text = writer,
+//                    fontSize = 24.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(vertical = 4.dp)
+//                )
+//            }
+//            Spacer(modifier = Modifier.height(24.dp))
+//
+//            SectionHeader(title = "Maturity Rating")
+//            Spacer(modifier = Modifier.height(24.dp))
+//            writers.forEach { writer ->
+//                Text(
+//                    text = writer,
+//                    fontSize = 24.sp,
+//                    color = Color.Gray,
+//                    modifier = Modifier.padding(vertical = 4.dp)
+//                )
+//            }
+//
+//        }
+//    }
+//}
 
 @Composable
 fun SectionHeader(title: String) {
@@ -492,10 +514,11 @@ fun BottomBar(selected: String = "Home") {
 @Composable
 fun MovieCard(
     movie: MovieResponse,
-    modifier: Modifier = Modifier
+    navController: NavHostController
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
+            .clickable {navController.navigate("MoviedetailScreen/${movie.Imdbid}")  }
             .width(140.dp)
             .padding(8.dp)
     ) {
@@ -508,12 +531,11 @@ fun MovieCard(
                 .background(Color.DarkGray),
             contentScale = ContentScale.Crop
         )
-
     }
 }
 
 @Composable
-fun MovieSection(title: String, movies: List<MovieResponse>) {
+fun MovieSection(title: String, movies: List<MovieResponse>,navController: NavHostController) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -524,7 +546,7 @@ fun MovieSection(title: String, movies: List<MovieResponse>) {
         )
         LazyRow {
             items(movies) { movie ->
-                MovieCard(movie = movie)
+                MovieCard(movie = movie,navController)
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
@@ -532,7 +554,7 @@ fun MovieSection(title: String, movies: List<MovieResponse>) {
 }
 
 @Composable
-fun NetflixHomeScreen() {
+fun NetflixHomeScreen(navController: NavHostController) {
     val movieviewmodel: NetflixViewModel = viewModel()
     val bollywood = movieviewmodel.bollywood
     val onlyOnNetflix = movieviewmodel.onlyOnNetflix
@@ -542,22 +564,34 @@ fun NetflixHomeScreen() {
     val susTvShows = movieviewmodel.susTvShows
     val hollywoodMovies = movieviewmodel.hollywoodMovies
     Column {
-        MovieSection(title = "Bollywood Movies", movies = bollywood)
-        MovieSection(title = "Top 10 Mobile Games", movies = kDramas.shuffled())
-        MovieSection(title = "Top 10 Movies on Netflix", movies = kDramas.shuffled())
-        MovieSection(title = "Only on Netflix", movies = onlyOnNetflix)
-        MovieSection(title = "K-Dramas", movies = kDramas)
-        MovieSection(title = "New on Netflix", movies = onlyOnNetflix.shuffled() )
-        MovieSection(title = "Comedy Movies", movies = comedyMovies)
-        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = fantasyMovies)
+        MovieSection(title = "Bollywood Movies", movies = bollywood,navController)
+        MovieSection(title = "Top 10 Mobile Games", movies = kDramas.shuffled(),navController)
+        MovieSection(title = "Top 10 Movies on Netflix", movies = kDramas.shuffled(),navController)
+        MovieSection(title = "Only on Netflix", movies = onlyOnNetflix,navController)
+        MovieSection(title = "K-Dramas", movies = kDramas,navController)
+        MovieSection(title = "New on Netflix", movies = onlyOnNetflix.shuffled(),navController )
+        MovieSection(title = "Comedy Movies", movies = comedyMovies,navController)
+        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = fantasyMovies,navController)
         //MovieSection(title = "Hollywood Movies", movies = hollywoodMovies)
-        MovieSection(title = "Suspenseful Tv Shows", movies = susTvShows)
+        MovieSection(title = "Suspenseful Tv Shows", movies = susTvShows,navController)
     }
 }
 
 @Composable
-fun MovieDetailScreen(movie: MovieResponse) {
+fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewModel: NetflixViewModel = viewModel()) {
     val scrollState = rememberScrollState()
+    val movie = viewModel.selectedMovie
+    LaunchedEffect(Imdb) {
+        viewModel.fetchMovieById(Imdb)
+    }
+
+    // Show loading while data is being fetched
+    if (movie == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Color.Red)
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -568,14 +602,13 @@ fun MovieDetailScreen(movie: MovieResponse) {
     ) {
         // Thumbnail and header icons
         Box {
-            Image(
-                painter = painterResource(id = movie.thumbnailResId),
-                contentDescription = null,
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp),
-                contentScale = ContentScale.Crop
+                    .height(240.dp)
+                    .background(Color.DarkGray) // Optional: gives a placeholder color
             )
+
 
             Row(
                 modifier = Modifier
@@ -678,33 +711,5 @@ fun MovieDetailScreen(movie: MovieResponse) {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun NetflixTopBarPreview() {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        NetflixTopBarScreen()
-    }
-}
-@Preview(showBackground = true)
-@Composable
 
-fun PreviewMovieDetails() {
-    val cast = listOf(
-        "Ajay Devgn", "Riteish Deshmukh", "Vaani Kapoor", "Saurabh Shukla",
-        "Supriya Pathak", "Rajat Kapoor", "Amit Sial", "Brijendra Kala",
-        "Yashpal Sharma", "Govind Namdeo"
-    )
 
-    val director = "Raj Kumar Gupta"
-    val writers = listOf("Ritesh Shah")
-
-    MovieDetailsScreen(
-        movieTitle = "Raid 2",
-        cast = cast,
-        director = director,
-        writers = writers
-    )
-}

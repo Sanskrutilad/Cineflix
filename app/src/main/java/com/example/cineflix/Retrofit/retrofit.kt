@@ -13,24 +13,50 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 
-data class PersonalData(
-    val employee: String
-)
+
+import com.google.gson.annotations.SerializedName
 
 data class MovieResponse(
+    @SerializedName("Title")
     val title: String,
-    val year: String,
-    val rating: String,
-    val duration: String,
-    val languages: List<String>,
-    val description: String,
-    val cast: List<String>,
-    val director: String,
-    val Poster: String = "",
-    val thumbnailResId: Int, // Resource ID of the image
-    val Response: String = ""
-)
 
+    @SerializedName("Year")
+    val year: String,
+
+    @SerializedName("Rated")
+    val rating: String,
+
+    @SerializedName("Runtime")
+    val duration: String,
+
+    @SerializedName("Language")
+    val languageString: String,  // comma-separated string from API
+
+    @SerializedName("Plot")
+    val description: String,
+
+    @SerializedName("Actors")
+    val castString: String,  // comma-separated string from API
+
+    @SerializedName("Director")
+    val director: String,
+
+    @SerializedName("Poster")
+    val Poster: String = "",
+
+
+    @SerializedName("Response")
+    val Response: String = "",
+
+    @SerializedName("imdbID")
+    val Imdbid: String = ""
+) {
+    val languages: List<String>
+        get() = languageString.split(",").map { it.trim() }
+
+    val cast: List<String>
+        get() = castString.split(",").map { it.trim() }
+}
 
 interface ApiService {
 

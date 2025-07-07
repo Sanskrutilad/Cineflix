@@ -16,7 +16,8 @@ class NetflixViewModel : ViewModel() {
     var comedyMovies by mutableStateOf<List<MovieResponse>>(emptyList())
     var fantasyMovies by mutableStateOf<List<MovieResponse>>(emptyList())
     var susTvShows by mutableStateOf<List<MovieResponse>>(emptyList())
-
+    var selectedMovie by mutableStateOf<MovieResponse?>(null)
+        private set
     private val apiKey = "f3542b87"
 
     init {
@@ -37,19 +38,34 @@ class NetflixViewModel : ViewModel() {
         }
     }
 
+    fun fetchMovieById(imdbId: String) {
+        viewModelScope.launch {
+            try {
+                val response = OmdbRetrofitInstance.api.getMovieById(imdbId, apiKey)
+                if (response.Response == "True") {
+                    selectedMovie = response
+                    Log.d("NetflixViewModel", "Loaded movie: ${response.title}")
+                } else {
+                    Log.e("NetflixViewModel", "Movie not found: $imdbId")
+                }
+            } catch (e: Exception) {
+                Log.e("NetflixViewModel", "Error loading $imdbId: ${e.message}")
+            }
+        }
+    }
     private suspend fun fetchMovies(titles: List<String>): List<MovieResponse> {
         return titles.mapNotNull { title ->
             try {
                 val response = OmdbRetrofitInstance.api.getMovieById(title, apiKey)
                 if (response.Response == "True") {
-                    Log.d("NetflixViewModel", "Loaded movie: ${response.title}")
+                    Log.d("NetflixView", "Loaded movie: ${response.title}")
                     response
                 } else {
-                    Log.e("NetflixViewModel", "Movie not found: $title")
+                    Log.e("NetflixView", "Movie not found: $title")
                     null
                 }
             } catch (e: Exception) {
-                Log.e("NetflixViewModel", "Error loading $title: ${e.message}")
+                Log.e("NetflixView", "Error loading $title: ${e.message}")
                 null
             }
         }

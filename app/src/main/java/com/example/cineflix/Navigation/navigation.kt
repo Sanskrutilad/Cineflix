@@ -8,6 +8,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.HelpScreen
+import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
+import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
@@ -18,7 +20,7 @@ import com.example.cineflix.Screen.SplashScreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Splashscreen") {
+    NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("Splashscreen") {
             SplashScreen(navController)
         }
@@ -37,6 +39,13 @@ fun Navigation(apiService: ApiService) {
         }
         composable("whoswatching") {
             AddProfileScreen(navController,apiService)
+        }
+        composable("HomeScreen") {
+            NetflixTopBarScreen(navController)
+        }
+        composable("MoviedetailScreen/{Imbdid}") {backStackEntry->
+            val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
+            MovieDetailScreen(navController,Imbdid)
         }
     }
 }
