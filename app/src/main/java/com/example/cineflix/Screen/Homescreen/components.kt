@@ -644,7 +644,21 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
         Column(modifier = Modifier.padding(16.dp)) {
             Text(movie.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
-            Text("${movie.year} • ${movie.rating} • ${movie.duration}", color = Color.Gray, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(movie.year, color = Color.Gray, fontSize = 14.sp)
+                Text("  ", color = Color.Gray, fontSize = 14.sp)
+                Text(
+                    movie.rating,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .background(Color.DarkGray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+                Text("  ", color = Color.Gray, fontSize = 14.sp)
+                Text(movie.duration, color = Color.Gray, fontSize = 14.sp)
+            }
+
 
             Spacer(Modifier.height(8.dp))
             Text("Watch in ${movie.languages.joinToString()}", color = Color.White, fontWeight = FontWeight.Medium)
