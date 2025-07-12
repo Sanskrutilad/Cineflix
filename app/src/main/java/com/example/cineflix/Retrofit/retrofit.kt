@@ -36,14 +36,19 @@ data class MovieResponse(
     val description: String,
 
     @SerializedName("Actors")
-    val castString: String,  // comma-separated string from API
+    val castString: String,
 
     @SerializedName("Director")
     val director: String,
 
+    @SerializedName("Writer")
+    val WriterString: String,
+
+    @SerializedName("Genre")
+    val GenreString: String,
+
     @SerializedName("Poster")
     val Poster: String = "",
-
 
     @SerializedName("Response")
     val Response: String = "",
@@ -56,6 +61,13 @@ data class MovieResponse(
 
     val cast: List<String>
         get() = castString.split(",").map { it.trim() }
+
+    val Writer: List<String>
+        get() = WriterString.split(",").map { it.trim() }
+
+    val Genre: List<String>
+        get() = GenreString.split(",").map { it.trim() }
+
 }
 
 interface ApiService {

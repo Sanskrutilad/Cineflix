@@ -9,6 +9,7 @@ import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
+import com.example.cineflix.Screen.Homescreen.MovieDetailsScreen
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
@@ -33,7 +34,6 @@ fun Navigation(apiService: ApiService) {
         composable("Helpscreen") {
             HelpScreen(navController)
         }
-
         composable("loginscreen") {
             NetflixLoginScreen(navController,apiService)
         }
@@ -42,6 +42,10 @@ fun Navigation(apiService: ApiService) {
         }
         composable("HomeScreen") {
             NetflixTopBarScreen(navController)
+        }
+        composable("castdetailscreen/{Imbdid}") {backStackEntry->
+            val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
+            MovieDetailsScreen(Imbdid, navController,)
         }
         composable("MoviedetailScreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
@@ -52,10 +53,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R // update with your actual package
@@ -221,132 +224,142 @@ fun FeaturedBanner() {
     }
 }
 
-//@Composable
-//fun MovieDetailsScreen(
-//    movieTitle: String,
-//    cast: List<String>,
-//    director: String,
-//    writers: List<String>
-//) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color.Black)
-//    ) {
-//        Spacer(modifier = Modifier.height(28.dp))
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(Color(0xFF242426))
-////                .padding(24.dp)
-//                .verticalScroll(rememberScrollState())
-//                .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            // Title
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 20.dp, vertical = 16.dp)
-//            ) {
-//                // Title centered
-//                Text(
-//                    text = movieTitle,
-//                    fontSize = 25.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    color = Color.White,
-//                    modifier = Modifier.align(Alignment.Center)
-//                )
-//                Box(
-//                    modifier = Modifier
-//                        .align(Alignment.TopEnd)
-//                        .padding(8.dp)
-//                        .size(36.dp)
-//                        .clip(CircleShape)
-//                        .background(Color.White.copy(alpha = 0.15f))
-//                ) {
-//                    IconButton(
-//                        onClick = { /* close action */ },
-//                        modifier = Modifier.fillMaxSize()
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Close,
-//                            contentDescription = "Close",
-//                            tint = Color.White
-//                        )
-//                    }
-//                }
-//
-//            }
-//
-//
-//            Spacer(modifier = Modifier.height(4.dp))
-//
-//            // Cast Header
-//            SectionHeader(title = "Cast")
-//            Spacer(modifier = Modifier.height(24.dp))
-//            cast.forEach { actor ->
-//                Text(
-//                    text = actor,
-//                    fontSize = 21.sp,
-//                    color = Color.Gray,
-//                    modifier = Modifier.padding(vertical = 4.dp)
-//                )
-//                Spacer(modifier = Modifier.height(22.dp))
-//            }
-//
-//
-//            // Director
-//            SectionHeader(title = "Director")
-//            Spacer(modifier = Modifier.height(24.dp))
-//            Text(
-//                text = director,
-//                fontSize = 24.sp,
-//                color = Color.Gray,
-//                modifier = Modifier.padding(vertical = 4.dp)
-//            )
-//
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            SectionHeader(title = "Writers")
-//            Spacer(modifier = Modifier.height(24.dp))
-//            writers.forEach { writer ->
-//                Text(
-//                    text = writer,
-//                    fontSize = 24.sp,
-//                    color = Color.Gray,
-//                    modifier = Modifier.padding(vertical = 4.dp)
-//                )
-//            }
-//
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            SectionHeader(title = "Maturity Rating")
-//            Spacer(modifier = Modifier.height(24.dp))
-//            writers.forEach { writer ->
-//                Text(
-//                    text = writer,
-//                    fontSize = 24.sp,
-//                    color = Color.Gray,
-//                    modifier = Modifier.padding(vertical = 4.dp)
-//                )
-//            }
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            SectionHeader(title = "Maturity Rating")
-//            Spacer(modifier = Modifier.height(24.dp))
-//            writers.forEach { writer ->
-//                Text(
-//                    text = writer,
-//                    fontSize = 24.sp,
-//                    color = Color.Gray,
-//                    modifier = Modifier.padding(vertical = 4.dp)
-//                )
-//            }
-//
-//        }
-//    }
-//}
+@Composable
+fun MovieDetailsScreen(
+    movieId: String,
+    navController: NavController,
+    viewModel: NetflixViewModel = viewModel()
+) {
+    val movie = viewModel.selectedMovie
+
+    LaunchedEffect(movieId) {
+        viewModel.fetchMovieById(movieId)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        Spacer(modifier = Modifier.height(28.dp))
+
+        if (movie == null) {
+            // Show loading or placeholder
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = Color.Red)
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF242426))
+                    .verticalScroll(rememberScrollState())
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Title & Close Button
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                ) {
+                    Text(
+                        text = movie.title,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.15f))
+                    ) {
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                SectionHeader(title = "Cast")
+                Spacer(modifier = Modifier.height(16.dp))
+                movie.cast.forEach { cast ->
+                    Text(
+                        text = cast,
+                        fontSize = 20.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                    Spacer(modifier = Modifier.height(21.dp))
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                SectionHeader(title = "Director")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = movie.director,
+                    fontSize = 20.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(vertical = 2.dp)
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                SectionHeader(title = "Writer")
+                Spacer(modifier = Modifier.height(16.dp))
+                movie.Writer.forEach { Writer ->
+                    Text(
+                        text = Writer,
+                        fontSize = 20.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                    Spacer(modifier = Modifier.height(21.dp))
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                SectionHeader(title = "Maturity Rating")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    movie.rating,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .background(Color.DarkGray, shape = RoundedCornerShape(4.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+                SectionHeader(title = "Genre")
+                Spacer(modifier = Modifier.height(16.dp))
+                movie.Genre.forEach { Genre ->
+                    Text(
+                        text = Genre,
+                        fontSize = 20.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(vertical = 2.dp)
+                    )
+                    Spacer(modifier = Modifier.height(21.dp))
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+    }
+}
 
 @Composable
 fun SectionHeader(title: String) {
@@ -376,9 +389,7 @@ fun MobileGamesSection() {
                 Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
             }
         }
-
         Spacer(modifier = Modifier.height(8.dp))
-
         val gameList = listOf(
             Game("https://i.imgur.com/WJ6mPci.png", "Squid Game: Unleashed", "Action"),
             Game("https://i.imgur.com/WJ6mPci.png", "Stranger Things 3", "Adventure"),
@@ -386,7 +397,6 @@ fun MobileGamesSection() {
             Game("https://i.imgur.com/WJ6mPci.png", "Twelve Minutes", "Thriller"),
             Game("https://i.imgur.com/WJ6mPci.png", "Before Your Eyes", "Narrative")
         )
-
         LazyRow {
             items(gameList) { game ->
                 Card(
@@ -453,11 +463,10 @@ data class Game(
 )
 
 @Composable
-fun BottomBar(selected: String = "Home") {
-    val items = listOf("Home", "Games", "New & Hot", "My Netflix")
+fun BottomBar(selected: String = "Home", onItemSelected: (String) -> Unit = {}) {
+    val items = listOf("Home", "New & Hot", "My Netflix")
     val icons = listOf(
         Icons.Default.Home,
-        Icons.Default.VideogameAsset,
         Icons.Default.Whatshot,
         Icons.Default.Person
     )
@@ -465,51 +474,80 @@ fun BottomBar(selected: String = "Home") {
         containerColor = Color.Black,
         contentColor = Color.White
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 46.dp, vertical = 6.dp)
         ) {
-            items.forEachIndexed { index, item ->
-                Column(
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .clickable { onItemSelected(items[0]) },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = icons[0],
+                    contentDescription = items[0],
+                    tint = if (items[0] == selected) Color.White else Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = items[0],
+                    fontSize = 10.sp,
+                    color = if (items[0] == selected) Color.White else Color.Gray
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clickable { onItemSelected(items[1]) },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = icons[1],
+                    contentDescription = items[1],
+                    tint = if (items[1] == selected) Color.White else Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    text = items[1],
+                    fontSize = 10.sp,
+                    color = if (items[1] == selected) Color.White else Color.Gray
+                )
+            }
+
+            // My Netflix - Right aligned
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .clickable { onItemSelected(items[2]) },
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
                     modifier = Modifier
-                        .clickable {  }
-                        .padding(vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(Color(0xFF1A73E8)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    if (item == "My Netflix") {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFF1A73E8)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = icons[index],
-                                contentDescription = item,
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = icons[index],
-                            contentDescription = item,
-                            tint = if (item == selected) Color.White else Color.Gray
-                        )
-                    }
-                    Text(
-                        text = item,
-                        fontSize = 10.sp,
-                        color = if (item == selected) Color.White else Color.Gray
+                    Icon(
+                        imageVector = icons[2],
+                        contentDescription = items[2],
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
+                Text(
+                    text = items[2],
+                    fontSize = 10.sp,
+                    color = if (items[2] == selected) Color.White else Color.Gray
+                )
             }
         }
     }
 }
+
+
 
 @Composable
 fun MovieCard(
@@ -577,15 +615,15 @@ fun NetflixHomeScreen(navController: NavHostController) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewModel: NetflixViewModel = viewModel()) {
+fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel: NetflixViewModel = viewModel()) {
     val scrollState = rememberScrollState()
     val movie = viewModel.selectedMovie
     LaunchedEffect(Imdb) {
         viewModel.fetchMovieById(Imdb)
     }
 
-    // Show loading while data is being fetched
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = Color.Red)
@@ -608,8 +646,6 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
                     .height(240.dp)
                     .background(Color.DarkGray) // Optional: gives a placeholder color
             )
-
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -658,13 +694,9 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
                 Text("  ", color = Color.Gray, fontSize = 14.sp)
                 Text(movie.duration, color = Color.Gray, fontSize = 14.sp)
             }
-
-
             Spacer(Modifier.height(8.dp))
             Text("Watch in ${movie.languages.joinToString()}", color = Color.White, fontWeight = FontWeight.Medium)
-
             Spacer(Modifier.height(16.dp))
-
             Button(
                 onClick = { },
                 colors = ButtonDefaults.buttonColors( Color.White),
@@ -675,9 +707,7 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
                 Spacer(Modifier.width(6.dp))
                 Text("Play", color = Color.Black, fontSize = 20.sp)
             }
-
             Spacer(Modifier.height(8.dp))
-
             OutlinedButton(
                 onClick = {  },
                 colors = ButtonDefaults.buttonColors( Color(0xFF1C1C1E)),
@@ -693,7 +723,23 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
             Text(movie.description, color = Color.White)
 
             Spacer(Modifier.height(8.dp))
-            Text("Starring: ${movie.cast.joinToString()}", color = Color.Gray)
+            FlowRow {
+                Text(
+                    text = "Starring: ${movie.cast.take(2).joinToString()}",
+                    color = Color.Gray
+                )
+                if (movie.cast.size > 2) {
+                    Text(
+                        text = "...more",
+                        color = Color.LightGray,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate("castdetailscreen/${movie.Imdbid}")
+                            }
+                    )
+                }
+            }
             Text("Director: ${movie.director}", color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -720,10 +766,7 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,  viewMode
                     Text("Share", color = Color.White, fontSize = 12.sp)
                 }
             }
-
         }
     }
 }
-
-
 
