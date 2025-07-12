@@ -62,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -213,6 +214,7 @@ fun MyNetflixScreen() {
             LazyRow(
                 //contentPadding = PaddingValues(horizontal = 9.dp),
                 horizontalArrangement = Arrangement.spacedBy(9.dp)
+
             ) {
                 itemsIndexed(likedMovies) { index, title ->
                     Card(
@@ -224,21 +226,23 @@ fun MyNetflixScreen() {
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Top,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Image(
                                 painter = painterResource(id = moviePosters[index]),
                                 contentDescription = title,
                                 modifier = Modifier
-                                    .height(160.dp)
+                                    .height(160.dp).padding(bottom = 10.dp)
                                     .fillMaxWidth()
-                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                            )
+                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                                        contentScale = ContentScale.Crop)
+
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center,
                                 modifier = Modifier
-                                    .padding(bottom = 8.dp)
+                                    .padding(bottom = 10.dp)
                                     .fillMaxWidth()
                             ) {
                                 Icon(
