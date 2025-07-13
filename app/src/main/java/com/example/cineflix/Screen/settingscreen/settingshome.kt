@@ -1,5 +1,6 @@
 package com.example.cineflix.Screen.settingscreen
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -7,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
@@ -65,6 +68,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -132,8 +136,6 @@ fun MyNetflixScreen() {
 
         ) {
             Spacer(modifier = Modifier.height(12.dp))
-
-            // Profile section (centered avatar with name below)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
@@ -153,10 +155,7 @@ fun MyNetflixScreen() {
                     fontSize = 20.sp
                 )
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // Notifications card
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)), // dark gray-ish
                 modifier = Modifier
@@ -200,9 +199,7 @@ fun MyNetflixScreen() {
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
             Text(
                 "TV Shows & Movies You have Liked",
                 color = Color.White,
@@ -212,7 +209,6 @@ fun MyNetflixScreen() {
             )
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
-                //contentPadding = PaddingValues(horizontal = 9.dp),
                 horizontalArrangement = Arrangement.spacedBy(9.dp)
 
             ) {
@@ -262,6 +258,70 @@ fun MyNetflixScreen() {
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                "Trailers You have Watched",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                //contentPadding = PaddingValues(horizontal = 9.dp),
+                horizontalArrangement = Arrangement.spacedBy(9.dp)
+
+            ) {
+                itemsIndexed(likedMovies) { index, title ->
+                    Card(
+                        modifier = Modifier
+                            .width(120.dp)
+                            .wrapContentHeight(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Top,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Image(
+                                painter = painterResource(id = moviePosters[index]),
+                                contentDescription = title,
+                                modifier = Modifier
+                                    .height(165.dp)
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                                contentScale = ContentScale.Crop)
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                "Recently Watched",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp)
+            ) {
+                items(recentlyWatched) { item ->
+                    RecentlyWatchedCard(
+                        imageRes = item.first,
+                        title = item.second,
+                        episode = item.third
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(100.dp))
             if (showBottomSheet) {
                 ModalBottomSheet(
@@ -280,6 +340,67 @@ fun MyNetflixScreen() {
             }
 
         }
+    }
+}
+val recentlyWatched = listOf(
+    Triple(R.drawable.prof, "Stranger Things", "S2:E5 Dig Dug"),
+    Triple(R.drawable.prof, "Alice in Borderland", "S1:E1 Episode One"),
+    Triple(R.drawable.prof, "Money Heist", "S3:E2 48 Hours Left")
+)
+
+@Composable
+fun RecentlyWatchedCard(
+    @DrawableRes imageRes: Int,
+    title: String,
+    episode: String
+) {
+    Column(
+        modifier = Modifier
+
+            .padding(end = 8.dp)
+    ) {
+        Box(modifier = Modifier.height(180.dp).width(270.dp)) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Share,
+                    contentDescription = "Share",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clickable { }
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(34.dp)
+                        .clickable {  }
+                )
+            }
+        }
+        Text(
+            text = episode,
+            color = Color.Gray,
+            fontSize = 12.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
