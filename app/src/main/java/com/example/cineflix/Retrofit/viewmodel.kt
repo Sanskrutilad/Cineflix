@@ -19,6 +19,8 @@ class NetflixViewModel : ViewModel() {
     var selectedMovie by mutableStateOf<MovieResponse?>(null)
         private set
     private val apiKey = "f3542b87"
+    var trailerId by mutableStateOf<String?>(null)
+        private set
 
     init {
         fetchMovieList()
@@ -70,5 +72,31 @@ class NetflixViewModel : ViewModel() {
             }
         }
     }
+    fun fetchTrailerByImdbId(imdbId: String) {
+        viewModelScope.launch {
+            try {
+                val movie = OmdbRetrofitInstance.api.getMovieById(imdbId, apiKey)
+                if (movie.Response == "True") {
+                    val query = "${movie.title} ${movie.year} official trailer"
+                    Log.d("TrailerQuery", "Searching: $query")
+
+                    val response = youtubeApi.searchTrailer(query = query, apiKey = youtubeApiKey)
+                    val trailerVideo = response.items.firstOrNull()
+                    trailerId = trailerVideo?.id?.videoId
+
+                    if (trailerId == null) {
+                        Log.e("Trailer", "No valid videoId found for: $query")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Trailer", "Error: ${e.message}")
+                trailerId = null
+            }
+        }
+    }
+
+
+
+
 
 }

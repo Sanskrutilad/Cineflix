@@ -1,5 +1,7 @@
 package com.example.cineflix.Screen.Homescreen
 
+import android.view.ViewGroup
+import android.webkit.WebView
 import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,6 +59,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -617,12 +620,27 @@ fun NetflixHomeScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel: NetflixViewModel = viewModel()) {
+fun MovieDetailScreen(
+    navController: NavHostController,
+    Imdb: String,
+    viewModel: NetflixViewModel = viewModel()
+) {
     val scrollState = rememberScrollState()
     val movie = viewModel.selectedMovie
+    val trailerId = viewModel.trailerId
+
+    // Fetch movie by ID
     LaunchedEffect(Imdb) {
         viewModel.fetchMovieById(Imdb)
     }
+
+    // Fetch trailer after movie is loaded
+    LaunchedEffect(movie?.Imdbid) {
+        if (!movie?.Imdbid.isNullOrEmpty()) {
+            viewModel.fetchTrailerByImdbId(movie.Imdbid)
+        }
+    }
+
 
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -640,12 +658,34 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
     ) {
         // Thumbnail and header icons
         Box {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(240.dp)
-                    .background(Color.DarkGray) // Optional: gives a placeholder color
-            )
+            if (!trailerId.isNullOrEmpty()) {
+                AndroidView(
+                    factory = { context ->
+                        WebView(context).apply {
+                            layoutParams = ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                600
+                            )
+                            settings.javaScriptEnabled = true
+                            loadUrl("https://www.youtube.com/embed/$trailerId")
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(vertical = 16.dp)
+                )
+            }
+            else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Trailer not available", color = Color.White)
+                }
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -660,7 +700,6 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
                 }
             }
         }
-
         // Red progress bar
         Box(
             modifier = Modifier
@@ -675,6 +714,9 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
                     .background(Color.Red)
             )
         }
+
+        // Show YouTube Trailer
+
 
         // Movie Info
         Column(modifier = Modifier.padding(16.dp)) {
@@ -694,25 +736,32 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
                 Text("  ", color = Color.Gray, fontSize = 14.sp)
                 Text(movie.duration, color = Color.Gray, fontSize = 14.sp)
             }
+
             Spacer(Modifier.height(8.dp))
             Text("Watch in ${movie.languages.joinToString()}", color = Color.White, fontWeight = FontWeight.Medium)
             Spacer(Modifier.height(16.dp))
+
             Button(
                 onClick = { },
-                colors = ButtonDefaults.buttonColors( Color.White),
-                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 shape = RectangleShape
             ) {
                 Icon(Icons.Default.PlayArrow, modifier = Modifier.size(30.dp), contentDescription = null, tint = Color.Black)
                 Spacer(Modifier.width(6.dp))
                 Text("Play", color = Color.Black, fontSize = 20.sp)
             }
+
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
-                onClick = {  },
-                colors = ButtonDefaults.buttonColors( Color(0xFF1C1C1E)),
-                modifier = Modifier.fillMaxWidth().height(50.dp),
-                 shape = RectangleShape
+                onClick = { },
+                colors = ButtonDefaults.buttonColors(Color(0xFF1C1C1E)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                shape = RectangleShape
             ) {
                 Icon(Icons.Default.FileDownload, contentDescription = null, tint = Color.White)
                 Spacer(Modifier.width(8.dp))
@@ -740,6 +789,7 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
                     )
                 }
             }
+
             Text("Director: ${movie.director}", color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -751,17 +801,17 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Add, contentDescription = "My List", tint = Color.White,modifier = Modifier.size(35.dp))
+                    Icon(Icons.Default.Add, contentDescription = "My List", tint = Color.White, modifier = Modifier.size(35.dp))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("My List", color = Color.White, fontSize = 12.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.ThumbUp, contentDescription = "Rate", tint = Color.White,modifier = Modifier.size(30.dp))
+                    Icon(Icons.Default.ThumbUp, contentDescription = "Rate", tint = Color.White, modifier = Modifier.size(30.dp))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Rate", color = Color.White, fontSize = 12.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White,modifier = Modifier.size(30.dp))
+                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(30.dp))
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Share", color = Color.White, fontSize = 12.sp)
                 }
@@ -769,4 +819,3 @@ fun MovieDetailScreen( navController: NavHostController, Imdb: String,viewModel:
         }
     }
 }
-

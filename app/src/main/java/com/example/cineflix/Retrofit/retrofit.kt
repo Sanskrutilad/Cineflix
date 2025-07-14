@@ -15,6 +15,7 @@ import retrofit2.http.Path
 
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.Query
 
 data class MovieResponse(
     @SerializedName("Title")
@@ -69,6 +70,34 @@ data class MovieResponse(
         get() = GenreString.split(",").map { it.trim() }
 
 }
+data class YouTubeSearchResponse(
+    val items: List<YouTubeVideoItem>
+)
+val youtubeApiKey = "AIzaSyA8vYqtM8ANJ8hkzOpTBf5toOrLq8IBU_E"
+
+data class YouTubeVideoItem(
+    val id: VideoId
+)
+
+data class VideoId(
+    val videoId: String
+)
+interface YouTubeApiService {
+    @GET("search")
+    suspend fun searchTrailer(
+        @Query("part") part: String = "snippet",
+        @Query("q") query: String,
+        @Query("type") type: String = "video",
+        @Query("maxResults") maxResults: Int = 1,
+        @Query("key") apiKey: String
+    ): YouTubeSearchResponse
+}
+val retrofit = Retrofit.Builder()
+    .baseUrl("https://www.googleapis.com/youtube/v3/")
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+val youtubeApi = retrofit.create(YouTubeApiService::class.java)
 
 interface ApiService {
 
