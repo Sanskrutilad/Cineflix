@@ -15,6 +15,7 @@ import retrofit2.http.Path
 
 
 import com.google.gson.annotations.SerializedName
+import retrofit2.http.Body
 import retrofit2.http.Query
 
 data class MovieResponse(
@@ -70,6 +71,28 @@ data class MovieResponse(
         get() = GenreString.split(",").map { it.trim() }
 
 }
+
+data class LikeRequest(
+    val imdbId: String,
+    val userId: String // Or whatever extra data you want to associate
+)
+
+data class WatchRequest(
+    val imdbId: String,
+    val userId: String
+)
+data class LikedMovie(
+    val imdbId: String,
+    val userId: String
+)
+
+data class WatchedMovie(
+    val imdbId: String,
+    val userId: String,
+    val watchedAt: Long
+)
+
+
 data class YouTubeSearchResponse(
     val items: List<YouTubeVideoItem>
 )
@@ -92,6 +115,11 @@ interface YouTubeApiService {
         @Query("key") apiKey: String
     ): YouTubeSearchResponse
 }
+data class LikedMoviesResponse(
+    val success: Boolean,
+    val imdbIds: List<String>
+)
+
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
     .addConverterFactory(GsonConverterFactory.create())
@@ -100,7 +128,6 @@ val retrofit = Retrofit.Builder()
 val youtubeApi = retrofit.create(YouTubeApiService::class.java)
 
 interface ApiService {
-
     @Multipart
     @POST("/uploadLogo")
     fun uploadLogo(
@@ -110,6 +137,20 @@ interface ApiService {
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(@Path("companyId") companyId: String): Response<ResponseBody>
+
+    @POST("likedmovies")
+    suspend fun likedMovie(@Body likeRequest: LikeRequest): Response<ResponseBody>
+
+    @GET("likedmovies/{userId}")
+    suspend fun getLikedMovies(@Path("userId") userId: String): Response<LikedMoviesResponse>
+
+
+    @POST("recentlywatched")
+    suspend fun recentlyWatched(@Body watchRequest: WatchRequest): Response<ResponseBody>
+
+    @GET("recentlywatched/{userId}")
+    suspend fun getRecentlyWatched(@Path("userId") userId: String): Response<List<WatchedMovie>>
+
 }
 
 interface OmdbApiService {
@@ -138,7 +179,7 @@ object OmdbRetrofitInstance {
 
 fun createApiService(): ApiService {
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:3000/api/")
+        .baseUrl("http://10.0.2.2:3000/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     return retrofit.create(ApiService::class.java)

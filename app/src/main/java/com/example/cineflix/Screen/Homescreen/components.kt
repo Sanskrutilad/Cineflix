@@ -3,7 +3,6 @@ package com.example.cineflix.Screen.Homescreen
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.animation.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,13 +24,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
@@ -39,6 +36,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,27 +49,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R // update with your actual package
+import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Retrofit.NetflixViewModel
 
 @Composable
 fun NetflixTopBarScreen(navController: NavHostController) {
     val scrollState = rememberLazyListState()
-
     val showChips by remember {
         derivedStateOf {
             scrollState.firstVisibleItemIndex == 0 && scrollState.firstVisibleItemScrollOffset < 20
@@ -80,7 +79,7 @@ fun NetflixTopBarScreen(navController: NavHostController) {
     Scaffold(
         containerColor = Color.Black,
         bottomBar = {
-            BottomBar(selected = "Home")
+            BottomBar(navController)
         }
     ) { paddingValues ->
         LazyColumn(
@@ -228,13 +227,12 @@ fun FeaturedBanner() {
 }
 
 @Composable
-fun MovieDetailsScreen(
+fun Castdetailsscreen(
     movieId: String,
     navController: NavController,
     viewModel: NetflixViewModel = viewModel()
 ) {
     val movie = viewModel.selectedMovie
-
     LaunchedEffect(movieId) {
         viewModel.fetchMovieById(movieId)
     }
@@ -363,7 +361,6 @@ fun MovieDetailsScreen(
         }
     }
 }
-
 @Composable
 fun SectionHeader(title: String) {
     Text(
@@ -373,7 +370,6 @@ fun SectionHeader(title: String) {
         color = Color.White
     )
 }
-
 @Composable
 fun MobileGamesSection() {
     Column(modifier = Modifier.padding(16.dp)) {
@@ -466,91 +462,89 @@ data class Game(
 )
 
 @Composable
-fun BottomBar(selected: String = "Home", onItemSelected: (String) -> Unit = {}) {
-    val items = listOf("Home", "New & Hot", "My Netflix")
-    val icons = listOf(
-        Icons.Default.Home,
-        Icons.Default.Whatshot,
-        Icons.Default.Person
-    )
-    BottomAppBar(
-        containerColor = Color.Black,
-        contentColor = Color.White
-    ) {
+fun BottomBar(navController: NavHostController, selected: String = "HomeScreen") {
+    val items = listOf("HomeScreen","Routes.NEW_HOT", "settingscreen")
+    val labels = listOf("Home", "New & Hot", "My Netflix")
+    val icons = listOf(Icons.Default.Home, Icons.Default.Whatshot, Icons.Default.Person)
+
+    BottomAppBar(containerColor = Color.Black, contentColor = Color.White) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 46.dp, vertical = 6.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .clickable { onItemSelected(items[0]) },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = icons[0],
-                    contentDescription = items[0],
-                    tint = if (items[0] == selected) Color.White else Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = items[0],
-                    fontSize = 10.sp,
-                    color = if (items[0] == selected) Color.White else Color.Gray
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clickable { onItemSelected(items[1]) },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    imageVector = icons[1],
-                    contentDescription = items[1],
-                    tint = if (items[1] == selected) Color.White else Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = items[1],
-                    fontSize = 10.sp,
-                    color = if (items[1] == selected) Color.White else Color.Gray
-                )
-            }
+            // Home
+            BottomBarItem(
+                label = labels[0],
+                icon = icons[0],
+                isSelected = selected == items[0],
+                modifier = Modifier.align(Alignment.CenterStart),
+                onClick = { navController.navigate(items[0]) }
+            )
 
-            // My Netflix - Right aligned
-            Column(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .clickable { onItemSelected(items[2]) },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFF1A73E8)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icons[2],
-                        contentDescription = items[2],
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-                Text(
-                    text = items[2],
-                    fontSize = 10.sp,
-                    color = if (items[2] == selected) Color.White else Color.Gray
-                )
-            }
+            // New & Hot
+            BottomBarItem(
+                label = labels[1],
+                icon = icons[1],
+                isSelected = selected == items[1],
+                modifier = Modifier.align(Alignment.Center),
+                onClick = { navController.navigate(items[1]) }
+            )
+
+            // My Netflix
+            BottomBarItem(
+                label = labels[2],
+                icon = icons[2],
+                isSelected = selected == items[2],
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onClick = { navController.navigate(items[2]) }
+            )
         }
     }
 }
+@Composable
+fun BottomBarItem(
+    label: String,
+    icon: ImageVector,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier.clickable { onClick() },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (label == "My Netflix") {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color(0xFF1A73E8)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = if (isSelected) Color.White else Color.Gray,
+                modifier = Modifier.size(24.dp)
+            )
+        }
 
-
+        Text(
+            text = label,
+            fontSize = 10.sp,
+            color = if (isSelected) Color.White else Color.Gray
+        )
+    }
+}
 
 @Composable
 fun MovieCard(
@@ -574,7 +568,6 @@ fun MovieCard(
         )
     }
 }
-
 @Composable
 fun MovieSection(title: String, movies: List<MovieResponse>,navController: NavHostController) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -618,13 +611,14 @@ fun NetflixHomeScreen(navController: NavHostController) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailScreen(
     navController: NavHostController,
     Imdb: String,
+    apiService: ApiService,
     viewModel: NetflixViewModel = viewModel()
-) {
+    ) {
     val scrollState = rememberScrollState()
     val movie = viewModel.selectedMovie
     val trailerId = viewModel.trailerId
@@ -686,21 +680,34 @@ fun MovieDetailScreen(
                     Text("Trailer not available", color = Color.White)
                 }
             }
-            Row(
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {  }) {
+                        Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White)
+                    }
+                    IconButton(onClick = {  }) {
+                        Icon(Icons.Default.FileDownload, contentDescription = "Download", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    navigationIconContentColor = Color.White,
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                Row {
-                    Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White)
-                    Spacer(Modifier.width(16.dp))
-                    Icon(Icons.Default.FileDownload, contentDescription = "Download", tint = Color.White)
-                }
-            }
+                    .background(Color.Transparent)
+                    .zIndex(1f)
+            )
+
         }
-        // Red progress bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -715,10 +722,6 @@ fun MovieDetailScreen(
             )
         }
 
-        // Show YouTube Trailer
-
-
-        // Movie Info
         Column(modifier = Modifier.padding(16.dp)) {
             Text(movie.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
@@ -767,10 +770,8 @@ fun MovieDetailScreen(
                 Spacer(Modifier.width(8.dp))
                 Text("Download", color = Color.White, fontSize = 20.sp)
             }
-
             Spacer(Modifier.height(16.dp))
             Text(movie.description, color = Color.White)
-
             Spacer(Modifier.height(8.dp))
             FlowRow {
                 Text(
@@ -789,7 +790,6 @@ fun MovieDetailScreen(
                     )
                 }
             }
-
             Text("Director: ${movie.director}", color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -806,7 +806,16 @@ fun MovieDetailScreen(
                     Text("My List", color = Color.White, fontSize = 12.sp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.ThumbUp, contentDescription = "Rate", tint = Color.White, modifier = Modifier.size(30.dp))
+                    Icon(
+                        Icons.Default.ThumbUp,
+                        contentDescription = "Rate",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable {
+                                viewModel.likeMovie(apiService, movie)
+                            }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Rate", color = Color.White, fontSize = 12.sp)
                 }

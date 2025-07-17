@@ -8,13 +8,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.HelpScreen
+import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
-import com.example.cineflix.Screen.Homescreen.MovieDetailsScreen
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
 import com.example.cineflix.Screen.SplashScreen
+import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
+import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -25,11 +27,17 @@ fun Navigation(apiService: ApiService) {
         composable("Splashscreen") {
             SplashScreen(navController)
         }
+        composable("settingscreen") {
+            Settingmainscreen(navController)
+        }
         composable("ReadyToWatchScreen") {
             ReadyToWatchScreen(navController)
         }
         composable("Signupscreen") {
             NetflixCreateAccountScreen(navController)
+        }
+        composable("appsettings") {
+            AppSettingsScreen(navController)
         }
         composable("Helpscreen") {
             HelpScreen(navController)
@@ -43,13 +51,16 @@ fun Navigation(apiService: ApiService) {
         composable("HomeScreen") {
             NetflixTopBarScreen(navController)
         }
+        composable("Menuscreen") {
+            NetflixTopBarScreen(navController)
+        }
         composable("castdetailscreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
-            MovieDetailsScreen(Imbdid, navController,)
+            Castdetailsscreen(Imbdid, navController,)
         }
         composable("MoviedetailScreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
-            MovieDetailScreen(navController,Imbdid)
+            MovieDetailScreen(navController,Imbdid,apiService)
         }
     }
 }

@@ -36,10 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppSettingsScreen() {
+fun AppSettingsScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,7 +53,7 @@ fun AppSettingsScreen() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
@@ -65,7 +66,6 @@ fun AppSettingsScreen() {
         },
         containerColor = Color.Black
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .padding(padding)
@@ -92,12 +92,9 @@ fun AppSettingsScreen() {
                     icon = Icons.Default.Notifications
                 )
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
             SettingsSection(title = "Downloads") {
                 SettingsItemWithSwitch(title = "Wi-Fi Only", icon = Icons.Default.Wifi)
-
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -394,8 +391,3 @@ fun StorageBar(used: Float, netflix: Float, free: Float) {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun PreviewAppSettings() {
-    AppSettingsScreen()
-}

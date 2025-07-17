@@ -1,5 +1,6 @@
 package com.example.cineflix.Retrofit
 
+import android.graphics.Movie
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,7 +40,6 @@ class NetflixViewModel : ViewModel() {
            // hollywoodMovies = fetchMovies(listOf("tt2078092","tt13457350","tt1663202","tt2821224","tt15313716","tt13054826","tt16419174","tt13225730"))
         }
     }
-
     fun fetchMovieById(imdbId: String) {
         viewModelScope.launch {
             try {
@@ -94,9 +94,47 @@ class NetflixViewModel : ViewModel() {
             }
         }
     }
+    fun likeMovie(apiService: ApiService, movie: MovieResponse, userId: String = "guest") {
+        Log.d("LikeMovie", "Function called") // Add this
+        viewModelScope.launch {
+            try {
+                val likeRequest = LikeRequest(
+                    imdbId = movie.Imdbid,
+                    userId = userId
+                )
+                val response = apiService.likedMovie(likeRequest)
+                if (response.isSuccessful) {
+                    Log.d("LikeMovie", "Liked successfully: ${response.code()}")
+                } else {
+                    Log.e("LikeMovie", "Like failed: ${response.code()} ${response.errorBody()?.string()}")
+                }
 
+            } catch (e: Exception) {
+                Log.e("LikeMovie", "Failed to post liked movie", e)
+            }
+        }
+    }
+    private val _likedMovieIds = mutableStateOf<List<String>>(emptyList())
+    val likedMovieIds: androidx.compose.runtime.State<List<String>> = _likedMovieIds
 
-
-
-
+    fun fetchLikedMovies(apiService: ApiService,userId: String) {
+        viewModelScope.launch {
+            try {
+                val response = apiService.getLikedMovies(userId)
+                if (response.isSuccessful) {
+                    response.body()?.let { body ->
+                        if (body.success) {
+                            _likedMovieIds.value = body.imdbIds
+                        } else {
+                            Log.e("NetflixViewModel", "API returned success = false")
+                        }
+                    }
+                } else {
+                    Log.e("NetflixViewModel", "HTTP Error: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("NetflixViewModel", "Network Exception: ${e.message}")
+            }
+        }
+    }
 }

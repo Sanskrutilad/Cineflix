@@ -2,7 +2,6 @@ package com.example.cineflix.Screen.settingscreen
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,39 +10,24 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.automirrored.filled.Help
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cast
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Help
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.outlined.AccountBox
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -72,15 +56,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.cineflix.R
 import com.example.cineflix.Screen.Homescreen.BottomBar
-import com.example.cineflix.Screen.settingscreen.BottomSheetItem
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyNetflixScreen() {
+fun Settingmainscreen(navController: NavHostController) {
     val likedMovies = listOf("Leo", "Yeh Jawaani Hai Deewani", "Devara")
     val moviePosters = listOf(
         R.drawable.prof,
@@ -124,8 +107,9 @@ fun MyNetflixScreen() {
             )
         },
         bottomBar = {
-            BottomBar(selected = "My Netflix") // Ensure "My Netflix" is selected
+            BottomBar(navController)// Ensure "My Netflix" is selected
         }
+
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -210,7 +194,6 @@ fun MyNetflixScreen() {
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(9.dp)
-
             ) {
                 itemsIndexed(likedMovies) { index, title ->
                     Card(
@@ -299,7 +282,6 @@ fun MyNetflixScreen() {
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))
-
             Text(
                 "Recently Watched",
                 color = Color.White,
@@ -321,7 +303,6 @@ fun MyNetflixScreen() {
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(100.dp))
             if (showBottomSheet) {
                 ModalBottomSheet(
@@ -335,13 +316,13 @@ fun MyNetflixScreen() {
                     containerColor = Color(0xFF1C1C1E),
                     tonalElevation = 4.dp
                 ) {
-                    NetflixBottomSheetContent()
+                    NetflixBottomSheetContent(navController)
                 }
             }
-
         }
     }
 }
+
 val recentlyWatched = listOf(
     Triple(R.drawable.prof, "Stranger Things", "S2:E5 Dig Dug"),
     Triple(R.drawable.prof, "Alice in Borderland", "S1:E1 Episode One"),
@@ -404,21 +385,17 @@ fun RecentlyWatchedCard(
     }
 }
 
-    @Composable
-    fun NetflixBottomSheetContent() {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 12.dp)
+@Composable
+fun NetflixBottomSheetContent(navController: NavHostController) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp)
         ) {
-
-            //Spacer(modifier = Modifier.height(8.dp))
-            BottomSheetItem(icon = Icons.Outlined.Edit, text = "Manage Profiles")
-            BottomSheetItem(icon = Icons.Outlined.Settings, text = "App Settings")
-            BottomSheetItem(icon = Icons.Outlined.AccountBox, text = "Account")
-            BottomSheetItem(icon = Icons.Default.Help, text = "Help")
-            BottomSheetItem(icon = Icons.Default.ExitToApp, text = "Sign Out", onClick = { })
-
+            BottomSheetItem(icon = Icons.Outlined.Edit, text = "Manage Profiles",onClick = { navController.navigate("whoswatching")})
+            BottomSheetItem(icon = Icons.Outlined.Settings, text = "App Settings",onClick = { navController.navigate("appsettings") })
+            BottomSheetItem(icon = Icons.Default.Help, text = "Help",onClick = { navController.navigate("Helpscreen") })
+            BottomSheetItem(icon = Icons.Default.ExitToApp, text = "Sign Out", onClick = {navController.navigate("") })
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "Version: 9.22.1 build 3",
@@ -428,9 +405,6 @@ fun RecentlyWatchedCard(
             Spacer(modifier = Modifier.height(15.dp))
         }
     }
-
-
-
     @Composable
     fun BottomSheetItem(icon: ImageVector, text: String, onClick: () -> Unit = {}) {
         Row(
@@ -453,10 +427,5 @@ fun RecentlyWatchedCard(
 
 
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun MyNetflixScreenPreview() {
-    MyNetflixScreen()
-}
 
 
