@@ -69,7 +69,6 @@ data class MovieResponse(
 
     val Genre: List<String>
         get() = GenreString.split(",").map { it.trim() }
-
 }
 
 data class LikeRequest(

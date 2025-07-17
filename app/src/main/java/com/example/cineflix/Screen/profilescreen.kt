@@ -54,9 +54,7 @@ fun ProfileScreen() {
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )
-
             Spacer(modifier = Modifier.weight(1f))
-
             Text(
                 text = "Profiles & More",
                 color = Color.White,
@@ -64,13 +62,9 @@ fun ProfileScreen() {
                 modifier = Modifier.weight(6f),
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.weight(1f)) // for symmetry with the icon
         }
-
-
         Spacer(modifier = Modifier.height(16.dp))
-
         LazyRow {
             items(profiles) { (name, imageRes) ->
                 Column(

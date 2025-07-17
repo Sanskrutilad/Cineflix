@@ -30,7 +30,6 @@ fun NetflixLoginScreen(navController: NavHostController, apiService: ApiService)
         topBar = { NetflixTopAppBar() },
         containerColor = Color.Black
     ) { innerPadding ->
-
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,

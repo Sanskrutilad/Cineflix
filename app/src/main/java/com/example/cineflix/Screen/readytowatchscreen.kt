@@ -45,7 +45,6 @@ fun ReadyToWatchScreen(
     loginViewModel: LoginScreenViewModel = viewModel()
 ) {
     val emailState = remember { mutableStateOf("") }
-
     Box(
         modifier = Modifier
             .fillMaxSize()

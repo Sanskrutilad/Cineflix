@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -87,7 +88,6 @@ fun NetflixTopBarScreen(navController: NavHostController) {
             modifier = Modifier.padding(paddingValues)
         ) {
             item { TopAppBarContent() }
-
             item {
                 AnimatedVisibility(
                     visible = showChips,
@@ -97,11 +97,8 @@ fun NetflixTopBarScreen(navController: NavHostController) {
                     FilterChipsRow()
                 }
             }
-
-            item { FeaturedBanner() }
-
-            item { MobileGamesSection() }
-
+            item { FeaturedBanner(navController) }
+            item { MobileGamesSection()}
             item {
                 NetflixHomeScreen(navController)
             }
@@ -163,34 +160,58 @@ fun FilterChip(text: String, showDropdown: Boolean = false) {
         }
     }
 }
-
 @Composable
-fun FeaturedBanner() {
+fun FeaturedBanner(navController: NavHostController) {
+    val movieViewModel: NetflixViewModel = viewModel()
+    val bollywood = movieViewModel.bollywood
+
+    // Assuming you want to display the first movie as the featured one
+    val featuredMovie = bollywood.firstOrNull()
+
     Column(modifier = Modifier.padding(16.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable{ }
+                .clickable { /* Navigate to movie details */ }
                 .padding(15.dp)
                 .height(500.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.DarkGray),
             contentAlignment = Alignment.BottomCenter
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            // Show poster image
+            featuredMovie?.Poster?.let { posterUrl ->
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = featuredMovie.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // Gradient overlay or dark background for readability (optional)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))))
+            )
+
+            // Play & My List buttons
             Row(
-                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = {  },
+                    onClick = { /* Play movie */ },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
-                        .padding(start=10.dp,end=5.dp)
+                        .padding(start = 10.dp, end = 5.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
@@ -203,12 +224,12 @@ fun FeaturedBanner() {
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 OutlinedButton(
-                    onClick = {  },
+                    onClick = { /* Add to My List */ },
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
-                        .padding(start=5.dp,end=10.dp)
+                        .padding(start = 5.dp, end = 10.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -220,7 +241,6 @@ fun FeaturedBanner() {
                     Text("My List", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
-
         }
         Spacer(modifier = Modifier.height(12.dp))
     }
@@ -343,7 +363,6 @@ fun Castdetailsscreen(
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-
                 SectionHeader(title = "Genre")
                 Spacer(modifier = Modifier.height(16.dp))
                 movie.Genre.forEach { Genre ->
@@ -481,7 +500,6 @@ fun BottomBar(navController: NavHostController, selected: String = "HomeScreen")
                 modifier = Modifier.align(Alignment.CenterStart),
                 onClick = { navController.navigate(items[0]) }
             )
-
             // New & Hot
             BottomBarItem(
                 label = labels[1],
@@ -490,7 +508,6 @@ fun BottomBar(navController: NavHostController, selected: String = "HomeScreen")
                 modifier = Modifier.align(Alignment.Center),
                 onClick = { navController.navigate(items[1]) }
             )
-
             // My Netflix
             BottomBarItem(
                 label = labels[2],
@@ -706,7 +723,6 @@ fun MovieDetailScreen(
                     .background(Color.Transparent)
                     .zIndex(1f)
             )
-
         }
         Box(
             modifier = Modifier
@@ -721,7 +737,6 @@ fun MovieDetailScreen(
                     .background(Color.Red)
             )
         }
-
         Column(modifier = Modifier.padding(16.dp)) {
             Text(movie.title, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))

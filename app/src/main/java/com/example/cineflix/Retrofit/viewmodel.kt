@@ -26,7 +26,6 @@ class NetflixViewModel : ViewModel() {
     init {
         fetchMovieList()
     }
-
     private fun fetchMovieList() {
         viewModelScope.launch {
             bollywood = fetchMovies(listOf("tt0995031", "tt26225118", "tt0499375","tt0248126","tt0367110","tt26733317","tt0346723",
@@ -115,8 +114,8 @@ class NetflixViewModel : ViewModel() {
         }
     }
     private val _likedMovieIds = mutableStateOf<List<String>>(emptyList())
-    val likedMovieIds: androidx.compose.runtime.State<List<String>> = _likedMovieIds
 
+    val likedMovieIds: androidx.compose.runtime.State<List<String>> = _likedMovieIds
     fun fetchLikedMovies(apiService: ApiService,userId: String) {
         viewModelScope.launch {
             try {
