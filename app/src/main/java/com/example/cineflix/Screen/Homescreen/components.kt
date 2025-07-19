@@ -46,7 +46,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -68,6 +67,38 @@ import com.example.cineflix.R // update with your actual package
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Retrofit.NetflixViewModel
+import android.content.Context
+import android.graphics.drawable.BitmapDrawable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.drawable.toBitmap
+import androidx.palette.graphics.Palette
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+
+fun extractDominantColorFromUrl(
+    context: Context,
+    imageUrl: String,
+    onColorExtracted: (Color) -> Unit
+) {
+    val request = ImageRequest.Builder(context)
+        .data(imageUrl)
+        .allowHardware(false)
+        .target { drawable ->
+            val bitmap = (drawable as BitmapDrawable).bitmap
+            Palette.from(bitmap).generate { palette ->
+                val dominantColorInt = palette?.getDominantColor(Color.DarkGray.toArgb())
+                val color = dominantColorInt?.let { Color(it) } ?: Color.DarkGray
+                onColorExtracted(color)
+            }
+        }
+        .build()
+
+    val imageLoader = ImageLoader(context)
+    imageLoader.enqueue(request)
+}
 
 @Composable
 fun NetflixTopBarScreen(navController: NavHostController) {
@@ -109,13 +140,16 @@ fun NetflixTopBarScreen(navController: NavHostController) {
 
 @Composable
 fun TopAppBarContent() {
+    var backgroundColor by remember { mutableStateOf(Color.Black) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Black)
+            .background(backgroundColor)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         AsyncImage(
             model = R.drawable.netlogo,
             contentDescription = "Netflix Logo",
@@ -162,24 +196,36 @@ fun FilterChip(text: String, showDropdown: Boolean = false) {
 }
 @Composable
 fun FeaturedBanner(navController: NavHostController) {
+    val context = LocalContext.current
     val movieViewModel: NetflixViewModel = viewModel()
     val bollywood = movieViewModel.bollywood
-
-    // Assuming you want to display the first movie as the featured one
     val featuredMovie = bollywood.firstOrNull()
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
+
+    // Extract dominant color only once
+    LaunchedEffect(featuredMovie?.Poster) {
+        featuredMovie?.Poster?.let { url ->
+            extractDominantColorFromUrl(context, url) { color ->
+                backgroundColor = color
+            }
+        }
+    }
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(backgroundColor)
+        .padding(16.dp)) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { /* Navigate to movie details */ }
+                .clickable {navController.navigate("MoviedetailScreen/${featuredMovie?.Imdbid}") }
                 .padding(15.dp)
                 .height(500.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.DarkGray),
+                .clip(RoundedCornerShape(16.dp)),
             contentAlignment = Alignment.BottomCenter
         ) {
-            // Show poster image
+            // Poster
             featuredMovie?.Poster?.let { posterUrl ->
                 AsyncImage(
                     model = posterUrl,
@@ -189,14 +235,18 @@ fun FeaturedBanner(navController: NavHostController) {
                 )
             }
 
-            // Gradient overlay or dark background for readability (optional)
+            // Optional overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Brush.verticalGradient(colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))
+                        )
+                    )
             )
 
-            // Play & My List buttons
+            // Buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -205,7 +255,7 @@ fun FeaturedBanner(navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { /* Play movie */ },
+                    onClick = { /* Play */ },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
@@ -213,38 +263,32 @@ fun FeaturedBanner(navController: NavHostController) {
                         .weight(1f)
                         .padding(start = 10.dp, end = 5.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Play",
-                        tint = Color.Black,
-                        modifier = Modifier.size(35.dp)
-                    )
-                    Spacer(modifier = Modifier.width(1.dp))
-                    Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 23.sp)
+                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black, modifier = Modifier.size(35.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
-                Spacer(modifier = Modifier.width(12.dp))
+
+                Spacer(Modifier.width(12.dp))
+
                 OutlinedButton(
-                    onClick = { /* Add to My List */ },
+                    onClick = { /* Add to list */ },
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
                         .padding(start = 5.dp, end = 10.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "+My List",
-                        tint = Color.White,
-                        modifier = Modifier.size(35.dp)
-                    )
-                    Spacer(modifier = Modifier.width(1.dp))
+                    Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White, modifier = Modifier.size(35.dp))
+                    Spacer(Modifier.width(4.dp))
                     Text("My List", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         }
-        Spacer(modifier = Modifier.height(12.dp))
+
+        Spacer(Modifier.height(12.dp))
     }
 }
+
 
 @Composable
 fun Castdetailsscreen(

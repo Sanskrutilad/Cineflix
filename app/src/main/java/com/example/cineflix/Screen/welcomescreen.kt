@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +23,6 @@ fun NetflixSimpleWelcomeScreen() {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Try to safely load the background image
         val imageRes = try {
             R.drawable.screenshot_2025_07_17_at_7_30_56pm
         } catch (e: Exception) {
@@ -36,11 +36,34 @@ fun NetflixSimpleWelcomeScreen() {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.matchParentSize()
             )
-        } else {
-            Log.e("NetflixScreen", "Image resource not found: R.drawable.netlogo")
         }
-
-        // Red "Get Started" Button
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "N",
+                color = Color.Red,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Row {
+                Text(
+                    text ="PRIVACY",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Text(
+                    text ="SIGN IN",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -50,7 +73,6 @@ fun NetflixSimpleWelcomeScreen() {
             Button(
                 onClick = {
                     Log.d("NetflixScreen", "Get Started button clicked")
-                    // TODO: Add navigation or action
                 },
                 modifier = Modifier
                     .fillMaxWidth()

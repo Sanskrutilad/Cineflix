@@ -91,7 +91,6 @@ data class WatchedMovie(
     val watchedAt: Long
 )
 
-
 data class YouTubeSearchResponse(
     val items: List<YouTubeVideoItem>
 )
@@ -142,7 +141,6 @@ interface ApiService {
 
     @GET("likedmovies/{userId}")
     suspend fun getLikedMovies(@Path("userId") userId: String): Response<LikedMoviesResponse>
-
 
     @POST("recentlywatched")
     suspend fun recentlyWatched(@Body watchRequest: WatchRequest): Response<ResponseBody>
