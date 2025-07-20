@@ -69,14 +69,15 @@ import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Retrofit.NetflixViewModel
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
-import coil.request.SuccessResult
+import kotlinx.coroutines.delay
 
 fun extractDominantColorFromUrl(
     context: Context,
@@ -102,54 +103,89 @@ fun extractDominantColorFromUrl(
 
 @Composable
 fun NetflixTopBarScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val movieViewModel: NetflixViewModel = viewModel()
+    val bollywood = movieViewModel.bollywood
+
+    // Defensive
+    if (bollywood.isEmpty()) {
+        // Show loader / placeholder
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Color.Red)
+        }
+        return
+    }
+
+    var order by remember(bollywood) { mutableStateOf(bollywood.shuffled()) }
+    var index by remember { mutableIntStateOf(0) }
+    val featuredMovie = order[index]
+
+    var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
+
+    // Extract color when poster changes
+    LaunchedEffect(featuredMovie.Poster) {
+        extractDominantColorFromUrl(context, featuredMovie.Poster) { c ->
+            backgroundColor = c
+        }
+    }
+
+    // Auto-rotate
+    LaunchedEffect(order) {
+        while (true) {
+            delay(7000) // 7s
+            index = (index + 1) % order.size
+            if (index == 0) order = bollywood.shuffled()
+        }
+    }
+
     val scrollState = rememberLazyListState()
     val showChips by remember {
         derivedStateOf {
-            scrollState.firstVisibleItemIndex == 0 && scrollState.firstVisibleItemScrollOffset < 20
+            scrollState.firstVisibleItemIndex == 0 &&
+                    scrollState.firstVisibleItemScrollOffset < 20
         }
     }
+
     Scaffold(
         containerColor = Color.Black,
-        bottomBar = {
-            BottomBar(navController)
-        }
+        bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         LazyColumn(
             state = scrollState,
             modifier = Modifier.padding(paddingValues)
         ) {
-            item { TopAppBarContent() }
+            item { TopAppBarContent(backgroundColor) }
             item {
                 AnimatedVisibility(
                     visible = showChips,
                     enter = fadeIn() + slideInVertically(),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    FilterChipsRow()
+                    FilterChipsRow(backgroundColor)
                 }
             }
-            item { FeaturedBanner(navController) }
-            item { MobileGamesSection()}
             item {
-                NetflixHomeScreen(navController)
+                FeaturedBanner(
+                    navController = navController,
+                    backgroundColor = backgroundColor,
+                    featuredMovie = featuredMovie,
+                )
             }
+            item { MobileGamesSection(backgroundColor) }
+            item { NetflixHomeScreen(navController) }
         }
-
     }
 }
 
 @Composable
-fun TopAppBarContent() {
-    var backgroundColor by remember { mutableStateOf(Color.Black) }
-
+fun TopAppBarContent(backgroundColor1: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor)
+            .background(backgroundColor1)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         AsyncImage(
             model = R.drawable.netlogo,
             contentDescription = "Netflix Logo",
@@ -165,11 +201,11 @@ fun TopAppBarContent() {
 }
 
 @Composable
-fun FilterChipsRow() {
+fun FilterChipsRow(backgroundColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Black)
+            .background(backgroundColor)
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
@@ -195,38 +231,30 @@ fun FilterChip(text: String, showDropdown: Boolean = false) {
     }
 }
 @Composable
-fun FeaturedBanner(navController: NavHostController) {
-    val context = LocalContext.current
-    val movieViewModel: NetflixViewModel = viewModel()
-    val bollywood = movieViewModel.bollywood
-    val featuredMovie = bollywood.firstOrNull()
-
-    var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
-
-    // Extract dominant color only once
-    LaunchedEffect(featuredMovie?.Poster) {
-        featuredMovie?.Poster?.let { url ->
-            extractDominantColorFromUrl(context, url) { color ->
-                backgroundColor = color
-            }
-        }
-    }
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(backgroundColor)
-        .padding(16.dp)) {
+fun FeaturedBanner(
+    navController: NavHostController,
+    backgroundColor: Color,
+    featuredMovie: MovieResponse,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .padding(16.dp)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {navController.navigate("MoviedetailScreen/${featuredMovie?.Imdbid}") }
-                .padding(15.dp)
                 .height(500.dp)
-                .clip(RoundedCornerShape(16.dp)),
+                .clip(RoundedCornerShape(16.dp))
+                .clickable {
+                    featuredMovie.Imdbid?.let { id ->
+                        navController.navigate("MoviedetailScreen/$id")
+                    }
+                },
             contentAlignment = Alignment.BottomCenter
         ) {
-            // Poster
-            featuredMovie?.Poster?.let { posterUrl ->
+            Crossfade(targetState = featuredMovie.Poster, label = "posterFade") { posterUrl ->
                 AsyncImage(
                     model = posterUrl,
                     contentDescription = featuredMovie.title,
@@ -235,23 +263,22 @@ fun FeaturedBanner(navController: NavHostController) {
                 )
             }
 
-            // Optional overlay
+            // Gradient overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))
                         )
                     )
             )
 
-            // Buttons
+            // Buttons row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
-                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
@@ -263,7 +290,7 @@ fun FeaturedBanner(navController: NavHostController) {
                         .weight(1f)
                         .padding(start = 10.dp, end = 5.dp)
                 ) {
-                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black, modifier = Modifier.size(35.dp))
+                    Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black)
                     Spacer(Modifier.width(4.dp))
                     Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
@@ -271,16 +298,16 @@ fun FeaturedBanner(navController: NavHostController) {
                 Spacer(Modifier.width(12.dp))
 
                 OutlinedButton(
-                    onClick = { /* Add to list */ },
+                    onClick = { /* add to list */ },
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
                         .weight(1f)
                         .padding(start = 5.dp, end = 10.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White, modifier = Modifier.size(35.dp))
+                    Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White)
                     Spacer(Modifier.width(4.dp))
-                    Text("My List", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("My List", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                 }
             }
         }
@@ -288,8 +315,6 @@ fun FeaturedBanner(navController: NavHostController) {
         Spacer(Modifier.height(12.dp))
     }
 }
-
-
 @Composable
 fun Castdetailsscreen(
     movieId: String,
@@ -434,7 +459,7 @@ fun SectionHeader(title: String) {
     )
 }
 @Composable
-fun MobileGamesSection() {
+fun MobileGamesSection(backgroundColor: Color) {
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
             modifier = Modifier

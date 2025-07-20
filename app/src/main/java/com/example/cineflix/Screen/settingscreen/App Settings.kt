@@ -1,6 +1,9 @@
 package com.example.cineflix.Screen.settingscreen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,15 +35,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppSettingsScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val notificationToggle by SettingsDataStore.getNotificationSetting(context).collectAsState(initial = false)
+    val wifiOnlyToggle by SettingsDataStore.getWiFiOnlySetting(context).collectAsState(initial = false)
     Scaffold(
         topBar = {
             TopAppBar(
@@ -89,12 +100,26 @@ fun AppSettingsScreen(navController: NavHostController) {
                 SettingsItemWithSwitch(
                     title = "Allow notifications",
                     subtitle = "Customise in Settings → Notifications",
-                    icon = Icons.Default.Notifications
+                    icon = Icons.Default.Notifications,
+                    checked = notificationToggle,
+                    onCheckedChange = {
+                        scope.launch {
+                            SettingsDataStore.saveNotificationSetting(context, it)
+                        }
+                    },
                 )
             }
             Spacer(modifier = Modifier.height(20.dp))
             SettingsSection(title = "Downloads") {
-                SettingsItemWithSwitch(title = "Wi-Fi Only", icon = Icons.Default.Wifi)
+                SettingsItemWithSwitch(
+                    title = "Wi-Fi Only", icon = Icons.Default.Wifi,
+                    checked = wifiOnlyToggle,
+                    onCheckedChange = {
+                        scope.launch {
+                            SettingsDataStore.saveWiFiOnlySetting(context, it)
+                        }
+                    },
+                )
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -134,6 +159,10 @@ fun AppSettingsScreen(navController: NavHostController) {
                     free = 52f
                 )
             }
+            fun openUrl(url: String) {
+                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                context.startActivity(intent)
+            }
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -152,16 +181,24 @@ fun AppSettingsScreen(navController: NavHostController) {
             SettingsRow(
                 icon = Icons.Default.Speed,
                 title = "Internet speed test",
-                showExternalIcon = true
+                showExternalIcon = true,
+                url = "https://fast.com/",
+                onExternalClick = { openUrl(it) }
             )
-
             Spacer(modifier = Modifier.height(20.dp))
-
             SectionHeader("Legal")
             SettingsRow(icon = Icons.Default.Description, title = "Open Source Licences")
-            SettingsRow(icon = Icons.Default.Description, title = "Privacy", showExternalIcon = true)
-            SettingsRow(icon = Icons.Default.Description, title = "Cookie Preferences", showExternalIcon = true)
-            SettingsRow(icon = Icons.Default.Description, title = "Terms of Use", showExternalIcon = true)
+            SettingsRow(icon = Icons.Default.Description, title = "Privacy", showExternalIcon = true,url = "https://help.netflix.com/en/node/100628",
+                onExternalClick = { openUrl(it) })
+            SettingsRow(icon = Icons.Default.Description, title = "Cookie Preferences", showExternalIcon = true,url = "https://help.netflix.com/en/node/124516",
+                onExternalClick = { openUrl(it) })
+            SettingsRow(
+                icon = Icons.Default.Description,
+                title = "Terms of Use",
+                showExternalIcon = true,
+                url = "https://brand.netflix.com/en/terms/",
+                onExternalClick = { openUrl(it) }
+            )
         }
     }
 }
@@ -194,7 +231,9 @@ fun SettingsRow(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    showExternalIcon: Boolean = false
+    showExternalIcon: Boolean = false,
+    url: String? = null,
+    onExternalClick: ((String) -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -214,11 +253,14 @@ fun SettingsRow(
                 }
             }
         }
-        if (showExternalIcon) {
+        if (showExternalIcon && url != null && onExternalClick != null) {
             Icon(
                 imageVector = Icons.Default.OpenInNew,
                 contentDescription = "Open",
-                tint = Color.White
+                tint = Color.White,
+                modifier = Modifier.clickable{
+                    onExternalClick(url)
+                }
             )
         }
     }
@@ -269,9 +311,10 @@ fun SettingsItem(
 fun SettingsItemWithSwitch(
     title: String,
     subtitle: String = "",
-    icon: ImageVector
+    icon: ImageVector,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -295,12 +338,13 @@ fun SettingsItemWithSwitch(
         }
         Switch(
             checked = checked,
-            onCheckedChange = { checked = it },
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(checkedThumbColor = Color.White),
             modifier = Modifier.padding(end = 16.dp)
         )
     }
 }
+
 
 @Composable
 fun CustomWiFiSwitch() {
