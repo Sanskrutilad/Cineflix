@@ -130,7 +130,7 @@ fun NetflixCreateAccountScreen(
                             email,
                             password,
                             home = {
-                                navController.navigate("home")
+                                navController.navigate("WhosWatchingScreen")
                             }
                         )
                     }

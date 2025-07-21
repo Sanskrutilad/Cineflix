@@ -15,10 +15,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 import com.example.cineflix.R
 
 @Composable
-fun NetflixSimpleWelcomeScreen() {
+fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +73,7 @@ fun NetflixSimpleWelcomeScreen() {
         ) {
             Button(
                 onClick = {
-                    Log.d("NetflixScreen", "Get Started button clicked")
+                   navController.navigate("ReadyToWatchScreen")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,8 +86,3 @@ fun NetflixSimpleWelcomeScreen() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewNetflixSimpleWelcomeScreen() {
-    NetflixSimpleWelcomeScreen()
-}

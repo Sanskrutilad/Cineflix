@@ -37,11 +37,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadyToWatchScreen(
     navController: NavController,
-    onClose: () -> Unit = {},
     loginViewModel: LoginScreenViewModel = viewModel()
 ) {
     val emailState = remember { mutableStateOf("") }
@@ -52,7 +52,7 @@ fun ReadyToWatchScreen(
             .padding(24.dp)
     ) {
         IconButton(
-            onClick = onClose,
+            onClick = {navController.popBackStack()},
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Icon(

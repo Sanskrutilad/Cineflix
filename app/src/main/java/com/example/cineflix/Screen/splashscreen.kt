@@ -1,6 +1,7 @@
 package com.example.cineflix.Screen
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -26,35 +27,35 @@ fun SplashScreen(navController: NavController) {
     var visible by remember { mutableStateOf(false) }
 
     val scale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0.8f,
-        animationSpec = tween(durationMillis = 1000)
+        targetValue = if (visible) 1f else 0.95f,
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
     )
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(durationMillis = 1000)
     )
 
+    // Trigger animation and navigate after delay
     LaunchedEffect(Unit) {
         visible = true
-        delay(2500)
-        navController.navigate("ReadyToWatchScreen") {
+        delay(3000) // Total splash time
+        navController.navigate("NetflixSimpleWelcomeScreen") {
             popUpTo("Splashscreen") { inclusive = true }
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Color.Black), // Netflix uses solid black background
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.netflixlogo), //
+            painter = painterResource(id = R.drawable.netflixlogo),
             contentDescription = "Netflix Logo",
             modifier = Modifier
                 .scale(scale)
                 .alpha(alpha)
-                .size(300.dp)
+                .size(160.dp) // Netflix's splash logo is medium size
         )
     }
 }

@@ -11,10 +11,13 @@ import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
+import com.example.cineflix.Screen.Homescreen.PreviewCategoryScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
+import com.example.cineflix.Screen.NetflixSimpleWelcomeScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
 import com.example.cineflix.Screen.SplashScreen
+import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
 import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 
@@ -23,7 +26,7 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "HomeScreen") {
+    NavHost(navController = navController, startDestination = "Splashscreen") {
         composable("Splashscreen") {
             SplashScreen(navController)
         }
@@ -45,14 +48,20 @@ fun Navigation(apiService: ApiService) {
         composable("loginscreen") {
             NetflixLoginScreen(navController,apiService)
         }
-        composable("whoswatching") {
+        composable("AddProfileScreen") {
             AddProfileScreen(navController,apiService)
+        }
+        composable("WhosWatchingScreen") {
+            WhosWatchingScreen(navController)
         }
         composable("HomeScreen") {
             NetflixTopBarScreen(navController)
         }
         composable("Menuscreen") {
             NetflixTopBarScreen(navController)
+        }
+        composable("CategoryScreen") {
+            PreviewCategoryScreen(navController)
         }
         composable("castdetailscreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
@@ -61,6 +70,9 @@ fun Navigation(apiService: ApiService) {
         composable("MoviedetailScreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
             MovieDetailScreen(navController,Imbdid,apiService)
+        }
+        composable("NetflixSimpleWelcomeScreen") {
+            NetflixSimpleWelcomeScreen(navController)
         }
     }
 }

@@ -69,8 +69,9 @@ import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Retrofit.NetflixViewModel
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -101,6 +102,7 @@ fun extractDominantColorFromUrl(
     imageLoader.enqueue(request)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NetflixTopBarScreen(navController: NavHostController) {
     val context = LocalContext.current
@@ -145,7 +147,6 @@ fun NetflixTopBarScreen(navController: NavHostController) {
                     scrollState.firstVisibleItemScrollOffset < 20
         }
     }
-
     Scaffold(
         containerColor = Color.Black,
         bottomBar = { BottomBar(navController) }
@@ -154,14 +155,16 @@ fun NetflixTopBarScreen(navController: NavHostController) {
             state = scrollState,
             modifier = Modifier.padding(paddingValues)
         ) {
-            item { TopAppBarContent(backgroundColor) }
+            stickyHeader {
+                TopAppBarContent(backgroundColor)
+            }
             item {
                 AnimatedVisibility(
                     visible = showChips,
                     enter = fadeIn() + slideInVertically(),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    FilterChipsRow(backgroundColor)
+                    FilterChipsRow(backgroundColor, navController)
                 }
             }
             item {
@@ -182,8 +185,8 @@ fun TopAppBarContent(backgroundColor1: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(backgroundColor1)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .background(backgroundColor1.copy(alpha = 0.85f)) // slightly transparent
+            .padding(horizontal = 16.dp, vertical = 1.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -191,45 +194,72 @@ fun TopAppBarContent(backgroundColor1: Color) {
             contentDescription = "Netflix Logo",
             modifier = Modifier.size(86.dp)
         )
-
         Spacer(modifier = Modifier.weight(1f))
-
-        Icon(Icons.Default.Download, contentDescription ="Downloads",tint = Color.White,modifier=Modifier.size(35.dp))
+        Icon(
+            imageVector = Icons.Default.Download,
+            contentDescription = "Downloads",
+            tint = Color.White,
+            modifier = Modifier.size(35.dp)
+        )
         Spacer(modifier = Modifier.width(16.dp))
-        Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White,modifier=Modifier.size(35.dp))
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = "Search",
+            tint = Color.White,
+            modifier = Modifier.size(35.dp)
+        )
     }
 }
 
+
 @Composable
-fun FilterChipsRow(backgroundColor: Color) {
+fun FilterChipsRow(backgroundColor: Color, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
+        horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        FilterChip("TV Shows")
-        FilterChip("Movies")
-        FilterChip("Categories", showDropdown = true)
+        FilterChip("TV Shows", route = "tv_shows", navController = navController)
+        FilterChip("Movies", route = "movies", navController = navController)
+        FilterChip("Categories", showDropdown = true, route = "CategoryScreen", navController = navController)
     }
 }
 
 @Composable
-fun FilterChip(text: String, showDropdown: Boolean = false) {
+fun FilterChip(
+    text: String,
+    showDropdown: Boolean = false,
+    route: String,
+    navController: NavHostController
+) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(Color.White)
+            .border(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(50)
+            )
+            .background(Color.Transparent)
+            .clickable { navController.navigate(route) }
             .padding(horizontal = 16.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, color = Color.Black)
+        Text(text, color = Color.White)
         if (showDropdown) {
-            Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Black)
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                tint = Color.White
+            )
         }
     }
 }
+
+
+
 @Composable
 fun FeaturedBanner(
     navController: NavHostController,
