@@ -1,5 +1,8 @@
 package com.example.cineflix.Retrofit
 
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -15,6 +18,9 @@ import retrofit2.http.Path
 
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import retrofit2.http.Body
 import retrofit2.http.Query
 
@@ -100,6 +106,17 @@ data class YouTubeVideoItem(
     val id: VideoId
 )
 
+data class FreeToGame(
+    val id: Int,
+    val title: String,
+    val thumbnail: String,
+    val short_description: String,
+    val game_url: String,
+    val genre: String,
+    val platform: String
+)
+
+
 data class VideoId(
     val videoId: String
 )
@@ -148,6 +165,7 @@ interface ApiService {
     @GET("recentlywatched/{userId}")
     suspend fun getRecentlyWatched(@Path("userId") userId: String): Response<List<WatchedMovie>>
 
+
 }
 
 interface OmdbApiService {
@@ -180,4 +198,40 @@ fun createApiService(): ApiService {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     return retrofit.create(ApiService::class.java)
+}
+
+interface FreeToGameApiService {
+    @GET("games")
+    suspend fun getGames(
+        @Query("platform") platform: String = "all",
+        @Query("sort-by") sortBy: String = "popularity"
+    ): List<FreeToGame>
+}
+
+object FreeToGameRetrofit {
+    private val retrofit = Retrofit.Builder()
+        .baseUrl("https://www.freetogame.com/api/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val api: FreeToGameApiService = retrofit.create(FreeToGameApiService::class.java)
+}
+
+class GamesViewModel : ViewModel() {
+    private val _games = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val games: StateFlow<List<FreeToGame>> = _games
+    init {
+        fetchGames()
+    }
+
+    fun fetchGames(platform: String = "all", sort: String = "popularity") {
+        viewModelScope.launch {
+            try {
+                val result = FreeToGameRetrofit.api.getGames(platform, sort)
+                _games.value = result
+            } catch (e: Exception) {
+                Log.e("GamesViewModel", "Error fetching games: ${e.message}")
+            }
+        }
+    }
 }

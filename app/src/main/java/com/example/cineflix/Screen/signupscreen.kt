@@ -1,5 +1,6 @@
 package com.example.cineflix.Screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cineflix.R
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,12 +43,11 @@ fun NetflixCreateAccountScreen(
                         modifier = Modifier.size(130.dp)
                     )
                 },
-
                 actions = {
                     TextButton(onClick = {navController.navigate("Helpscreen") }) {
                         Text("HELP", color = Color.Black)
                     }
-                    TextButton(onClick = { navController.navigate("login") }) {
+                    TextButton(onClick = { navController.navigate("loginscreen") }) {
                         Text("SIGN IN", color = Color.Black)
                     }
                 },
@@ -134,6 +135,11 @@ fun NetflixCreateAccountScreen(
                             }
                         )
                     }
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    currentUser?.providerData?.forEach {
+                        Log.d("FB", "Provider: ${it.providerId}")
+                    }
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()

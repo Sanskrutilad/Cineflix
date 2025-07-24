@@ -75,9 +75,11 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.example.cineflix.Retrofit.GamesViewModel
 import kotlinx.coroutines.delay
 
 fun extractDominantColorFromUrl(
@@ -109,15 +111,26 @@ fun NetflixTopBarScreen(navController: NavHostController) {
     val movieViewModel: NetflixViewModel = viewModel()
     val bollywood = movieViewModel.bollywood
 
-    // Defensive
     if (bollywood.isEmpty()) {
-        // Show loader / placeholder
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp) // Keeps it within the section height
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             CircularProgressIndicator(color = Color.Red)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Loading Bollywood movies...\nThis may take a while.",
+                color = Color.White,
+                fontSize = 13.sp,
+                textAlign = TextAlign.Center
+            )
         }
         return
     }
-
     var order by remember(bollywood) { mutableStateOf(bollywood.shuffled()) }
     var index by remember { mutableIntStateOf(0) }
     val featuredMovie = order[index]
@@ -258,8 +271,6 @@ fun FilterChip(
     }
 }
 
-
-
 @Composable
 fun FeaturedBanner(
     navController: NavHostController,
@@ -345,6 +356,7 @@ fun FeaturedBanner(
         Spacer(Modifier.height(12.dp))
     }
 }
+
 @Composable
 fun Castdetailsscreen(
     movieId: String,
@@ -488,18 +500,22 @@ fun SectionHeader(title: String) {
         color = Color.White
     )
 }
+
 @Composable
-fun MobileGamesSection(backgroundColor: Color) {
+fun MobileGamesSection(
+    backgroundColor: Color,
+    viewModel: GamesViewModel = viewModel()
+) {
+    val games by viewModel.games.collectAsState()
     Column(modifier = Modifier.padding(16.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 2.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold)
-
+            Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold,  style = MaterialTheme.typography.titleLarge)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("See All", color = Color.White)
                 Spacer(modifier = Modifier.width(4.dp))
@@ -507,65 +523,65 @@ fun MobileGamesSection(backgroundColor: Color) {
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        val gameList = listOf(
-            Game("https://i.imgur.com/WJ6mPci.png", "Squid Game: Unleashed", "Action"),
-            Game("https://i.imgur.com/WJ6mPci.png", "Stranger Things 3", "Adventure"),
-            Game("https://i.imgur.com/WJ6mPci.png", "Hextech Mayhem", "Music"),
-            Game("https://i.imgur.com/WJ6mPci.png", "Twelve Minutes", "Thriller"),
-            Game("https://i.imgur.com/WJ6mPci.png", "Before Your Eyes", "Narrative")
-        )
-        LazyRow {
-            items(gameList) { game ->
-                Card(
-                    modifier = Modifier
-                        .width(140.dp)
-                        .padding(end = 12.dp)
-                        .clickable {},
-                    colors = CardDefaults.cardColors(containerColor = Color.Black),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp)
+        if (games.isEmpty()) {
+            // Show loading indicator while data is being fetched
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        } else {
+            LazyRow {
+                items(games.take(10)) { game ->
+                    Card(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(end = 12.dp)
+                            .clickable {
+                                // Optional: Handle click to open game.game_url
+                            },
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Box(modifier = Modifier.height(100.dp)) {
-                            AsyncImage(
-                                model = game.imageUrl,
-                                contentDescription = game.title,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.DarkGray)
-                            )
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Box(modifier = Modifier.height(100.dp)) {
+                                AsyncImage(
+                                    model = game.thumbnail,
+                                    contentDescription = game.title,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color.DarkGray)
+                                )
+                                Text(
+                                    text = "New Update",
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .background(Color.Red, shape = RoundedCornerShape(4.dp))
+                                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        .offset(x = 6.dp, y = 6.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(6.dp))
+
                             Text(
-                                text = "New Update",
+                                text = game.title,
                                 color = Color.White,
-                                fontSize = 10.sp,
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .background(Color.Red, shape = RoundedCornerShape(4.dp))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    .offset(x = 6.dp, y = 6.dp)
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+
+                            Text(
+                                text = game.genre,
+                                color = Color.Gray,
+                                fontSize = 11.sp
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(6.dp))
-
-                        Text(
-                            text = game.title,
-                            color = Color.White,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Text(
-                            text = game.genre,
-                            color = Color.Gray,
-                            fontSize = 11.sp
-                        )
                     }
                 }
             }
@@ -715,7 +731,6 @@ fun NetflixHomeScreen(navController: NavHostController) {
     val hollywoodMovies = movieviewmodel.hollywoodMovies
     Column {
         MovieSection(title = "Bollywood Movies", movies = bollywood,navController)
-        MovieSection(title = "Top 10 Mobile Games", movies = kDramas.shuffled(),navController)
         MovieSection(title = "Top 10 Movies on Netflix", movies = kDramas.shuffled(),navController)
         MovieSection(title = "Only on Netflix", movies = onlyOnNetflix,navController)
         MovieSection(title = "K-Dramas", movies = kDramas,navController)
@@ -743,22 +758,18 @@ fun MovieDetailScreen(
     LaunchedEffect(Imdb) {
         viewModel.fetchMovieById(Imdb)
     }
-
     // Fetch trailer after movie is loaded
     LaunchedEffect(movie?.Imdbid) {
         if (!movie?.Imdbid.isNullOrEmpty()) {
             viewModel.fetchTrailerByImdbId(movie.Imdbid)
         }
     }
-
-
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = Color.Red)
         }
         return
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -768,32 +779,45 @@ fun MovieDetailScreen(
     ) {
         // Thumbnail and header icons
         Box {
-            if (!trailerId.isNullOrEmpty()) {
-                AndroidView(
-                    factory = { context ->
-                        WebView(context).apply {
-                            layoutParams = ViewGroup.LayoutParams(
-                                ViewGroup.LayoutParams.MATCH_PARENT,
-                                600
-                            )
-                            settings.javaScriptEnabled = true
-                            loadUrl("https://www.youtube.com/embed/$trailerId")
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(vertical = 16.dp)
-                )
+            if (trailerId != null) {
+                if (trailerId.isNotEmpty()) {
+                    AndroidView(
+                        factory = { context ->
+                            WebView(context).apply {
+                                layoutParams = ViewGroup.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    600
+                                )
+                                settings.javaScriptEnabled = true
+                                loadUrl("https://www.youtube.com/embed/$trailerId")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .padding(vertical = 16.dp)
+                    )
+                } else {
+                    // Only show this if trailerId is known to be empty
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Trailer not available", color = Color.White)
+                    }
+                }
             }
             else {
+                // While trailerId is null (still loading), show a loading spinner instead of flickering
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Trailer not available", color = Color.White)
+                    CircularProgressIndicator(color = Color.Red)
                 }
             }
             TopAppBar(

@@ -61,7 +61,6 @@ fun ReadyToWatchScreen(
                 tint = Color.Black
             )
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -108,20 +107,15 @@ fun ReadyToWatchScreen(
 
             Button(
                 onClick = {
-                    val email = emailState.value.trim()
-                    if (email.isNotEmpty()) {
-                        loginViewModel.isUserRegistered(email) { isRegistered ->
-                            if (isRegistered) {
-                                Log.d("FB", "Navigating to loginscreen for: $email")
-                                navController.navigate("loginscreen")
-                            } else {
-                                Log.d("FB", "Navigating to signupscreen for: $email")
-                                navController.navigate("signupscreen")
-                            }
+                    loginViewModel.isUserRegistered(emailState.value) { isRegistered ->
+                        Log.d("FB", "isUserRegistered callback for $emailState.value: $isRegistered")
+                        if (isRegistered) {
+                            navController.navigate("loginscreen")
+                        } else {
+                            navController.navigate("signupscreen")
                         }
-                    } else {
-                        Log.d("FB", "Email is empty.")
                     }
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()

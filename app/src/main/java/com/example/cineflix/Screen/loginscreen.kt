@@ -1,5 +1,7 @@
 package com.example.cineflix.Screen
 
+import android.R.attr.password
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,14 +20,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Viewmodel.LoginScreenViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixLoginScreen(navController: NavHostController, apiService: ApiService) {
+fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginScreenViewModel = viewModel()) {
     Scaffold(
         topBar = { NetflixTopAppBar() },
         containerColor = Color.Black
@@ -89,8 +94,28 @@ fun NetflixLoginScreen(navController: NavHostController, apiService: ApiService)
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { },
-                modifier = Modifier
+                onClick = {
+                    Log.d("LoginButton", "Sign In button clicked")
+                    Log.d("LoginButton", "Email: ${emailState.value}")
+                    Log.d("LoginButton", "Password: ${passwordState.value}")
+                    FirebaseAuth.getInstance().fetchSignInMethodsForEmail("s@gmail.com")
+                        .addOnSuccessListener {
+                            Log.d("SIGN_METHODS", "Sign-in methods: ${it.signInMethods}")
+                        }
+
+                    loginViewModel.signInWithEmailAndPassword(
+                        email = emailState.value,
+                        password = passwordState.value,
+                        home = {
+                            Log.d("LoginButton", "Navigation to HomeScreen triggered")
+                            navController.navigate("HomeScreen")
+                        }
+                    )
+                    val user = FirebaseAuth.getInstance().currentUser
+                    Log.d("USER", "UID: ${user?.uid}, email: ${user?.email}, provider: ${user?.providerId}")
+
+                },
+                        modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
