@@ -80,7 +80,6 @@ fun ReadyToWatchScreen(
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(20.dp))
-
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
