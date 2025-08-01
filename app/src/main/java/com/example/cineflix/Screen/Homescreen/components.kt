@@ -553,16 +553,6 @@ fun MobileGamesSection(
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(Color.DarkGray)
                                 )
-                                Text(
-                                    text = "New Update",
-                                    color = Color.White,
-                                    fontSize = 10.sp,
-                                    modifier = Modifier
-                                        .align(Alignment.TopStart)
-                                        .background(Color.Red, shape = RoundedCornerShape(4.dp))
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                        .offset(x = 6.dp, y = 6.dp)
-                                )
                             }
 
                             Spacer(modifier = Modifier.height(6.dp))

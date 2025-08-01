@@ -37,9 +37,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
     val imageList = listOf(
-        R.drawable.img05,
-        R.drawable.img06,
-        R.drawable.img04
+        R.drawable.gs1,
+        R.drawable.gs2,
+        R.drawable.gs3
     )
     val context = LocalContext.current
     var currentImageIndex by remember { mutableStateOf(0) }
@@ -70,65 +70,115 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row {
-                Text(
-                    text = "PRIVACY",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(end = 16.dp).clickable{openUrl("https://help.netflix.com/en/node/100628")}
-                )
-                Text(
-                    text = "SIGN IN",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    modifier=Modifier.clickable{navController.navigate("loginscreen")}
-                )
-            }
+            Text(
+                text = "PRIVACY",
+                color = Color.White,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .clickable { openUrl("https://help.netflix.com/en/node/100628") }
+            )
+
+            Text(
+                text = "SIGN IN",
+                color = Color.White,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .clickable { navController.navigate("loginscreen") }
+            )
         }
+
 
         // Text & dots over image (Bottom Center)
-        Column(
+        // Overlay layout
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp, vertical = 24.dp)
         ) {
-            // Dot Indicators
-            Row(horizontalArrangement = Arrangement.Center) {
-                imageList.indices.forEach { index ->
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(if (index == currentImageIndex) Color.White else Color.Gray)
-                            .padding(4.dp)
-                            .then(Modifier.padding(horizontal = 4.dp))
-                    )
-                    Spacer(Modifier.width(30.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Get Started Button
-            Button(
-                onClick = { navController.navigate("ReadyToWatchScreen") },
+            // Centered text block (middle of the screen)
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    .align(Alignment.BottomCenter).padding(bottom = 95.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                //verticalArrangement = Arrangement.SpaceBetween
             ) {
+                //Spacer(modifier = Modifier.height(100.dp))
                 Text(
-                    text = "Get Started",
+                    text = "Unlimited ",
                     color = Color.White,
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "entertainment,",
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "one low price.",
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "All of Netflix, starting at just \n ₹149.",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center
                 )
             }
+
+            // Bottom section: Dots + Button
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(horizontalArrangement = Arrangement.Center) {
+                    imageList.indices.forEach { index ->
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (index == currentImageIndex) Color.White else Color.Gray)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { navController.navigate("ReadyToWatchScreen") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                ) {
+                    Text(
+                        text = "Get Started",
+                        color = Color.White,
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    )
+                }
+            }
         }
+
     }
 }

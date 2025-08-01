@@ -20,42 +20,57 @@ import kotlinx.coroutines.delay
 import androidx.compose.material3.*
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.R
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    var visible by remember { mutableStateOf(false) }
-
-    val scale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0.95f,
-        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+    val letterImages = listOf(
+        R.drawable.nlogo,
+        R.drawable.elogo,
+        R.drawable.tlogo,
+        R.drawable.flogo,
+        R.drawable.llogo,
+        R.drawable.ilogo,
+        R.drawable.xlogo
     )
-    val alpha by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(durationMillis = 1000)
-    )
+    var visibleLettersCount by remember { mutableStateOf(0) }
 
-    // Trigger animation and navigate after delay
+    // Reveal one image at a time
     LaunchedEffect(Unit) {
-        visible = true
-        delay(3000) // Total splash time
+        for (i in letterImages.indices) {
+            delay(320)
+            visibleLettersCount = i + 1
+        }
+        delay(1500)
         navController.navigate("NetflixSimpleWelcomeScreen") {
             popUpTo("Splashscreen") { inclusive = true }
         }
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black), // Netflix uses solid black background
+            .background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.netflixlogo),
-            contentDescription = "Netflix Logo",
-            modifier = Modifier
-                .scale(scale)
-                .alpha(alpha)
-                .size(160.dp) // Netflix's splash logo is medium size
-        )
+        Row(
+            //horizontalArrangement = Arrangement.spacedBy(0.dp), // No added space
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            letterImages.forEachIndexed { index, imageRes ->
+                AnimatedVisibility(visible = index < visibleLettersCount) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imageRes),
+                        contentDescription = "Letter $index",
+                        modifier = Modifier
+                            .size(50.dp) // Slightly smaller
+
+                    )
+                }
+            }
+        }
+
     }
 }
+
