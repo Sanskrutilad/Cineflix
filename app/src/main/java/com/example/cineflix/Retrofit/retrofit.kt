@@ -106,15 +106,6 @@ data class YouTubeVideoItem(
     val id: VideoId
 )
 
-data class FreeToGame(
-    val id: Int,
-    val title: String,
-    val thumbnail: String,
-    val short_description: String,
-    val game_url: String,
-    val genre: String,
-    val platform: String
-)
 
 
 data class VideoId(
@@ -200,13 +191,25 @@ fun createApiService(): ApiService {
     return retrofit.create(ApiService::class.java)
 }
 
+data class FreeToGame(
+    val id: Int,
+    val title: String,
+    val thumbnail: String,
+    val short_description: String,
+    val game_url: String,
+    val genre: String,
+    val platform: String
+)
+
 interface FreeToGameApiService {
     @GET("games")
     suspend fun getGames(
         @Query("platform") platform: String = "all",
+        @Query("category") category: String? = null,
         @Query("sort-by") sortBy: String = "popularity"
     ): List<FreeToGame>
 }
+
 
 object FreeToGameRetrofit {
     private val retrofit = Retrofit.Builder()
@@ -217,20 +220,35 @@ object FreeToGameRetrofit {
     val api: FreeToGameApiService = retrofit.create(FreeToGameApiService::class.java)
 }
 
+
 class GamesViewModel : ViewModel() {
-    private val _games = MutableStateFlow<List<FreeToGame>>(emptyList())
-    val games: StateFlow<List<FreeToGame>> = _games
+
+    private val _shooterGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val shooterGames: StateFlow<List<FreeToGame>> = _shooterGames
+
+    private val _mmorpgGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val mmorpgGames: StateFlow<List<FreeToGame>> = _mmorpgGames
+
+    private val _pvpGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val pvpGames: StateFlow<List<FreeToGame>> = _pvpGames
+
+    private val _fantasyGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val fantasyGames: StateFlow<List<FreeToGame>> = _fantasyGames
+
     init {
-        fetchGames()
+        fetchGamesByCategory("shooter", _shooterGames)
+        fetchGamesByCategory("mmorpg", _mmorpgGames)
+        fetchGamesByCategory("pvp", _pvpGames)
+        fetchGamesByCategory("fantasy", _fantasyGames)
     }
 
-    fun fetchGames(platform: String = "all", sort: String = "popularity") {
+    private fun fetchGamesByCategory(category: String, stateFlow: MutableStateFlow<List<FreeToGame>>) {
         viewModelScope.launch {
             try {
-                val result = FreeToGameRetrofit.api.getGames(platform, sort)
-                _games.value = result
+                val result = FreeToGameRetrofit.api.getGames(category = category)
+                stateFlow.value = result
             } catch (e: Exception) {
-                Log.e("GamesViewModel", "Error fetching games: ${e.message}")
+                Log.e("GamesViewModel", "Error fetching $category games: ${e.message}")
             }
         }
     }

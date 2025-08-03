@@ -107,7 +107,6 @@ class NetflixViewModel : ViewModel() {
                 } else {
                     Log.e("LikeMovie", "Like failed: ${response.code()} ${response.errorBody()?.string()}")
                 }
-
             } catch (e: Exception) {
                 Log.e("LikeMovie", "Failed to post liked movie", e)
             }

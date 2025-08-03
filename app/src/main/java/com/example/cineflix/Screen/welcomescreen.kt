@@ -51,7 +51,6 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
         }
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background image
         Image(
             painter = painterResource(id = imageList[currentImageIndex]),
             contentDescription = null,
@@ -70,7 +69,7 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = 36.dp, vertical = 36.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -82,7 +81,6 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
                     .padding(end = 16.dp)
                     .clickable { openUrl("https://help.netflix.com/en/node/100628") }
             )
-
             Text(
                 text = "SIGN IN",
                 color = Color.White,

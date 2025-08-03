@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
+import com.example.cineflix.Screen.Gamesscreen.GameHomeScreen
 import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
@@ -26,7 +27,7 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Splashscreen") {
+    NavHost(navController = navController, startDestination = "GameHomeScreen") {
         composable("Splashscreen") {
             SplashScreen(navController)
         }
@@ -59,6 +60,9 @@ fun Navigation(apiService: ApiService) {
         }
         composable("Menuscreen") {
             NetflixTopBarScreen(navController)
+        }
+        composable("GameHomeScreen") {
+            GameHomeScreen(navController)
         }
         composable("CategoryScreen") {
             PreviewCategoryScreen(navController)
