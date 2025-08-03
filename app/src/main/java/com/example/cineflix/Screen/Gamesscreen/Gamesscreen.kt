@@ -99,13 +99,8 @@ fun GameSection(title: String, games: List<FreeToGame>, navController: NavContro
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(title, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("See All", color = Color.White)
-                Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
-            }
-        }
 
+        }
         LazyRow {
             items(games.take(10)) { game ->
                 GameCard(game = game) {
@@ -123,7 +118,7 @@ fun GameCard(game: FreeToGame, onClick: () -> Unit) {
             .width(140.dp)
             .padding(end = 12.dp)
             .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -133,12 +128,11 @@ fun GameCard(game: FreeToGame, onClick: () -> Unit) {
                 contentDescription = game.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .height(100.dp)
+                    .height(105.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
             )
             Spacer(modifier = Modifier.height(6.dp))
-
             Text(
                 text = game.title,
                 color = Color.White,
@@ -146,12 +140,6 @@ fun GameCard(game: FreeToGame, onClick: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = game.genre,
-                color = Color.Gray,
-                fontSize = 11.sp
             )
         }
     }

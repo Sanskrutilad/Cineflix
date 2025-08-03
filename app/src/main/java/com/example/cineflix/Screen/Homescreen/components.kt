@@ -99,7 +99,6 @@ fun extractDominantColorFromUrl(
             }
         }
         .build()
-
     val imageLoader = ImageLoader(context)
     imageLoader.enqueue(request)
 }
