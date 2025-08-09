@@ -111,22 +111,27 @@ fun NetflixTopBarScreen(navController: NavHostController) {
     val bollywood = movieViewModel.bollywood
 
     if (bollywood.isEmpty()) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp) // Keeps it within the section height
+                .fillMaxHeight()
+                .background(Color.Gray)
                 .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = Color.Red)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Loading Bollywood movies...\nThis may take a while.",
-                color = Color.White,
-                fontSize = 13.sp,
-                textAlign = TextAlign.Center
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(color = Color.Red)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Loading..\nThis may take a while.",
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
         return
     }
@@ -184,7 +189,7 @@ fun NetflixTopBarScreen(navController: NavHostController) {
                     featuredMovie = featuredMovie,
                 )
             }
-//            item { MobileGamesSection(backgroundColor) }
+            item { MobileGamesSection(backgroundColor, navController ) }
             item { NetflixHomeScreen(navController) }
         }
     }
@@ -488,6 +493,7 @@ fun Castdetailsscreen(
         }
     }
 }
+
 @Composable
 fun SectionHeader(title: String) {
     Text(
@@ -498,83 +504,80 @@ fun SectionHeader(title: String) {
     )
 }
 
-//@Composable
-//fun MobileGamesSection(
-//    backgroundColor: Color,
-//    viewModel: GamesViewModel = viewModel()
-//) {
-//    val games by viewModel.games.collectAsState()
-//    Column(modifier = Modifier.padding(16.dp)) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 2.dp, vertical = 8.dp),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold,  style = MaterialTheme.typography.titleLarge)
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Text("See All", color = Color.White)
-//                Spacer(modifier = Modifier.width(4.dp))
-//                Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
-//            }
-//        }
-//        Spacer(modifier = Modifier.height(8.dp))
-//        if (games.isEmpty()) {
-//            // Show loading indicator while data is being fetched
-//            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-//                CircularProgressIndicator(color = Color.White)
-//            }
-//        } else {
-//            LazyRow {
-//                items(games.take(10)) { game ->
-//                    Card(
-//                        modifier = Modifier
-//                            .width(140.dp)
-//                            .padding(end = 12.dp)
-//                            .clickable {
-//                                // Optional: Handle click to open game.game_url
-//                            },
-//                        colors = CardDefaults.cardColors(containerColor = Color.Black),
-//                        shape = RoundedCornerShape(12.dp),
-//                        elevation = CardDefaults.cardElevation(4.dp)
-//                    ) {
-//                        Column(modifier = Modifier.padding(8.dp)) {
-//                            Box(modifier = Modifier.height(100.dp)) {
-//                                AsyncImage(
-//                                    model = game.thumbnail,
-//                                    contentDescription = game.title,
-//                                    contentScale = ContentScale.Crop,
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .clip(RoundedCornerShape(8.dp))
-//                                        .background(Color.DarkGray)
-//                                )
-//                            }
-//
-//                            Spacer(modifier = Modifier.height(6.dp))
-//
-//                            Text(
-//                                text = game.title,
-//                                color = Color.White,
-//                                fontSize = 13.sp,
-//                                fontWeight = FontWeight.SemiBold,
-//                                maxLines = 1,
-//                                overflow = TextOverflow.Ellipsis
-//                            )
-//
-//                            Text(
-//                                text = game.genre,
-//                                color = Color.Gray,
-//                                fontSize = 11.sp
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
+@Composable
+fun MobileGamesSection(
+    backgroundColor: Color,
+    navController: NavHostController,
+    viewModel: GamesViewModel = viewModel(),
+) {
+    val shooterGames by viewModel.shooterGames.collectAsState()
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 2.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold,  style = MaterialTheme.typography.titleLarge,)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("See All", color = Color.White, modifier = Modifier.clickable{navController.navigate("GameHomeScreen")})
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null, modifier = Modifier.clickable{navController.navigate("GameHomeScreen")})
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        if (shooterGames.isEmpty()) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color.White)
+            }
+        } else {
+            LazyRow {
+                items(shooterGames.take(10)) { game ->
+                    Card(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(end = 12.dp)
+                            .clickable {
+                                // Optional: Handle click to open game.game_url
+                            },
+                        colors = CardDefaults.cardColors(containerColor = Color.Black),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Box(modifier = Modifier.height(100.dp)) {
+                                AsyncImage(
+                                    model = game.thumbnail,
+                                    contentDescription = game.title,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color.DarkGray)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = game.title,
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = game.genre,
+                                color = Color.Gray,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 data class Game(
     val imageUrl: String,

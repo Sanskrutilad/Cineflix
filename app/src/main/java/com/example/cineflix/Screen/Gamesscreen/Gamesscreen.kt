@@ -32,10 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.FreeToGame
 import com.example.cineflix.Retrofit.GamesViewModel
+import com.example.cineflix.Screen.Homescreen.BottomBar
 import com.example.cineflix.Screen.Homescreen.Game
 import kotlin.collections.take
 
@@ -52,24 +54,16 @@ fun GameHomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("FreeToGame", color = Color.White) },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black)
-            )
+                TopAppBar(
+                    title = { Text("Games", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 25.sp) },
+                    colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black),
+                    actions = {
+                        Icon(Icons.Default.Search, contentDescription = "Profile", tint = Color.White, modifier=Modifier.padding(end=15.dp))
+                    }
+                )
         },
         bottomBar = {
-            BottomAppBar(
-                containerColor = Color.Black,
-                contentColor = Color.White,
-                content = {
-                    IconButton(onClick = {  }) {
-                        Icon(Icons.Default.Home, contentDescription = "Home", tint = Color.White)
-                    }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.Person, contentDescription = "Profile", tint = Color.White)
-                    }
-                }
-            )
+            BottomBar(navController as NavHostController)
         },
         containerColor = Color.Black
     ) { padding ->
@@ -91,7 +85,7 @@ fun GameHomeScreen(
 
 @Composable
 fun GameSection(title: String, games: List<FreeToGame>, navController: NavController) {
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(modifier = Modifier.padding(6.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -101,8 +95,6 @@ fun GameSection(title: String, games: List<FreeToGame>, navController: NavContro
         ) {
             Text(title, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("See All", color = Color.White)
-                Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
             }
         }
         LazyRow {
@@ -132,15 +124,14 @@ fun GameCard(game: FreeToGame, onClick: () -> Unit) {
                 contentDescription = game.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .height(105.dp)
-                    .fillMaxWidth()
+                    .size(150.dp)
                     .clip(RoundedCornerShape(8.dp))
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = game.title,
                 color = Color.White,
-                fontSize = 13.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

@@ -27,7 +27,7 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "GameHomeScreen") {
+    NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
         }
