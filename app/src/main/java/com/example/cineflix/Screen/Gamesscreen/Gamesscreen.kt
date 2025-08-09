@@ -99,7 +99,11 @@ fun GameSection(title: String, games: List<FreeToGame>, navController: NavContro
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
+            Text(title, color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleLarge)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("See All", color = Color.White)
+                Icon(Icons.Default.ArrowForwardIos, tint = Color.White, contentDescription = null)
+            }
         }
         LazyRow {
             items(games.take(10)) { game ->

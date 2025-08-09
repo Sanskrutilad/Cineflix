@@ -27,20 +27,20 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Splashscreen") {
-        composable("Splashscreen") {
+    NavHost(navController = navController, startDestination = "GameHomeScreen") {
+        composable("Splashscreen"){
             SplashScreen(navController)
         }
-        composable("settingscreen") {
+        composable("settingscreen"){
             Settingmainscreen(navController)
         }
-        composable("ReadyToWatchScreen") {
+        composable("ReadyToWatchScreen"){
             ReadyToWatchScreen(navController)
         }
-        composable("Signupscreen") {
+        composable("Signupscreen"){
             NetflixCreateAccountScreen(navController)
         }
-        composable("appsettings") {
+        composable("appsettings"){
             AppSettingsScreen(navController)
         }
         composable("Helpscreen") {
