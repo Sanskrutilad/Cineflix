@@ -221,7 +221,7 @@ fun TopAppBarContent(backgroundColor1: Color) {
             imageVector = Icons.Default.Search,
             contentDescription = "Search",
             tint = Color.White,
-            modifier = Modifier.size(35.dp)
+            modifier = Modifier.size(35.dp).clickable{}
         )
     }
 }
@@ -956,3 +956,5 @@ fun MovieDetailScreen(
         }
     }
 }
+
+
