@@ -131,11 +131,11 @@ fun MoviesScreen(
     netflixViewModel: NetflixViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val onlyOnNetflix = netflixViewModel.onlyOnNetflix
+    //val onlyOnNetflix = netflixViewModel.onlyOnNetflix
     val bollywood = netflixViewModel.bollywood
-    val hollywood = netflixViewModel.hollywoodMovies
+    val comedy = netflixViewModel.comedyMovies
 
-    if (onlyOnNetflix.isEmpty()) {
+    if (bollywood.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -148,7 +148,7 @@ fun MoviesScreen(
     }
 
     var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
-    val featuredMovie = onlyOnNetflix.first()
+    val featuredMovie = bollywood.first()
 
     LaunchedEffect(featuredMovie.Poster) {
         extractDominantColorFromUrl(context, featuredMovie.Poster) { c ->
@@ -183,15 +183,11 @@ fun MoviesScreen(
                     )
                 }
 
-
-                if (onlyOnNetflix.isNotEmpty())
-                    item { HorizontalMovieSection("Only on Netflix", onlyOnNetflix) }
-
                 if (bollywood.isNotEmpty())
                     item { HorizontalMovieSection("Bollywood Movies", bollywood) }
 
-                if (hollywood.isNotEmpty())
-                    item { HorizontalMovieSection("Hollywood Movies", hollywood) }
+                if (comedy.isNotEmpty())
+                    item { HorizontalMovieSection("Comedy Movies", comedy) }
             }
 
             // Top bar overlay — now always on top & intercepts touches
