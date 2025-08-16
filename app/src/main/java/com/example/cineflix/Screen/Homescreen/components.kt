@@ -82,6 +82,7 @@ import coil.request.ImageRequest
 import com.example.cineflix.Retrofit.GamesViewModel
 import kotlinx.coroutines.delay
 
+
 fun extractDominantColorFromUrl(
     context: Context,
     imageUrl: String,
@@ -236,7 +237,7 @@ fun FilterChipsRow(backgroundColor: Color, navController: NavHostController) {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        FilterChip("TV Shows", route = "tv_shows", navController = navController)
+        FilterChip("TV Shows", route = "TVShows", navController = navController)
         FilterChip("Movies", route = "movies", navController = navController)
         FilterChip("Categories", showDropdown = true, route = "CategoryScreen", navController = navController)
     }
@@ -690,6 +691,7 @@ fun MovieCard(
         )
     }
 }
+
 @Composable
 fun MovieSection(title: String, movies: List<MovieResponse>,navController: NavHostController) {
     Column(modifier = Modifier.fillMaxWidth()) {

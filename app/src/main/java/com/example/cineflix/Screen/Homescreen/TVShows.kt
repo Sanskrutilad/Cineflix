@@ -1,6 +1,6 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.cineflix.Screen.Homescreen
+
+
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -61,7 +61,7 @@ import com.example.cineflix.Retrofit.NetflixViewModel
 
 
 @Composable
-fun PreviewCategoryScreen(navController: NavHostController) {
+fun PreviewCategoryScreen2(navController: NavHostController) {
     val sampleCategories = listOf(
         "Home", "My List", "Available for Download", "The Summer Edition",
         "Celebrating Disability with Dimension", "Hindi", "Tamil", "Punjabi",
@@ -72,11 +72,11 @@ fun PreviewCategoryScreen(navController: NavHostController) {
         "Reality & Talk", "Romance", "Sci-Fi", "Stand-Up", "Thrillers",
         "United States", "Audio Description in English"
     )
-    CategoryScreen(categories = sampleCategories, onClose = {},navController)
+    CategoryScreen2(categories = sampleCategories, onClose = {},navController)
 }
 
 @Composable
-fun CategoryScreen(categories: List<String>, onClose: () -> Unit, navController: NavHostController) {
+fun CategoryScreen2(categories: List<String>, onClose: () -> Unit, navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -123,17 +123,14 @@ fun CategoryScreen(categories: List<String>, onClose: () -> Unit, navController:
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MoviesScreen(
+fun MoviesScreen2(
     navController: NavHostController,
     netflixViewModel: NetflixViewModel = viewModel()
 ) {
     val context = LocalContext.current
     //val onlyOnNetflix = netflixViewModel.onlyOnNetflix
-    val bollywood = netflixViewModel.bollywood
-    val comedy = netflixViewModel.comedyMovies
-    val fantasyMovies = netflixViewModel.fantasyMovies
-    val HollywoodMovies = netflixViewModel.hollywoodMovies
-    if (bollywood.isEmpty()) {
+    val kDramas = netflixViewModel.kDramas
+    if (kDramas.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -144,10 +141,8 @@ fun MoviesScreen(
         }
         return
     }
-
     var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
-    val featuredMovie = bollywood.first()
-
+    val featuredMovie = kDramas.first()
     LaunchedEffect(featuredMovie.Poster) {
         extractDominantColorFromUrl(context, featuredMovie.Poster) { c ->
             backgroundColor = c
@@ -169,9 +164,8 @@ fun MoviesScreen(
                 item { Spacer(modifier = Modifier.height(56.dp)) } // space for TopBar
 
                 item {
-                    CategoryChipsRow(backgroundColor)
+                    CategoryChipsRow2(backgroundColor)
                 }
-
                 // Inside LazyColumn in MoviesScreen
                 item {
                     FeaturedBanner(
@@ -180,23 +174,22 @@ fun MoviesScreen(
                         featuredMovie = featuredMovie
                     )
                 }
+
                 item {
                     val movieviewmodel: NetflixViewModel = viewModel()
-                    val bollywood = movieviewmodel.bollywood
-                    val comedyMovies = movieviewmodel.comedyMovies
+                    val kDramas = movieviewmodel.kDramas
+                    val susTvShows = movieviewmodel.susTvShows
                     val fantasyMovies = movieviewmodel.fantasyMovies
                     Column {
-                        MovieSection(title = "Bollywood Movies", movies = bollywood,navController)
-
-                        MovieSection(title = "Comedy Movies", movies = comedyMovies,navController)
-                        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = fantasyMovies,navController)
+                        MovieSection(title = "kDramas", movies = kDramas,navController)
+                        MovieSection(title = "TV Shows", movies = susTvShows,navController)
                         //MovieSection(title = "Hollywood Movies", movies = hollywoodMovies)
                     }
                 }
             }
 
             // Top bar overlay — now always on top & intercepts touches
-            MoviesTopBar(
+            MoviesTopBar2(
                 backgroundColor = backgroundColor,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -207,21 +200,22 @@ fun MoviesScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoviesTopBar(
+fun MoviesTopBar2(
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
     TopAppBar(
-        title = { Text("Component", color = Color.White) },
+        title = { Text("TV Shows", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White)
             }
         },
         actions = {
-            IconButton(onClick = { /* Download */ }) {
+            IconButton(onClick = {  }) {
                 Icon(Icons.Default.FileDownload, contentDescription = null, tint = Color.White)
             }
             IconButton(onClick = { /* Search */ }) {
@@ -235,7 +229,7 @@ fun MoviesTopBar(
 
 
 @Composable
-fun CategoryChipsRow(backgroundColor: Color) {
+fun CategoryChipsRow2(backgroundColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -243,7 +237,7 @@ fun CategoryChipsRow(backgroundColor: Color) {
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        FilterChip(selected = true, onClick = {}, label = { Text("Movies") })
+        FilterChip(selected = true, onClick = {}, label = { Text("TV Shows") })
         FilterChip(selected = false, onClick = {}, label = { Text("All Categories") })
     }
 }

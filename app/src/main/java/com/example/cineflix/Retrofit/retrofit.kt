@@ -100,6 +100,7 @@ data class WatchedMovie(
 data class YouTubeSearchResponse(
     val items: List<YouTubeVideoItem>
 )
+
 val youtubeApiKey = "AIzaSyA8vYqtM8ANJ8hkzOpTBf5toOrLq8IBU_E"
 
 data class YouTubeVideoItem(
@@ -107,10 +108,10 @@ data class YouTubeVideoItem(
 )
 
 
-
 data class VideoId(
     val videoId: String
 )
+
 interface YouTubeApiService {
     @GET("search")
     suspend fun searchTrailer(
@@ -121,6 +122,7 @@ interface YouTubeApiService {
         @Query("key") apiKey: String
     ): YouTubeSearchResponse
 }
+
 data class LikedMoviesResponse(
     val success: Boolean,
     val imdbIds: List<String>
@@ -155,7 +157,6 @@ interface ApiService {
 
     @GET("recentlywatched/{userId}")
     suspend fun getRecentlyWatched(@Path("userId") userId: String): Response<List<WatchedMovie>>
-
 
 }
 

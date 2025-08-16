@@ -37,73 +37,95 @@ fun NewAndHotScreen() {
     val tabs = listOf("Coming Soon", "Everyone's Watching")
     var selectedTab by remember { mutableStateOf(tabs[0]) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        TopAppBar(
-            title = {
-                Text(
-                    "New & Hot",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-            },
-            actions = {
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White)
-                }
-                IconButton(onClick = {}) {
-                    Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
-        )
-        val tabs = listOf("Coming Soon", "Everyone's Watching")
-        val emojis = listOf("🍿", "🔥")
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            tabs.forEachIndexed { index, tab ->
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(if (selectedTab == tab) Color.Red else Color.DarkGray)
-                        .clickable { selectedTab = tab }
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
                     Text(
-                        text = "${emojis[index]} $tab",
+                        "New & Hot",
                         color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White)
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.Black,
+                contentColor = Color.White
+            ) {
+                IconButton(onClick = { /* Home */ }) {
+                    Icon(Icons.Default.PlayArrow, contentDescription = "Home", tint = Color.White)
+                }
+                Spacer(modifier = Modifier.weight(1f)) // pushes icons to edges
+
+                IconButton(onClick = { /* Profile */ }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Profile", tint = Color.White)
+                }
+            }
+        },
+        containerColor = Color.Black
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding) // important to avoid overlap with app bars
+                .background(Color.Black)
+        ) {
+            val emojis = listOf("🍿", "🔥")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Black)
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                tabs.forEachIndexed { index, tab ->
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(if (selectedTab == tab) Color.Red else Color.DarkGray)
+                            .clickable { selectedTab = tab }
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "${emojis[index]} $tab",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(8.dp)
+            ) {
+                items(5) {
+                    ShowCard(
+                        imageUrl = "https://via.placeholder.com/600x400",
+                        ageRating = "U/A 13+",
+                        title = "The Great Indian Kapil Show",
+                        description = "New Episode Every Saturday 8pm\nIt's always more fun with siblings! Join Shilpa Shetty, Shamita Shetty, Huma Qureshi and Saqib Saleem as they put their chemistry and candor on display."
                     )
                 }
             }
         }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            items(5) {
-                ShowCard(
-                    imageUrl = "https://via.placeholder.com/600x400", // Replace with real image
-                    ageRating = "U/A 13+",
-                    title = "The Great Indian Kapil Show",
-                    description = "New Episode Every Saturday 8pm\nIt's always more fun with siblings! Join Shilpa Shetty, Shamita Shetty, Huma Qureshi and Saqib Saleem as they put their chemistry and candor on display."
-                )
-            }
-        }
     }
 }
+
 
 @Composable
 fun ShowCard(imageUrl: String, ageRating: String, title: String, description: String) {

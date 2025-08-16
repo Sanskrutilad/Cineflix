@@ -26,6 +26,7 @@ class NetflixViewModel : ViewModel() {
     init {
         fetchMovieList()
     }
+
     private fun fetchMovieList() {
         viewModelScope.launch {
             bollywood = fetchMovies(listOf("tt0995031", "tt26225118", "tt0499375","tt0248126","tt0367110","tt26733317","tt0346723",
@@ -33,10 +34,10 @@ class NetflixViewModel : ViewModel() {
           onlyOnNetflix = fetchMovies(listOf("tt10919420", "tt30003786", "tt4574334","tt10795658","tt28106741","tt6468322","tt6077448","tt3597912","tt2442560"))
            kDramas = fetchMovies(listOf("tt26471411", "tt14169960", "tt29569035","tt30423279","tt14819828","tt27668559","tt26693803","tt13274038",
                "tt11138512"))
-            susTvShows = fetchMovies(listOf("tt0401916","tt0903747","tt19072562","tt10730376","tt8421350","tt31158589","tt9319668"))
+            susTvShows = fetchMovies(listOf("tt9319668","tt0903747","tt19072562","tt10730376","tt8421350","tt31158589","tt9319668","tt0401916"))
             comedyMovies = fetchMovies(listOf("tt0242519","tt0805184","tt0995031","tt0488798","tt3159708","tt0464160","tt1573072","tt0807758","tt1464588"))
             fantasyMovies = fetchMovies(listOf("tt2338151","tt1270797","tt0110475","tt0113497","tt0451850","tt0948470"))
-           // hollywoodMovies = fetchMovies(listOf("tt2078092","tt13457350","tt1663202","tt2821224","tt15313716","tt13054826","tt16419174","tt13225730"))
+//            hollywoodMovies = fetchMovies(listOf("tt2078092","tt13457350","tt1663202","tt2821224","tt15313716","tt13054826","tt16419174","tt13225730"))
         }
     }
     fun fetchMovieById(imdbId: String) {
@@ -54,6 +55,7 @@ class NetflixViewModel : ViewModel() {
             }
         }
     }
+
     private suspend fun fetchMovies(titles: List<String>): List<MovieResponse> {
         return titles.mapNotNull { title ->
             try {
