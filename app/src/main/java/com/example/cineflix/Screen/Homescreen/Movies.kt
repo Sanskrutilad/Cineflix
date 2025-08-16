@@ -1,30 +1,20 @@
 package com.example.cineflix.Screen.Homescreen
 
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,30 +34,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.example.cineflix.Retrofit.MovieResponse
 import com.example.cineflix.Viewmodel.NetflixViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TvShowScreen(
+fun MoviesScreen(
     navController: NavHostController,
     netflixViewModel: NetflixViewModel = viewModel()
 ) {
     val context = LocalContext.current
     //val onlyOnNetflix = netflixViewModel.onlyOnNetflix
-    val kDramas = netflixViewModel.kDramas
-    if (kDramas.isEmpty()) {
+    val bollywood = netflixViewModel.bollywood
+    val comedy = netflixViewModel.comedyMovies
+    val fantasyMovies = netflixViewModel.fantasyMovies
+    val HollywoodMovies = netflixViewModel.hollywoodMovies
+    if (bollywood.isEmpty()) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -78,8 +64,10 @@ fun TvShowScreen(
         }
         return
     }
+
     var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
-    val featuredMovie = kDramas.first()
+    val featuredMovie = bollywood.first()
+
     LaunchedEffect(featuredMovie.Poster) {
         extractDominantColorFromUrl(context, featuredMovie.Poster) { c ->
             backgroundColor = c
@@ -101,8 +89,9 @@ fun TvShowScreen(
                 item { Spacer(modifier = Modifier.height(56.dp)) } // space for TopBar
 
                 item {
-                    TvshowChipsRow(backgroundColor)
+                    CategoryChipsRow(backgroundColor)
                 }
+
                 // Inside LazyColumn in MoviesScreen
                 item {
                     FeaturedBanner(
@@ -111,22 +100,23 @@ fun TvShowScreen(
                         featuredMovie = featuredMovie
                     )
                 }
-
                 item {
                     val movieviewmodel: NetflixViewModel = viewModel()
-                    val kDramas = movieviewmodel.kDramas
-                    val susTvShows = movieviewmodel.susTvShows
+                    val bollywood = movieviewmodel.bollywood
+                    val comedyMovies = movieviewmodel.comedyMovies
                     val fantasyMovies = movieviewmodel.fantasyMovies
                     Column {
-                        MovieSection(title = "kDramas", movies = kDramas,navController)
-                        MovieSection(title = "TV Shows", movies = susTvShows,navController)
+                        MovieSection(title = "Bollywood Movies", movies = bollywood,navController)
+
+                        MovieSection(title = "Comedy Movies", movies = comedyMovies,navController)
+                        MovieSection(title = "NX: Super-Powered Sci-Fi, Fantasy& More", movies = fantasyMovies,navController)
                         //MovieSection(title = "Hollywood Movies", movies = hollywoodMovies)
                     }
                 }
             }
 
             // Top bar overlay — now always on top & intercepts touches
-            TvshowTopBar(
+            MoviesTopBar(
                 backgroundColor = backgroundColor,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,20 +129,20 @@ fun TvShowScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TvshowTopBar(
+fun MoviesTopBar(
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
     TopAppBar(
-        title = { Text("TV Shows", color = Color.White) },
+        title = { Text("Component", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White)
             }
         },
         actions = {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = { /* Download */ }) {
                 Icon(Icons.Default.FileDownload, contentDescription = null, tint = Color.White)
             }
             IconButton(onClick = { /* Search */ }) {
@@ -166,7 +156,7 @@ fun TvshowTopBar(
 
 
 @Composable
-fun TvshowChipsRow(backgroundColor: Color) {
+fun CategoryChipsRow(backgroundColor: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,7 +164,7 @@ fun TvshowChipsRow(backgroundColor: Color) {
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        FilterChip(selected = true, onClick = {}, label = { Text("TV Shows") })
+        FilterChip(selected = true, onClick = {}, label = { Text("Movies") })
         FilterChip(selected = false, onClick = {}, label = { Text("All Categories") })
     }
 }

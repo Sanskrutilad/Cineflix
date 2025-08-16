@@ -1,12 +1,17 @@
-package com.example.cineflix.Retrofit
+package com.example.cineflix.Viewmodel
 
-import android.graphics.Movie
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Retrofit.LikeRequest
+import com.example.cineflix.Retrofit.MovieResponse
+import com.example.cineflix.Retrofit.OmdbRetrofitInstance
+import com.example.cineflix.Retrofit.youtubeApi
+import com.example.cineflix.Retrofit.youtubeApiKey
 import kotlinx.coroutines.launch
 
 class NetflixViewModel : ViewModel() {
@@ -31,9 +36,9 @@ class NetflixViewModel : ViewModel() {
         viewModelScope.launch {
             bollywood = fetchMovies(listOf("tt0995031", "tt26225118", "tt0499375","tt0248126","tt0367110","tt26733317","tt0346723",
                 "tt21383812","tt5764024","tt21626284","tt26932223","tt23790740","tt10028196","tt0449994"))
-          onlyOnNetflix = fetchMovies(listOf("tt10919420", "tt30003786", "tt4574334","tt10795658","tt28106741","tt6468322","tt6077448","tt3597912","tt2442560"))
-           kDramas = fetchMovies(listOf("tt26471411", "tt14169960", "tt29569035","tt30423279","tt14819828","tt27668559","tt26693803","tt13274038",
-               "tt11138512"))
+            onlyOnNetflix = fetchMovies(listOf("tt10919420", "tt30003786", "tt4574334","tt10795658","tt28106741","tt6468322","tt6077448","tt3597912","tt2442560"))
+            kDramas = fetchMovies(listOf("tt26471411", "tt14169960", "tt29569035","tt30423279","tt14819828","tt27668559","tt26693803","tt13274038",
+                "tt11138512"))
             susTvShows = fetchMovies(listOf("tt9319668","tt0903747","tt19072562","tt10730376","tt8421350","tt31158589","tt9319668","tt0401916"))
             comedyMovies = fetchMovies(listOf("tt0242519","tt0805184","tt0995031","tt0488798","tt3159708","tt0464160","tt1573072","tt0807758","tt1464588"))
             fantasyMovies = fetchMovies(listOf("tt2338151","tt1270797","tt0110475","tt0113497","tt0451850","tt0948470"))

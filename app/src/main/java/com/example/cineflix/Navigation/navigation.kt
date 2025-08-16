@@ -12,9 +12,9 @@ import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
 import com.example.cineflix.Screen.Homescreen.MoviesScreen
-import com.example.cineflix.Screen.Homescreen.MoviesScreen2
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
 import com.example.cineflix.Screen.Homescreen.PreviewCategoryScreen
+import com.example.cineflix.Screen.Homescreen.TvShowScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.NetflixSimpleWelcomeScreen
@@ -84,7 +84,7 @@ fun Navigation(apiService: ApiService) {
             MoviesScreen(navController = navController)
         }
         composable("TVShows") {
-            MoviesScreen2(navController = navController)
+            TvShowScreen(navController = navController)
         }
 
     }
