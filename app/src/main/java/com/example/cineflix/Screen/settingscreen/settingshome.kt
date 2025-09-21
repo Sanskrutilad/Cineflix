@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.cineflix.R
 import com.example.cineflix.Screen.Homescreen.BottomBar
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,9 +253,7 @@ fun Settingmainscreen(navController: NavHostController) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             LazyRow(
-                //contentPadding = PaddingValues(horizontal = 9.dp),
                 horizontalArrangement = Arrangement.spacedBy(9.dp)
-
             ) {
                 itemsIndexed(likedMovies) { index, title ->
                     Card(
@@ -395,7 +394,10 @@ fun NetflixBottomSheetContent(navController: NavHostController) {
             BottomSheetItem(icon = Icons.Outlined.Edit, text = "Manage Profiles",onClick = { navController.navigate("whoswatching")})
             BottomSheetItem(icon = Icons.Outlined.Settings, text = "App Settings",onClick = { navController.navigate("appsettings") })
             BottomSheetItem(icon = Icons.Default.Help, text = "Help",onClick = { navController.navigate("Helpscreen") })
-            BottomSheetItem(icon = Icons.Default.ExitToApp, text = "Sign Out", onClick = {navController.navigate("") })
+            BottomSheetItem(icon = Icons.Default.ExitToApp, text = "Sign Out", onClick = { FirebaseAuth.getInstance().signOut()
+                navController.navigate("NetflixSimpleWelcomeScreen") {
+                    popUpTo(0) { inclusive = true }
+                }})
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "Version: 9.22.1 build 3",

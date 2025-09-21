@@ -23,6 +23,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,9 +35,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,15 +110,26 @@ fun ReadyToWatchScreen(
 
             Button(
                 onClick = {
-                    loginViewModel.isUserRegistered(emailState.value) { isRegistered ->
-                        Log.d("FB", "isUserRegistered callback for $emailState.value: $isRegistered")
-                        if (isRegistered) {
-                            navController.navigate("loginscreen")
-                        } else {
-                            navController.navigate("signupscreen")
-                        }
+                    val email = emailState.value.trim()
+                    if (email.isNotEmpty()) {
+                        FirebaseAuth.getInstance()
+                            .fetchSignInMethodsForEmail(email)
+                            .addOnSuccessListener { result ->
+                                val signInMethods = result.signInMethods
+                                if (!signInMethods.isNullOrEmpty()) {
+                                    // Already registered → navigate to Login
+                                    Log.d("READY_SCREEN", "Email exists, go to Login")
+                                    navController.navigate("loginscreen")
+                                } else {
+                                    // New user → navigate to SignUp
+                                    Log.d("READY_SCREEN", "New email, go to SignUp")
+                                    navController.navigate("Signupscreen")
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("READY_SCREEN", "Error: ${e.message}")
+                            }
                     }
-
                 },
                 modifier = Modifier
                     .fillMaxWidth()

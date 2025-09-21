@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.cineflix.R
 
 @Composable
@@ -141,6 +142,7 @@ fun ProfileScreen() {
             color = Color.White,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .clickable{ }
                 .padding(16.dp),
             fontWeight = FontWeight.Bold,
             fontSize = 35.sp

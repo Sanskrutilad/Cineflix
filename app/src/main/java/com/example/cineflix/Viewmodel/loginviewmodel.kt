@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoginScreenViewModel() : ViewModel() {
@@ -18,7 +20,8 @@ class LoginScreenViewModel() : ViewModel() {
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val _loading = MutableLiveData(false)
     val loading: LiveData<Boolean> = _loading
-
+    private val _navigationTarget = MutableStateFlow<String?>(null)
+    val navigationTarget: StateFlow<String?> = _navigationTarget
     fun signInWithEmailAndPassword(
         email: String,
         password: String,
@@ -55,7 +58,6 @@ class LoginScreenViewModel() : ViewModel() {
                     if (task.isSuccessful) {
                         val user = task.result?.user
                         Log.d("FB", "Account created for: ${user?.email}")
-
                         // Log providers to confirm password is linked
                         user?.providerData?.forEach {
                             Log.d("FB", "Linked provider: ${it.providerId}")
@@ -71,8 +73,6 @@ class LoginScreenViewModel() : ViewModel() {
                 }
         }
     }
-
-
     private fun createUser(displayName: String?) {
         val userId = auth.currentUser?.uid ?: return
         val user = MUser(
@@ -93,25 +93,6 @@ class LoginScreenViewModel() : ViewModel() {
                 Log.e("FB", "Error creating user document: ${exception.message}")
             }
     }
-
-    fun isUserRegistered(email: String, callback: (Boolean) -> Unit) {
-        FirebaseAuth.getInstance()
-            .fetchSignInMethodsForEmail(email)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val signInMethods = task.result?.signInMethods ?: emptyList<String>()
-                    Log.d("FB", "Fetched sign-in methods for $email: $signInMethods")
-
-                    // Check if password is one of the methods
-                    val isRegistered = "password" in signInMethods
-                    callback(isRegistered)
-                } else {
-                    Log.e("FB", "Error fetching sign-in methods", task.exception)
-                    callback(false)
-                }
-            }
-    }
-
 
     private fun linkEmailPasswordIfMissing(email: String, password: String) {
         val normalizedEmail = email.trim().lowercase()

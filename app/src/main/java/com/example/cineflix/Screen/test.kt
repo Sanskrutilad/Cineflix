@@ -92,8 +92,6 @@ fun WhosWatchingScreen(navController: NavHostController) {
                         onClick = { navController.navigate("HomeScreen") }
                     )
                 }
-
-                // Add Profile Card
                 item {
                     AddProfileItem(onClick = { navController.navigate("AddProfileScreen") })
                 }
@@ -115,12 +113,12 @@ fun ProfileItem(profile: Profile, onClick: () -> Unit) {
                 .combinedClickable(
                     onClick = {
                         if (!showEdit) {
-                            onClick() // Navigate to Home on normal click
+                            onClick()
                         } else {
 
                         }
                     },
-                    onLongClick = { showEdit = !showEdit } // Toggle edit icon on long press
+                    onLongClick = { showEdit = !showEdit }
                 )
         ) {
             Image(
@@ -144,7 +142,6 @@ fun ProfileItem(profile: Profile, onClick: () -> Unit) {
         Text(text = profile.name, color = Color.White)
     }
 }
-
 
 @Composable
 fun AddProfileItem(onClick: () -> Unit) {
