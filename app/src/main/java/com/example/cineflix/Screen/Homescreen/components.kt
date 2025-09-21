@@ -104,7 +104,6 @@ fun extractDominantColorFromUrl(
     imageLoader.enqueue(request)
 }
 
-
 @Composable
 fun TopAppBarContent(backgroundColor1: Color) {
     Row(
@@ -135,8 +134,6 @@ fun TopAppBarContent(backgroundColor1: Color) {
         )
     }
 }
-
-
 @Composable
 fun FilterChipsRow(backgroundColor: Color, navController: NavHostController) {
     Row(
@@ -251,7 +248,7 @@ fun FeaturedBanner(
                 Spacer(Modifier.width(12.dp))
 
                 OutlinedButton(
-                    onClick = { /* add to list */ },
+                    onClick = {  },
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
@@ -363,7 +360,7 @@ data class Game(
 
 @Composable
 fun BottomBar(navController: NavHostController, selected: String = "HomeScreen") {
-    val items = listOf("HomeScreen","Routes.NEW_HOT", "settingscreen")
+    val items = listOf("HomeScreen","NewsandHot", "settingscreen")
     val labels = listOf("Home", "New & Hot", "My Netflix")
     val icons = listOf(Icons.Default.Home, Icons.Default.Whatshot, Icons.Default.Person)
 
@@ -397,9 +394,11 @@ fun BottomBar(navController: NavHostController, selected: String = "HomeScreen")
                 modifier = Modifier.align(Alignment.CenterEnd),
                 onClick = { navController.navigate(items[2]) }
             )
+
         }
     }
 }
+
 @Composable
 fun BottomBarItem(
     label: String,

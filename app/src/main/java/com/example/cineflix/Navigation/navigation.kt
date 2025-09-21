@@ -18,6 +18,7 @@ import com.example.cineflix.Screen.Homescreen.TvShowScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.NetflixSimpleWelcomeScreen
+import com.example.cineflix.Screen.Newsandhotscreen.NewAndHotScreen
 import com.example.cineflix.Screen.ReadyToWatchScreen
 import com.example.cineflix.Screen.SplashScreen
 import com.example.cineflix.Screen.WhosWatchingScreen
@@ -29,7 +30,7 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "Splashscreen") {
+    NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
         }
@@ -86,6 +87,14 @@ fun Navigation(apiService: ApiService) {
         composable("TVShows") {
             TvShowScreen(navController = navController)
         }
+        composable("NewsandHot") {
+            NewAndHotScreen(
+                navController = navController,
+            )
+        }
+
+
+
 
     }
 }
