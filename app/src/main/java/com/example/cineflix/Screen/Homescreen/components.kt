@@ -232,7 +232,9 @@ fun FeaturedBanner(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { /* Play */ },
+                    onClick = { featuredMovie.Imdbid?.let { id ->
+                        navController.navigate("MoviedetailScreen/$id")
+                    }},
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     shape = RectangleShape,
                     modifier = Modifier

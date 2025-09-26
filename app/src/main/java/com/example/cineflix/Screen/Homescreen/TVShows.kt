@@ -100,9 +100,6 @@ fun TvShowScreen(
             ) {
                 item { Spacer(modifier = Modifier.height(56.dp)) } // space for TopBar
 
-                item {
-                    TvshowChipsRow(backgroundColor)
-                }
                 // Inside LazyColumn in MoviesScreen
                 item {
                     FeaturedBanner(
@@ -165,18 +162,5 @@ fun TvshowTopBar(
 }
 
 
-@Composable
-fun TvshowChipsRow(backgroundColor: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        FilterChip(selected = true, onClick = {}, label = { Text("TV Shows") })
-        FilterChip(selected = false, onClick = {}, label = { Text("All Categories") })
-    }
-}
 
 

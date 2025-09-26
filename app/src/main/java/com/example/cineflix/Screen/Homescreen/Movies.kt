@@ -88,10 +88,6 @@ fun MoviesScreen(
             ) {
                 item { Spacer(modifier = Modifier.height(56.dp)) } // space for TopBar
 
-                item {
-                    CategoryChipsRow(backgroundColor)
-                }
-
                 // Inside LazyColumn in MoviesScreen
                 item {
                     FeaturedBanner(
@@ -135,7 +131,7 @@ fun MoviesTopBar(
     navController: NavHostController
 ) {
     TopAppBar(
-        title = { Text("Component", color = Color.White) },
+        title = { Text("Movies", color = Color.White) },
         navigationIcon = {
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null, tint = Color.White)
@@ -155,18 +151,5 @@ fun MoviesTopBar(
 }
 
 
-@Composable
-fun CategoryChipsRow(backgroundColor: Color) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        FilterChip(selected = true, onClick = {}, label = { Text("Movies") })
-        FilterChip(selected = false, onClick = {}, label = { Text("All Categories") })
-    }
-}
 
 
