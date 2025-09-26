@@ -79,6 +79,8 @@ import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
 import com.example.cineflix.Retrofit.GamesViewModel
+import com.example.cineflix.Viewmodel.MyListMovie
+import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.NetflixViewModel
 import kotlinx.coroutines.delay
 
@@ -185,6 +187,7 @@ fun FeaturedBanner(
     navController: NavHostController,
     backgroundColor: Color,
     featuredMovie: MovieResponse,
+    myListViewModel: MyListViewModel = viewModel()
 ) {
     Column(
         modifier = Modifier
@@ -204,27 +207,6 @@ fun FeaturedBanner(
                 },
             contentAlignment = Alignment.BottomCenter
         ) {
-            Crossfade(targetState = featuredMovie.Poster, label = "posterFade") { posterUrl ->
-                AsyncImage(
-                    model = posterUrl,
-                    contentDescription = featuredMovie.title,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            // Gradient overlay
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))
-                        )
-                    )
-            )
-
-            // Buttons row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -250,7 +232,22 @@ fun FeaturedBanner(
                 Spacer(Modifier.width(12.dp))
 
                 OutlinedButton(
-                    onClick = {  },
+                    onClick = {
+                        featuredMovie.Imdbid?.let { id ->
+                            val movie = MyListMovie(
+                                imdbId = id,
+                                title = featuredMovie.title ?: "",
+                                poster = featuredMovie.Poster ?: ""
+                            )
+                            myListViewModel.addMovieToMyList(movie) { success ->
+                                if (success) {
+                                    println("Movie added to My List ✅")
+                                } else {
+                                    println("Failed to add movie ❌")
+                                }
+                            }
+                        }
+                    },
                     shape = RectangleShape,
                     modifier = Modifier
                         .height(48.dp)
@@ -267,7 +264,6 @@ fun FeaturedBanner(
         Spacer(Modifier.height(12.dp))
     }
 }
-
 
 @Composable
 fun SectionHeader(title: String) {

@@ -117,6 +117,9 @@ class LoginScreenViewModel() : ViewModel() {
                 Log.e("FB", "Failed to fetch sign-in methods: ${exception.message}")
             }
     }
+    private fun Additemtolist(){
+
+    }
 }
 
 data class MUser(val id: String?,
