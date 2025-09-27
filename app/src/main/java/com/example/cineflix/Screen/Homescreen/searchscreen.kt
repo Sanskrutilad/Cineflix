@@ -7,7 +7,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,11 +24,16 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.layout.ContentScale
+import androidx.navigation.NavController
 import com.example.cineflix.Viewmodel.NetflixViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(viewModel: NetflixViewModel = viewModel()) {
+fun SearchScreen(
+
+    navController: NavController,
+    viewModel: NetflixViewModel = viewModel()
+) {
     val searchQuery = viewModel.searchQuery
     val searchResults = viewModel.searchResults
 
@@ -33,40 +42,65 @@ fun SearchScreen(viewModel: NetflixViewModel = viewModel()) {
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // 🔍 Search Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 30.dp, horizontal = 8.dp),
+                .padding(top = 20.dp, bottom = 10.dp, start = 8.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(onClick = {navController.popBackStack()}) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
             TextField(
                 value = searchQuery,
                 onValueChange = { viewModel.updateSearchQuery(it) },
-                placeholder = { Text("Search", color = Color.Gray) },
+                placeholder = {
+                    Text(
+                        "Search for movies, shows...",
+                        color = Color.LightGray,
+                        fontSize = 14.sp
+                    )
+                },
                 modifier = Modifier
                     .weight(1f)
-                    .height(53.dp),
+                    .height(50.dp)
+                    .clip(RoundedCornerShape(25.dp)), // Rounded pill style
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.DarkGray,
                     unfocusedContainerColor = Color.DarkGray,
-                    cursorColor = Color.White,
+                    cursorColor = Color.Red,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 ),
-                singleLine = true
+                singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search Icon",
+                        tint = Color.Gray
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(onClick = { viewModel.updateSearchQuery("") }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            if (searchQuery.isNotBlank()) {
-                Text(
-                    text = "Cancel",
-                    color = Color.White,
-                    modifier = Modifier.clickable { viewModel.updateSearchQuery("") }
-                )
-            }
         }
 
-        // 🎯 Show either search results or Top Searches
+        // 🎯 Search Results / Top Searches
         if (searchQuery.isNotBlank()) {
             Text(
                 text = "Search Results",

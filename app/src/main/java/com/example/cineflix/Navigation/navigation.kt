@@ -94,7 +94,9 @@ fun Navigation(apiService: ApiService) {
             )
         }
         composable("search") {
-            SearchScreen()
+            SearchScreen(
+                navController,
+            )
         }
 
 

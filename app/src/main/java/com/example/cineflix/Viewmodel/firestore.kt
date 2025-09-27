@@ -1,5 +1,6 @@
 package com.example.cineflix.Viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -17,10 +18,10 @@ class MyListViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private fun getUserId(): String? = auth.currentUser?.uid
-
     fun addMovieToMyList(movie: MyListMovie, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) {
+            Log.e("MyListViewModel", "User not logged in, cannot save movie")
             onResult(false)
             return
         }
@@ -32,10 +33,10 @@ class MyListViewModel : ViewModel() {
                     .document(movie.imdbId)
                     .set(movie)
                     .await()
-
+                Log.d("MyListViewModel", "Movie added successfully: ${movie.title}")
                 onResult(true)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("MyListViewModel", "Failed to add movie: ${e.message}", e)
                 onResult(false)
             }
         }
