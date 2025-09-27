@@ -91,7 +91,7 @@ fun NetflixTopBarScreen(navController: NavHostController) {
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(Color.Gray)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 16.dp, vertical = 10.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -146,7 +146,7 @@ fun NetflixTopBarScreen(navController: NavHostController) {
             modifier = Modifier.padding(paddingValues)
         ) {
             stickyHeader {
-                TopAppBarContent(backgroundColor)
+                TopAppBarContent(backgroundColor,navController)
             }
             item {
                 AnimatedVisibility(

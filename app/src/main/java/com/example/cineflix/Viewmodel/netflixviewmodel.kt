@@ -142,4 +142,27 @@ class NetflixViewModel : ViewModel() {
             }
         }
     }
+
+    var searchQuery by mutableStateOf("")
+        private set
+
+    var searchResults by mutableStateOf<List<MovieResponse>>(emptyList())
+        private set
+
+    // 🔎 Update query & filter movies
+    fun updateSearchQuery(query: String) {
+        searchQuery = query
+
+        if (query.isBlank()) {
+            searchResults = emptyList()
+            return
+        }
+
+        val allMovies = bollywood + onlyOnNetflix + kDramas +
+                hollywoodMovies + comedyMovies + fantasyMovies + susTvShows
+
+        searchResults = allMovies.filter { movie ->
+            movie.title?.contains(query, ignoreCase = true) == true
+        }
+    }
 }

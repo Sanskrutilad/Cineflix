@@ -14,6 +14,7 @@ import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
 import com.example.cineflix.Screen.Homescreen.MoviesScreen
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
 import com.example.cineflix.Screen.Homescreen.PreviewCategoryScreen
+import com.example.cineflix.Screen.Homescreen.SearchScreen
 import com.example.cineflix.Screen.Homescreen.TvShowScreen
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
@@ -92,8 +93,9 @@ fun Navigation(apiService: ApiService) {
                 navController = navController,
             )
         }
-
-
+        composable("search") {
+            SearchScreen()
+        }
 
 
     }

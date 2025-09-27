@@ -107,7 +107,7 @@ fun extractDominantColorFromUrl(
 }
 
 @Composable
-fun TopAppBarContent(backgroundColor1: Color) {
+fun TopAppBarContent(backgroundColor1: Color , navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +132,7 @@ fun TopAppBarContent(backgroundColor1: Color) {
             imageVector = Icons.Default.Search,
             contentDescription = "Search",
             tint = Color.White,
-            modifier = Modifier.size(35.dp).clickable{}
+            modifier = Modifier.size(35.dp).clickable{navController.navigate("search")}
         )
     }
 }
@@ -207,16 +207,41 @@ fun FeaturedBanner(
                 },
             contentAlignment = Alignment.BottomCenter
         ) {
+            // 🎬 Poster with crossfade
+            Crossfade(targetState = featuredMovie.Poster, label = "posterFade") { posterUrl ->
+                AsyncImage(
+                    model = posterUrl,
+                    contentDescription = featuredMovie.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            // 🌑 Gradient overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))
+                        )
+                    )
+            )
+
+            // 🎯 Buttons row at bottom
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // ▶️ Play Button
                 Button(
-                    onClick = { featuredMovie.Imdbid?.let { id ->
-                        navController.navigate("MoviedetailScreen/$id")
-                    }},
+                    onClick = {
+                        featuredMovie.Imdbid?.let { id ->
+                            navController.navigate("MoviedetailScreen/$id")
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     shape = RectangleShape,
                     modifier = Modifier
@@ -226,11 +251,17 @@ fun FeaturedBanner(
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black)
                     Spacer(Modifier.width(4.dp))
-                    Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text(
+                        "Play",
+                        color = Color.Black,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
                 }
 
                 Spacer(Modifier.width(12.dp))
 
+                // ➕ My List Button
                 OutlinedButton(
                     onClick = {
                         featuredMovie.Imdbid?.let { id ->
@@ -256,7 +287,12 @@ fun FeaturedBanner(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White)
                     Spacer(Modifier.width(4.dp))
-                    Text("My List", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(
+                        "My List",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp
+                    )
                 }
             }
         }
@@ -264,6 +300,7 @@ fun FeaturedBanner(
         Spacer(Modifier.height(12.dp))
     }
 }
+
 
 @Composable
 fun SectionHeader(title: String) {
