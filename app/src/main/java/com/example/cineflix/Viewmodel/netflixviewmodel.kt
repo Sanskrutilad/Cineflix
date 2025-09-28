@@ -31,6 +31,9 @@ class NetflixViewModel : ViewModel() {
     init {
         fetchMovieList()
     }
+    val allMovies: List<MovieResponse>
+        get() = bollywood + onlyOnNetflix + kDramas +
+                hollywoodMovies + comedyMovies + fantasyMovies + susTvShows
 
     private fun fetchMovieList() {
         viewModelScope.launch {
@@ -157,9 +160,6 @@ class NetflixViewModel : ViewModel() {
             searchResults = emptyList()
             return
         }
-
-        val allMovies = bollywood + onlyOnNetflix + kDramas +
-                hollywoodMovies + comedyMovies + fantasyMovies + susTvShows
 
         searchResults = allMovies.filter { movie ->
             movie.title?.contains(query, ignoreCase = true) == true

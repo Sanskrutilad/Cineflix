@@ -2,6 +2,7 @@ package com.example.cineflix.Navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -10,12 +11,14 @@ import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.Gamesscreen.GameHomeScreen
 import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
+import com.example.cineflix.Screen.Homescreen.CategoryScreen
 import com.example.cineflix.Screen.Homescreen.MovieDetailScreen
+import com.example.cineflix.Screen.Homescreen.MovieListScreen
 import com.example.cineflix.Screen.Homescreen.MoviesScreen
 import com.example.cineflix.Screen.Homescreen.NetflixTopBarScreen
-import com.example.cineflix.Screen.Homescreen.PreviewCategoryScreen
 import com.example.cineflix.Screen.Homescreen.SearchScreen
 import com.example.cineflix.Screen.Homescreen.TvShowScreen
+import com.example.cineflix.Screen.Homescreen.sampleCategories
 import com.example.cineflix.Screen.NetflixCreateAccountScreen
 import com.example.cineflix.Screen.NetflixLoginScreen
 import com.example.cineflix.Screen.NetflixSimpleWelcomeScreen
@@ -25,6 +28,7 @@ import com.example.cineflix.Screen.SplashScreen
 import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
 import com.example.cineflix.Screen.settingscreen.Settingmainscreen
+import com.example.cineflix.Viewmodel.NetflixViewModel
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -69,8 +73,16 @@ fun Navigation(apiService: ApiService) {
             GameHomeScreen(navController)
         }
         composable("CategoryScreen") {
-            PreviewCategoryScreen(navController)
+            CategoryScreen(
+                categories = sampleCategories,
+                navController = navController
+            )
         }
+        composable("movies/{category}") { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: ""
+            MovieListScreen(category,  navController)
+        }
+
         composable("castdetailscreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
             Castdetailsscreen(Imbdid, navController)

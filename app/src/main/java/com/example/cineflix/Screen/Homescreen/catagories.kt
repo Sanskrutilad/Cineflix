@@ -4,6 +4,7 @@ package com.example.cineflix.Screen.Homescreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,24 +49,21 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 
-
+val sampleCategories = listOf(
+    "Home", "My List", "Available for Download", "The Summer Edition",
+    "Celebrating Disability with Dimension", "Hindi", "Tamil", "Punjabi",
+    "Telugu", "Malayalam", "Marathi", "Bengali", "English", "Action",
+    "Anime", "Award Winners", "Biographical", "Blockbusters", "Bollywood",
+    "Kids & Family", "Comedies", "Documentaries", "Dramas", "Fantasy",
+    "Hollywood", "Horror", "International", "Indian", "Music & Musicals",
+    "Reality & Talk", "Romance", "Sci-Fi", "Stand-Up", "Thrillers",
+    "United States", "Audio Description in English"
+)
 @Composable
-fun PreviewCategoryScreen(navController: NavHostController) {
-    val sampleCategories = listOf(
-        "Home", "My List", "Available for Download", "The Summer Edition",
-        "Celebrating Disability with Dimension", "Hindi", "Tamil", "Punjabi",
-        "Telugu", "Malayalam", "Marathi", "Bengali", "English", "Action",
-        "Anime", "Award Winners", "Biographical", "Blockbusters", "Bollywood",
-        "Kids & Family", "Comedies", "Documentaries", "Dramas", "Fantasy",
-        "Hollywood", "Horror", "International", "Indian", "Music & Musicals",
-        "Reality & Talk", "Romance", "Sci-Fi", "Stand-Up", "Thrillers",
-        "United States", "Audio Description in English"
-    )
-    CategoryScreen(categories = sampleCategories, onClose = {},navController)
-}
-
-@Composable
-fun CategoryScreen(categories: List<String>, onClose: () -> Unit, navController: NavHostController) {
+fun CategoryScreen(
+    categories: List<String>,
+    navController: NavHostController
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -84,7 +82,10 @@ fun CategoryScreen(categories: List<String>, onClose: () -> Unit, navController:
                     color = Color.White,
                     fontSize = 18.sp,
                     modifier = Modifier
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp)
+                        .clickable {
+                            navController.navigate("movies/$category")
+                        },
                     textAlign = TextAlign.Center
                 )
             }
@@ -95,7 +96,7 @@ fun CategoryScreen(categories: List<String>, onClose: () -> Unit, navController:
                 .padding(bottom = 16.dp)
         ) {
             IconButton(
-                onClick = {navController.popBackStack()},
+                onClick = { navController.popBackStack() },
                 modifier = Modifier
                     .size(48.dp)
                     .background(Color.White, shape = CircleShape)
