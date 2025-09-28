@@ -1,5 +1,6 @@
 package com.example.cineflix.Screen.Homescreen
 
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.animation.AnimatedVisibility
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,6 +77,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Viewmodel.MyListMovie
+import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.NetflixViewModel
 import kotlinx.coroutines.delay
 
@@ -336,12 +340,14 @@ fun MovieDetailScreen(
     navController: NavHostController,
     Imdb: String,
     apiService: ApiService,
-    viewModel: NetflixViewModel = viewModel()
+    viewModel: NetflixViewModel = viewModel(),
+    myListViewModel: MyListViewModel = viewModel()
 ) {
     val scrollState = rememberScrollState()
     val movie = viewModel.selectedMovie
     val trailerId = viewModel.trailerId
-
+    val isInList = remember { mutableStateOf(false) }
+    val isLiked = remember { mutableStateOf(false) }
     // Fetch movie by ID
     LaunchedEffect(Imdb) {
         viewModel.fetchMovieById(Imdb)
@@ -358,6 +364,7 @@ fun MovieDetailScreen(
         }
         return
     }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -518,7 +525,6 @@ fun MovieDetailScreen(
             }
             Text("Director: ${movie.director}", color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -533,18 +539,38 @@ fun MovieDetailScreen(
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
-                        Icons.Default.ThumbUp,
+                        if (isLiked.value) Icons.Default.ThumbUp else Icons.Outlined.ThumbUp,
                         contentDescription = "Rate",
-                        tint = Color.White,
+                        tint = if (isLiked.value) Color.Green else Color.White,
                         modifier = Modifier
                             .size(30.dp)
                             .clickable {
-                                viewModel.likeMovie(apiService, movie)
+                                val imdb = movie.Imdbid ?: return@clickable
+                                val movieObj = MyListMovie(
+                                    imdbId = imdb,
+                                    title = movie.title,
+                                    poster = movie.Poster ?: ""
+                                )
+                                Log.d("MovieDetailScreen", "Toggling like for movie: ${movieObj.title} (${movieObj.imdbId})")
+
+                                myListViewModel.toggleLikeMovie(movieObj, isLiked.value) { success ->
+                                    if (success) {
+                                        isLiked.value = !isLiked.value
+                                        Log.d(
+                                            "MovieDetailScreen",
+                                            if (isLiked.value) "Movie liked ✅: ${movieObj.title}"
+                                            else "Movie unliked ❌: ${movieObj.title}"
+                                        )
+                                    } else {
+                                        Log.e("MovieDetailScreen", "Failed to toggle like for movie: ${movieObj.title}")
+                                    }
+                                }
                             }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Rate", color = Color.White, fontSize = 12.sp)
                 }
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(30.dp))
                     Spacer(modifier = Modifier.height(4.dp))

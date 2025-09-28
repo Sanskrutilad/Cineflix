@@ -68,9 +68,11 @@ import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Retrofit.MovieResponse
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -189,6 +191,18 @@ fun FeaturedBanner(
     featuredMovie: MovieResponse,
     myListViewModel: MyListViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val isInList = remember { mutableStateOf(false) }
+
+    // 🔍 Check on load
+    LaunchedEffect(featuredMovie.Imdbid) {
+        featuredMovie.Imdbid?.let { id ->
+            myListViewModel.isMovieInMyList(id) { exists ->
+                isInList.value = exists
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +221,7 @@ fun FeaturedBanner(
                 },
             contentAlignment = Alignment.BottomCenter
         ) {
-            // 🎬 Poster with crossfade
+            // 🎬 Poster
             Crossfade(targetState = featuredMovie.Poster, label = "posterFade") { posterUrl ->
                 AsyncImage(
                     model = posterUrl,
@@ -217,7 +231,6 @@ fun FeaturedBanner(
                 )
             }
 
-            // 🌑 Gradient overlay
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -228,14 +241,13 @@ fun FeaturedBanner(
                     )
             )
 
-            // 🎯 Buttons row at bottom
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // ▶️ Play Button
+
                 Button(
                     onClick = {
                         featuredMovie.Imdbid?.let { id ->
@@ -251,30 +263,35 @@ fun FeaturedBanner(
                 ) {
                     Icon(Icons.Default.PlayArrow, contentDescription = "Play", tint = Color.Black)
                     Spacer(Modifier.width(4.dp))
-                    Text(
-                        "Play",
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
+                    Text("Play", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
 
                 Spacer(Modifier.width(12.dp))
 
-                // ➕ My List Button
+
                 OutlinedButton(
                     onClick = {
                         featuredMovie.Imdbid?.let { id ->
-                            val movie = MyListMovie(
-                                imdbId = id,
-                                title = featuredMovie.title ?: "",
-                                poster = featuredMovie.Poster ?: ""
-                            )
-                            myListViewModel.addMovieToMyList(movie) { success ->
-                                if (success) {
-                                    println("Movie added to My List ✅")
-                                } else {
-                                    println("Failed to add movie ❌")
+                            if (isInList.value) {
+                                // Remove
+                                myListViewModel.removeMovieFromMyList(id) { success ->
+                                    if (success) {
+                                        isInList.value = false
+                                        Log.d("FeaturedBanner", "Movie removed ❌")
+                                    }
+                                }
+                            } else {
+                                // Add
+                                val movie = MyListMovie(
+                                    imdbId = id,
+                                    title = featuredMovie.title ?: "",
+                                    poster = featuredMovie.Poster ?: ""
+                                )
+                                myListViewModel.addMovieToMyList(movie) { success ->
+                                    if (success) {
+                                        isInList.value = true
+                                        Log.d("FeaturedBanner", "Movie added ✅")
+                                    }
                                 }
                             }
                         }
@@ -285,14 +302,15 @@ fun FeaturedBanner(
                         .weight(1f)
                         .padding(start = 5.dp, end = 10.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White)
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        "My List",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    )
+                    if (isInList.value) {
+                        Icon(Icons.Default.Check, contentDescription = "In My List", tint = Color.White)
+                        Spacer(Modifier.width(4.dp))
+                        Text("Added", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    } else {
+                        Icon(Icons.Default.Add, contentDescription = "+My List", tint = Color.White)
+                        Spacer(Modifier.width(4.dp))
+                        Text("My List", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    }
                 }
             }
         }
@@ -300,6 +318,7 @@ fun FeaturedBanner(
         Spacer(Modifier.height(12.dp))
     }
 }
+
 
 
 @Composable
