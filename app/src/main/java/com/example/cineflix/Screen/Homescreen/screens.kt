@@ -36,6 +36,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cast
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.PlayArrow
@@ -354,10 +355,18 @@ fun MovieDetailScreen(
     }
     // Fetch trailer after movie is loaded
     LaunchedEffect(movie?.Imdbid) {
-        if (!movie?.Imdbid.isNullOrEmpty()) {
-            viewModel.fetchTrailerByImdbId(movie.Imdbid)
+        movie?.Imdbid?.let { imdbId ->
+            // Fetch trailer
+            viewModel.fetchTrailerByImdbId(imdbId)
+
+            // Check if already in My List
+            myListViewModel.isMovieInMyList(imdbId) { inList ->
+                isInList.value = inList
+            }
         }
     }
+
+
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = Color.Red)
@@ -533,10 +542,46 @@ fun MovieDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Add, contentDescription = "My List", tint = Color.White, modifier = Modifier.size(35.dp))
+                    Icon(
+                        imageVector = if (isInList.value) Icons.Default.Check else Icons.Default.Add,
+                        contentDescription = "My List",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(35.dp)
+                            .clickable {
+                                val imdb = movie.Imdbid ?: return@clickable
+                                if (isInList.value) {
+                                    // Remove from My List
+                                    myListViewModel.removeMovieFromMyList(imdb) { success ->
+                                        if (success) {
+                                            isInList.value = false
+                                            Log.d("MovieDetailScreen", "Removed from My List ❌: ${movie.title}")
+                                        }
+                                    }
+                                } else {
+                                    // Add to My List
+                                    val movieObj = MyListMovie(
+                                        imdbId = imdb,
+                                        title = movie.title,
+                                        poster = movie.Poster ?: ""
+                                    )
+                                    myListViewModel.addMovieToMyList(movieObj) { success ->
+                                        if (success) {
+                                            isInList.value = true
+                                            Log.d("MovieDetailScreen", "Added to My List ✅: ${movie.title}")
+                                        }
+                                    }
+                                }
+                            }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("My List", color = Color.White, fontSize = 12.sp)
+                    Text(
+                        text = if (isInList.value) "Added" else "My List",
+                        color = Color.White,
+                        fontSize = 12.sp
+                    )
                 }
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         if (isLiked.value) Icons.Default.ThumbUp else Icons.Outlined.ThumbUp,
@@ -568,7 +613,7 @@ fun MovieDetailScreen(
                             }
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Rate", color = Color.White, fontSize = 12.sp)
+                    Text("Like", color = Color.White, fontSize = 12.sp)
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

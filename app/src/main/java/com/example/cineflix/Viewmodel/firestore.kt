@@ -133,4 +133,23 @@ class MyListViewModel : ViewModel() {
         }
     }
 
+    fun getMyList(onResult: (List<MyListMovie>) -> Unit) {
+        val userId = getUserId() ?: return onResult(emptyList())
+        viewModelScope.launch {
+            try {
+                val snapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("myList")
+                    .get()
+                    .await()
+                val list = snapshot.toObjects(MyListMovie::class.java)
+                onResult(list)
+            } catch (e: Exception) {
+                Log.e("MyListViewModel", "Failed to fetch my list: ${e.message}", e)
+                onResult(emptyList())
+            }
+        }
+    }
+
+
 }

@@ -84,8 +84,17 @@ fun CategoryScreen(
                     modifier = Modifier
                         .padding(vertical = 8.dp)
                         .clickable {
-                            navController.navigate("movies/$category")
-                        },
+                            if (category == "My List") {
+                                navController.navigate("mylist")
+                            }
+                            else if(category == "Home"){
+                                navController.navigate("HomeScreen")
+                            }
+                            else {
+                                navController.navigate("movies/$category")
+                            }
+                        }
+                    ,
                     textAlign = TextAlign.Center
                 )
             }
