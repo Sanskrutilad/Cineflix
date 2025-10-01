@@ -84,6 +84,7 @@ import com.example.cineflix.Retrofit.GamesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.NetflixViewModel
+import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
 import kotlinx.coroutines.delay
 
 
@@ -193,6 +194,7 @@ fun FeaturedBanner(
 ) {
     val context = LocalContext.current
     val isInList = remember { mutableStateOf(false) }
+
 
     // 🔍 Check on load
     LaunchedEffect(featuredMovie.Imdbid) {
@@ -314,7 +316,6 @@ fun FeaturedBanner(
                 }
             }
         }
-
         Spacer(Modifier.height(12.dp))
     }
 }

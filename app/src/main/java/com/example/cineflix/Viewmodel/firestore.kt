@@ -3,8 +3,11 @@ package com.example.cineflix.Viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cineflix.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -150,6 +153,181 @@ class MyListViewModel : ViewModel() {
             }
         }
     }
+}
+data class LikedMovie(
+    val imdbId: String = "",
+    val title: String = "",
+    val poster: String = ""   // store poster URL
+)
+
+class LikedMoviesViewModel : ViewModel() {
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private fun getUserId(): String? = auth.currentUser?.uid
+
+    // Add movie to liked
+    fun addMovieToLiked(movie: LikedMovie, onResult: (Boolean) -> Unit) {
+        val userId = getUserId()
+        if (userId == null) { onResult(false); return }
+        viewModelScope.launch {
+            try {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("likedMovies")
+                    .document(movie.imdbId)
+                    .set(movie)
+                    .await()
+                onResult(true)
+            } catch (e: Exception) {
+                Log.e("LikedMoviesVM", "Add failed: ${e.message}", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // Remove movie from liked
+    fun removeMovieFromLiked(movieId: String, onResult: (Boolean) -> Unit) {
+        val userId = getUserId()
+        if (userId == null) { onResult(false); return }
+        viewModelScope.launch {
+            try {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("likedMovies")
+                    .document(movieId)
+                    .delete()
+                    .await()
+                onResult(true)
+            } catch (e: Exception) {
+                Log.e("LikedMoviesVM", "Remove failed: ${e.message}", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // Check if movie is liked
+    fun isMovieLiked(movieId: String, onResult: (Boolean) -> Unit) {
+        val userId = getUserId()
+        if (userId == null) { onResult(false); return }
+        viewModelScope.launch {
+            try {
+                val doc = firestore.collection("users")
+                    .document(userId)
+                    .collection("likedMovies")
+                    .document(movieId)
+                    .get()
+                    .await()
+                onResult(doc.exists())
+            } catch (e: Exception) {
+                Log.e("LikedMoviesVM", "Check failed: ${e.message}", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // Get all liked movies
+    fun getLikedMovies(onResult: (List<LikedMovie>) -> Unit) {
+        val userId = getUserId()
+        if (userId == null) { onResult(emptyList()); return }
+        viewModelScope.launch {
+            try {
+                val snapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("likedMovies")
+                    .get()
+                    .await()
+                val list = snapshot.toObjects(LikedMovie::class.java)
+                onResult(list)
+            } catch (e: Exception) {
+                Log.e("LikedMoviesVM", "Fetch failed: ${e.message}", e)
+                onResult(emptyList())
+            }
+        }
+    }
+}
 
 
+
+data class WatchedTrailer(
+    val imdbId: String,
+    val title: String,
+    val poster: String,
+)
+
+class WatchedTrailersViewModel : ViewModel() {
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
+    private val _watchedList = MutableStateFlow<List<WatchedTrailer>>(emptyList())
+    val watchedList: StateFlow<List<WatchedTrailer>> = _watchedList
+
+    init {
+        fetchWatchedTrailers()
+    }
+
+    private fun userId(): String? = auth.currentUser?.uid
+
+    fun addWatchedTrailer(trailer: WatchedTrailer) {
+        val uid = userId() ?: return
+        viewModelScope.launch {
+            firestore.collection("users")
+                .document(uid)
+                .collection("watched")
+                .document(trailer.imdbId)
+                .set(trailer)
+                .addOnSuccessListener {
+                    fetchWatchedTrailers()
+                }
+        }
+    }
+
+    private fun fetchWatchedTrailers() {
+        val uid = userId()
+        if (uid == null) {
+            Log.e("WatchedVM", "User not logged in")
+            _watchedList.value = emptyList()
+            return
+        }
+
+        firestore.collection("users")
+            .document(uid)
+            .collection("watched")
+            .orderBy("watchedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val trailers = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        val trailer = doc.toObject(WatchedTrailer::class.java)
+                        if (trailer?.imdbId == null || trailer.title.isNullOrEmpty() || trailer.poster.isNullOrEmpty()) {
+                            Log.w("WatchedVM", "Incomplete trailer data skipped: ${doc.id}")
+                            null
+                        } else trailer
+                    } catch (e: Exception) {
+                        Log.e("WatchedVM", "Error parsing document ${doc.id}", e)
+                        null
+                    }
+                }
+                Log.d("WatchedVM", "Fetched ${trailers.size} watched trailers")
+                _watchedList.value = trailers
+            }
+            .addOnFailureListener { e ->
+                Log.e("WatchedVM", "Failed to fetch watched trailers", e)
+                _watchedList.value = emptyList()
+            }
+    }
+
+
+    fun clearHistory() {
+        val uid = userId() ?: return
+        firestore.collection("users")
+            .document(uid)
+            .collection("watched")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                for (doc in snapshot.documents) {
+                    doc.reference.delete()
+                }
+                _watchedList.value = emptyList()
+            }
+    }
 }

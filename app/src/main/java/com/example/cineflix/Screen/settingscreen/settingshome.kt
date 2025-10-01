@@ -38,6 +38,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,65 +53,67 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.R
 import com.example.cineflix.Screen.Homescreen.BottomBar
+import com.example.cineflix.Viewmodel.LikedMovie
+import com.example.cineflix.Viewmodel.LikedMoviesViewModel
+import com.example.cineflix.Viewmodel.MyListMovie
+import com.example.cineflix.Viewmodel.MyListViewModel
+import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Settingmainscreen(navController: NavHostController) {
-    val likedMovies = listOf("Leo", "Yeh Jawaani Hai Deewani", "Devara")
-    val moviePosters = listOf(
-        R.drawable.prof,
-        R.drawable.prof,
-        R.drawable.prof
-    )
+fun Settingmainscreen(
+    navController: NavHostController,
+    likedMoviesViewModel: LikedMoviesViewModel = viewModel(),
+    watchedViewModel: WatchedTrailersViewModel = viewModel()
+) {
+    var myListMovies by remember { mutableStateOf<List<LikedMovie>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        likedMoviesViewModel.getLikedMovies { list ->
+            myListMovies = list
+            isLoading = false
+        }
+    }
+
+    // Collect watched trailers from ViewModel
+    val watchedTrailers by watchedViewModel.watchedList.collectAsState()
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        "My Netflix",
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                },
+                title = { Text("My Netflix", fontWeight = FontWeight.Bold, color = Color.White) },
                 actions = {
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White)
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Search",
-                            tint = Color.White
-                        )
-                    }
+                    IconButton(onClick = {}) { Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White) }
+                    IconButton(onClick = {}) { Icon(Icons.Default.Search, contentDescription = "Search", tint = Color.White) }
                     IconButton(onClick = {
                         coroutineScope.launch {
                             showBottomSheet = true
                             sheetState.show()
                         }
-                    }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
-                    }
+                    }) { Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(Color.Black),
             )
         },
-        bottomBar = {
-            BottomBar(navController)// Ensure "My Netflix" is selected
-        }
-
+        bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -117,191 +121,123 @@ fun Settingmainscreen(navController: NavHostController) {
                 .padding(paddingValues)
                 .background(Color.Black)
                 .verticalScroll(rememberScrollState())
-
         ) {
             Spacer(modifier = Modifier.height(12.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+
+            // Profile
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Image(
                     painter = painterResource(id = R.drawable.prof),
                     contentDescription = "Profile",
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                    modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp))
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "shrikant",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+                Text("shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
+
             Spacer(modifier = Modifier.height(20.dp))
+
+            // Notifications card
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)), // dark gray-ish
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 1.dp, vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1C1C1E)),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 1.dp, vertical = 8.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = Color.White
-                        )
+                        Icon(Icons.Default.Notifications, contentDescription = "Notifications", tint = Color.White)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Notifications",
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 16.sp
-                        )
+                        Text("Notifications", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
                     }
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "See All",
-                            color = Color.Gray,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowRight,
-                            contentDescription = "Arrow",
-                            tint = Color.Gray
-                        )
+                        Text("See All", color = Color.Gray, fontWeight = FontWeight.Medium)
+                        Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Arrow", tint = Color.Gray)
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                "TV Shows & Movies You have Liked",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(9.dp)
-            ) {
-                itemsIndexed(likedMovies) { index, title ->
-                    Card(
-                        modifier = Modifier
-                            .width(120.dp)
-                            .wrapContentHeight(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Top,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Image(
-                                painter = painterResource(id = moviePosters[index]),
-                                contentDescription = title,
-                                modifier = Modifier
-                                    .height(160.dp).padding(bottom = 10.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                                        contentScale = ContentScale.Crop)
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier
-                                    .padding(bottom = 10.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Share,
-                                    contentDescription = "Share",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(24.dp)
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Liked Movies Section
+            Text("TV Shows & Movies You have Liked", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                when {
+                    isLoading -> item { Text("Loading...", color = Color.Gray, modifier = Modifier.padding(16.dp)) }
+                    myListMovies.isEmpty() -> item { Text("No liked movies yet", color = Color.Gray, modifier = Modifier.padding(16.dp)) }
+                    else -> items(myListMovies) { likedMovie ->
+                        Card(
+                            modifier = Modifier.width(120.dp).wrapContentHeight(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxWidth()) {
+                                AsyncImage(
+                                    model = likedMovie.poster,
+                                    contentDescription = likedMovie.title,
+                                    modifier = Modifier.height(160.dp).fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                                    contentScale = ContentScale.Crop
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                                    Icon(Icons.Outlined.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text("Share", color = Color.White, fontSize = 14.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Watched Trailers Section
+            Text("Trailers You Watched", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                if (watchedTrailers.isEmpty()) {
+                    item { Text("No trailers watched yet", color = Color.Gray, modifier = Modifier.padding(16.dp)) }
+                } else {
+                    items(watchedTrailers) { trailer ->
+                        Card(
+                            modifier = Modifier.width(200.dp).wrapContentHeight(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxWidth()) {
+                                AsyncImage(
+                                    model = trailer.poster,
+                                    contentDescription = trailer.title,
+                                    modifier = Modifier.height(120.dp).fillMaxWidth().clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "Share",
+                                    text = trailer.title,
                                     color = Color.White,
-                                    fontSize = 18.sp
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
                         }
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                "Trailers You have Watched",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(9.dp)
-            ) {
-                itemsIndexed(likedMovies) { index, title ->
-                    Card(
-                        modifier = Modifier
-                            .width(120.dp)
-                            .wrapContentHeight(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Top,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Image(
-                                painter = painterResource(id = moviePosters[index]),
-                                contentDescription = title,
-                                modifier = Modifier
-                                    .height(165.dp)
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                                contentScale = ContentScale.Crop)
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                "Recently Watched",
-                color = Color.White,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp)
-            ) {
-                items(recentlyWatched) { item ->
-                    RecentlyWatchedCard(
-                        imageRes = item.first,
-                        title = item.second,
-                        episode = item.third
-                    )
-                }
-            }
             Spacer(modifier = Modifier.height(100.dp))
+
+            // Bottom sheet
             if (showBottomSheet) {
                 ModalBottomSheet(
                     onDismissRequest = {
@@ -321,6 +257,8 @@ fun Settingmainscreen(navController: NavHostController) {
     }
 }
 
+
+
 val recentlyWatched = listOf(
     Triple(R.drawable.prof, "Stranger Things", "S2:E5 Dig Dug"),
     Triple(R.drawable.prof, "Alice in Borderland", "S1:E1 Episode One"),
@@ -335,7 +273,6 @@ fun RecentlyWatchedCard(
 ) {
     Column(
         modifier = Modifier
-
             .padding(end = 8.dp)
     ) {
         Box(modifier = Modifier.height(180.dp).width(270.dp)) {

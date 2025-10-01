@@ -78,9 +78,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Viewmodel.LikedMovie
+import com.example.cineflix.Viewmodel.LikedMoviesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.NetflixViewModel
+import com.example.cineflix.Viewmodel.WatchedTrailer
+import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -342,13 +346,14 @@ fun MovieDetailScreen(
     Imdb: String,
     apiService: ApiService,
     viewModel: NetflixViewModel = viewModel(),
-    myListViewModel: MyListViewModel = viewModel()
+    myListViewModel: MyListViewModel = viewModel(),
+     watchedViewModel: WatchedTrailersViewModel = viewModel()
 ) {
     val scrollState = rememberScrollState()
     val movie = viewModel.selectedMovie
     val trailerId = viewModel.trailerId
     val isInList = remember { mutableStateOf(false) }
-    val isLiked = remember { mutableStateOf(false) }
+
     // Fetch movie by ID
     LaunchedEffect(Imdb) {
         viewModel.fetchMovieById(Imdb)
@@ -358,15 +363,22 @@ fun MovieDetailScreen(
         movie?.Imdbid?.let { imdbId ->
             // Fetch trailer
             viewModel.fetchTrailerByImdbId(imdbId)
-
-            // Check if already in My List
             myListViewModel.isMovieInMyList(imdbId) { inList ->
                 isInList.value = inList
             }
         }
     }
 
+    val likedViewModel: LikedMoviesViewModel = viewModel()
+    val isLiked = remember { mutableStateOf(false) }
 
+    LaunchedEffect(movie?.Imdbid) {
+        movie?.Imdbid?.let { id ->
+            likedViewModel.isMovieLiked(id) { exists ->
+                isLiked.value = exists
+            }
+        }
+    }
     if (movie == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = Color.Red)
@@ -487,7 +499,17 @@ fun MovieDetailScreen(
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = { },
+                onClick = {
+                    movie.Imdbid?.let { imdb ->
+                        val trailer = WatchedTrailer(
+                            imdbId = imdb,
+                            title = movie.title,
+                            poster = movie.Poster ?: ""
+                        )
+                        watchedViewModel.addWatchedTrailer(trailer)
+                        Log.d("MovieDetailScreen", "Trailer added to history ✅: ${movie.title}")
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(Color.White),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -585,37 +607,37 @@ fun MovieDetailScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(
                         if (isLiked.value) Icons.Default.ThumbUp else Icons.Outlined.ThumbUp,
-                        contentDescription = "Rate",
-                        tint = if (isLiked.value) Color.Green else Color.White,
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable {
-                                val imdb = movie.Imdbid ?: return@clickable
-                                val movieObj = MyListMovie(
-                                    imdbId = imdb,
-                                    title = movie.title,
-                                    poster = movie.Poster ?: ""
-                                )
-                                Log.d("MovieDetailScreen", "Toggling like for movie: ${movieObj.title} (${movieObj.imdbId})")
-
-                                myListViewModel.toggleLikeMovie(movieObj, isLiked.value) { success ->
-                                    if (success) {
-                                        isLiked.value = !isLiked.value
-                                        Log.d(
-                                            "MovieDetailScreen",
-                                            if (isLiked.value) "Movie liked ✅: ${movieObj.title}"
-                                            else "Movie unliked ❌: ${movieObj.title}"
-                                        )
-                                    } else {
-                                        Log.e("MovieDetailScreen", "Failed to toggle like for movie: ${movieObj.title}")
+                        contentDescription = "Like",
+                        tint = if (isLiked.value) Color.White else Color.White,
+                        modifier = Modifier.size(30.dp).clickable {
+                            movie.Imdbid?.let { id ->
+                                val movieObj = LikedMovie(id, movie.title ?: "", movie.Poster ?: "")
+                                if (isLiked.value) {
+                                    likedViewModel.removeMovieFromLiked(id) { success ->
+                                        if (success) {
+                                            isLiked.value = false
+                                            Log.d("MovieDetailScreen", "Movie unliked ❌: ${movie.title}")
+                                        } else {
+                                            Log.e("MovieDetailScreen", "Failed to unlike movie: ${movie.title}")
+                                        }
+                                    }
+                                } else {
+                                    likedViewModel.addMovieToLiked(movieObj) { success ->
+                                        if (success) {
+                                            isLiked.value = true
+                                            Log.d("MovieDetailScreen", "Movie liked ✅: ${movie.title}")
+                                        } else {
+                                            Log.e("MovieDetailScreen", "Failed to like movie: ${movie.title}")
+                                        }
                                     }
                                 }
                             }
+                        }
                     )
+
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Like", color = Color.White, fontSize = 12.sp)
                 }
-
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(30.dp))
                     Spacer(modifier = Modifier.height(4.dp))
