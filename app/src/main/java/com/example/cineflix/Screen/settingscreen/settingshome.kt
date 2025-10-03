@@ -132,7 +132,7 @@ fun Settingmainscreen(
                     modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp))
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -335,12 +335,6 @@ fun NetflixBottomSheetContent(navController: NavHostController) {
                     popUpTo(0) { inclusive = true }
                 }})
             Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                text = "Version: 9.22.1 build 3",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
-            Spacer(modifier = Modifier.height(15.dp))
         }
     }
     @Composable

@@ -1,5 +1,9 @@
 package com.example.cineflix.Screen.Homescreen
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -638,8 +642,33 @@ fun MovieDetailScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Like", color = Color.White, fontSize = 12.sp)
                 }
+                val context = LocalContext.current
+
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(30.dp))
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = "Share",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable {
+                                movie.Imdbid?.let { imdbId ->
+                                    val movieLink = "https://www.imdb.com/title/$imdbId"
+
+                                    // Show chooser with Share + Copy Link
+                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                        type = "text/plain"
+                                        putExtra(
+                                            Intent.EXTRA_TEXT,
+                                            "Check out this movie: ${movie.title}\n\n$movieLink"
+                                        )
+                                    }
+                                    context.startActivity(
+                                        Intent.createChooser(shareIntent, "Share via")
+                                    )
+                                }
+                            }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Share", color = Color.White, fontSize = 12.sp)
                 }
