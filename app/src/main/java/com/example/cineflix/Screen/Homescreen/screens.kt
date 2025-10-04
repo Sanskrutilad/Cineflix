@@ -243,7 +243,6 @@ fun Castdetailsscreen(
                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title & Close Button
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -334,7 +333,6 @@ fun Castdetailsscreen(
                     )
                     Spacer(modifier = Modifier.height(21.dp))
                 }
-
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
@@ -418,7 +416,6 @@ fun MovieDetailScreen(
                             .padding(vertical = 16.dp)
                     )
                 } else {
-                    // Only show this if trailerId is known to be empty
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

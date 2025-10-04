@@ -185,7 +185,7 @@ fun Settingmainscreen(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Spacer(modifier = Modifier.height(8.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth().clickable{}) {
                                     Icon(Icons.Outlined.Share, contentDescription = "Share", tint = Color.White, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text("Share", color = Color.White, fontSize = 14.sp)
@@ -337,6 +337,7 @@ fun NetflixBottomSheetContent(navController: NavHostController) {
             Spacer(modifier = Modifier.height(5.dp))
         }
     }
+
     @Composable
     fun BottomSheetItem(icon: ImageVector, text: String, onClick: () -> Unit = {}) {
         Row(

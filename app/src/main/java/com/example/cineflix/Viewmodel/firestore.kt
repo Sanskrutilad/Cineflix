@@ -245,14 +245,12 @@ class LikedMoviesViewModel : ViewModel() {
         }
     }
 }
-
-
-
 data class WatchedTrailer(
-    val imdbId: String,
-    val title: String,
-    val poster: String,
+    val imdbId: String = "",
+    val title: String = "",
+    val poster: String = ""
 )
+
 
 class WatchedTrailersViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
@@ -292,16 +290,11 @@ class WatchedTrailersViewModel : ViewModel() {
         firestore.collection("users")
             .document(uid)
             .collection("watched")
-            .orderBy("watchedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { snapshot ->
                 val trailers = snapshot.documents.mapNotNull { doc ->
                     try {
-                        val trailer = doc.toObject(WatchedTrailer::class.java)
-                        if (trailer?.imdbId == null || trailer.title.isNullOrEmpty() || trailer.poster.isNullOrEmpty()) {
-                            Log.w("WatchedVM", "Incomplete trailer data skipped: ${doc.id}")
-                            null
-                        } else trailer
+                        doc.toObject(WatchedTrailer::class.java)
                     } catch (e: Exception) {
                         Log.e("WatchedVM", "Error parsing document ${doc.id}", e)
                         null
@@ -315,6 +308,7 @@ class WatchedTrailersViewModel : ViewModel() {
                 _watchedList.value = emptyList()
             }
     }
+
 
 
     fun clearHistory() {

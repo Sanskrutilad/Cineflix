@@ -84,9 +84,7 @@ fun ProfileScreen() {
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(20.dp))
-
         Text(
             "Manage Profiles",
             color = Color.LightGray,
@@ -121,7 +119,6 @@ fun ProfileScreen() {
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(label, color = Color.White, fontSize = 20.sp)
                     }
-
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowRight,
                         contentDescription = "Navigate",
@@ -130,11 +127,8 @@ fun ProfileScreen() {
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(10.dp))
         }
-
-
         Spacer(modifier = Modifier.height(100.dp))
 
         Text(
