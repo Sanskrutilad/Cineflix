@@ -56,7 +56,7 @@ fun NewAndHotScreen(
                     IconButton(onClick = {}) {
                         Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White)
                     }
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {navController.navigate("search")}) {
                         Icon(Icons.Default.Search, contentDescription = null, tint = Color.White)
                     }
                 },

@@ -150,7 +150,7 @@ fun SearchScreen(
                 items(topSearches) { movie ->
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().clickable{navController.navigate("MoviedetailScreen/{${movie.Imdbid}}")}
                             .padding(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
