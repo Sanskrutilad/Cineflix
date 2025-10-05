@@ -1,5 +1,6 @@
 package com.example.cineflix.Screen.settingscreen
 
+import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
@@ -103,7 +104,6 @@ fun Settingmainscreen(
         },
         bottomBar = { BottomBar(navController) }
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -112,8 +112,6 @@ fun Settingmainscreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(12.dp))
-
-            // Profile
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
@@ -126,44 +124,35 @@ fun Settingmainscreen(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // ---------------- Liked Movies Section ----------------
             SectionWithMovies(
                 title = "TV Shows & Movies You Liked",
                 isLoading = isLoadingLiked,
                 emptyMessage = "No liked movies yet",
                 movies = myListMovies.map { MovieUi(it.title ?: "", it.poster ?: "", it.imdbId) },
                 context = context,
-                showShare = true
+                showShare = true,
+                navController = navController
             )
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // ---------------- My List Section ----------------
             SectionWithMovies(
                 title = "My List",
                 isLoading = isLoadingMyList,
                 emptyMessage = "Your My List is empty",
                 movies = myList.map { MovieUi(it.title ?: "", it.poster ?: "", it.imdbId) },
-                context = context
+                context = context,
+                navController = navController
             )
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // ---------------- Watched Trailers Section ----------------
             SectionWithMovies(
                 title = "Trailers You Watched",
                 isLoading = false,
                 emptyMessage = "No trailers watched yet",
                 movies = watchedTrailers.map { MovieUi(it.title, it.poster, it.imdbId) },
-                context = context
+                context = context,
+                navController = navController
             )
-
             Spacer(modifier = Modifier.height(100.dp))
-
-            // Bottom Sheet
             if (showBottomSheet) {
                 ModalBottomSheet(
                     onDismissRequest = {
@@ -195,8 +184,9 @@ fun SectionWithMovies(
     isLoading: Boolean,
     emptyMessage: String,
     movies: List<MovieUi>,
-    context: android.content.Context,
-    showShare: Boolean = false
+    context: Context,
+    showShare: Boolean = false,
+    navController: NavHostController
 ) {
     Text(title, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
     Spacer(modifier = Modifier.height(8.dp))
@@ -211,7 +201,7 @@ fun SectionWithMovies(
             }
             else -> items(movies) { movie ->
                 Card(
-                    modifier = Modifier.width(120.dp).wrapContentHeight(),
+                    modifier = Modifier.width(120.dp).wrapContentHeight().clickable{navController.navigate("MoviedetailScreen/${movie.imdbId}")},
                     shape = RoundedCornerShape(8.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
                 ) {
@@ -261,7 +251,6 @@ fun SectionWithMovies(
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text("Share", color = Color.White, fontSize = 14.sp)
                             }
-
                         }
                     }
                 }
