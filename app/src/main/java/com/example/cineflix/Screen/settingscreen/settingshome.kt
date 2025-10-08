@@ -161,28 +161,32 @@ fun Settingmainscreen(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (isUploading) {
-                        CircularProgressIndicator(color = Color.Red, strokeWidth = 3.dp)
-                    } else if (uploadedLogoUrl != null) {
-                        AsyncImage(
-                            model = uploadedLogoUrl,
-                            contentDescription = "Profile",
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
-                        )
-                    } else {
-                        Image(
-                            painter = painterResource(id = R.drawable.prof),
-                            contentDescription = "Profile",
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                            contentScale = ContentScale.Crop
-                        )
+                    when {
+                        isUploading -> {
+                            CircularProgressIndicator(color = Color.Red, strokeWidth = 3.dp)
+                        }
+                        !uploadedLogoUrl.isNullOrEmpty() -> {
+                            AsyncImage(
+                                model = uploadedLogoUrl, // must be full URL
+                                contentDescription = "Profile",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(12.dp)),
+                                contentScale = ContentScale.Crop,
+                                error = painterResource(R.drawable.prof) // fallback image
+                            )
+                        }
+                        else -> {
+                            Image(
+                                painter = painterResource(id = R.drawable.prof),
+                                contentDescription = "Profile",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
