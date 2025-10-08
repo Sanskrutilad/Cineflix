@@ -41,7 +41,7 @@ fun Navigation(apiService: ApiService) {
             SplashScreen(navController)
         }
         composable("settingscreen"){
-            Settingmainscreen(navController)
+            Settingmainscreen(apiService,navController)
         }
         composable("ReadyToWatchScreen"){
             ReadyToWatchScreen(navController)

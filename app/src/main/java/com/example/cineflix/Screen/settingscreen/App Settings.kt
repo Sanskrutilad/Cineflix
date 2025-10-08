@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,13 +166,14 @@ fun AppSettingsScreen(navController: NavHostController) {
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-
+            val user = FirebaseAuth.getInstance().currentUser
             SettingsRow(
                 icon = Icons.Default.Person,
                 title = "Account",
-                subtitle = "Email: shrikants0421@gmail.com",
+                subtitle = "Email: ${user?.email ?: "Not available"}",
                 showExternalIcon = true
             )
+
 
             Spacer(modifier = Modifier.height(20.dp))
 

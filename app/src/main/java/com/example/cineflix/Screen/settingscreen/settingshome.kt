@@ -2,6 +2,10 @@ package com.example.cineflix.Screen.settingscreen
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,7 +41,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R
+import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.Homescreen.BottomBar
+import com.example.cineflix.Screen.uploadLogo
 import com.example.cineflix.Viewmodel.LikedMovie
 import com.example.cineflix.Viewmodel.LikedMoviesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
@@ -49,16 +55,21 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Settingmainscreen(
+    apiService: ApiService,
     navController: NavHostController,
     likedMoviesViewModel: LikedMoviesViewModel = viewModel(),
     watchedViewModel: WatchedTrailersViewModel = viewModel(),
     myListViewModel: MyListViewModel = viewModel()
+
 ) {
     var myListMovies by remember { mutableStateOf<List<LikedMovie>>(emptyList()) }
     var isLoadingLiked by remember { mutableStateOf(true) }
 
     var myList by remember { mutableStateOf<List<MyListMovie>>(emptyList()) }
     var isLoadingMyList by remember { mutableStateOf(true) }
+
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: ""
 
     LaunchedEffect(Unit) {
         likedMoviesViewModel.getLikedMovies { list ->
@@ -71,10 +82,35 @@ fun Settingmainscreen(
             isLoadingMyList = false
         }
     }
+    val context = LocalContext.current
+    var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            isUploading = true
+            uploadLogo(
+                context = context,
+                apiService = apiService,
+                logoUri = it,
+                userId = userId
+            ) { success, url ->
+                isUploading = false
+                if (success && url != null) {
+                    uploadedLogoUrl = url
+                    Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Upload failed, try again.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     val watchedTrailers by watchedViewModel.watchedList.collectAsState()
 
-    val context = LocalContext.current
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -116,11 +152,38 @@ fun Settingmainscreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.prof),
-                    contentDescription = "Profile",
-                    modifier = Modifier.size(70.dp).clip(RoundedCornerShape(12.dp))
-                )
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            if (!isUploading) imagePickerLauncher.launch("image/*")
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isUploading) {
+                        CircularProgressIndicator(color = Color.Red, strokeWidth = 3.dp)
+                    } else if (uploadedLogoUrl != null) {
+                        AsyncImage(
+                            model = uploadedLogoUrl,
+                            contentDescription = "Profile",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.prof),
+                            contentDescription = "Profile",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
