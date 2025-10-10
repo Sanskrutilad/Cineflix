@@ -79,7 +79,7 @@ data class MovieResponse(
 
 data class LikeRequest(
     val imdbId: String,
-    val userId: String // Or whatever extra data you want to associate
+    val userId: String
 )
 
 data class WatchRequest(
@@ -106,7 +106,6 @@ val youtubeApiKey = "AIzaSyA8vYqtM8ANJ8hkzOpTBf5toOrLq8IBU_E"
 data class YouTubeVideoItem(
     val id: VideoId
 )
-
 
 data class VideoId(
     val videoId: String

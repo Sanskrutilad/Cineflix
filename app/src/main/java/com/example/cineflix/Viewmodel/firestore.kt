@@ -1,5 +1,6 @@
 package com.example.cineflix.Viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,7 +59,6 @@ class MyListViewModel : ViewModel() {
                     .document(movieId)
                     .delete()
                     .await()
-
                 onResult(true)
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -87,7 +87,6 @@ class MyListViewModel : ViewModel() {
             }
         }
     }
-
     fun toggleLikeMovie(movie: MyListMovie, isLiked: Boolean, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) {
@@ -157,7 +156,7 @@ class MyListViewModel : ViewModel() {
 data class LikedMovie(
     val imdbId: String = "",
     val title: String = "",
-    val poster: String = ""   // store poster URL
+    val poster: String = ""
 )
 
 class LikedMoviesViewModel : ViewModel() {
@@ -165,7 +164,6 @@ class LikedMoviesViewModel : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private fun getUserId(): String? = auth.currentUser?.uid
 
-    // Add movie to liked
     fun addMovieToLiked(movie: LikedMovie, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) { onResult(false); return }
@@ -184,8 +182,6 @@ class LikedMoviesViewModel : ViewModel() {
             }
         }
     }
-
-    // Remove movie from liked
     fun removeMovieFromLiked(movieId: String, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) { onResult(false); return }
@@ -205,7 +201,7 @@ class LikedMoviesViewModel : ViewModel() {
         }
     }
 
-    // Check if movie is liked
+
     fun isMovieLiked(movieId: String, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) { onResult(false); return }
@@ -245,12 +241,12 @@ class LikedMoviesViewModel : ViewModel() {
         }
     }
 }
+
 data class WatchedTrailer(
     val imdbId: String = "",
     val title: String = "",
     val poster: String = ""
 )
-
 
 class WatchedTrailersViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
@@ -308,9 +304,6 @@ class WatchedTrailersViewModel : ViewModel() {
                 _watchedList.value = emptyList()
             }
     }
-
-
-
     fun clearHistory() {
         val uid = userId() ?: return
         firestore.collection("users")

@@ -60,28 +60,27 @@ fun Settingmainscreen(
     likedMoviesViewModel: LikedMoviesViewModel = viewModel(),
     watchedViewModel: WatchedTrailersViewModel = viewModel(),
     myListViewModel: MyListViewModel = viewModel()
-
 ) {
     var myListMovies by remember { mutableStateOf<List<LikedMovie>>(emptyList()) }
     var isLoadingLiked by remember { mutableStateOf(true) }
-
     var myList by remember { mutableStateOf<List<MyListMovie>>(emptyList()) }
     var isLoadingMyList by remember { mutableStateOf(true) }
-
     val user = FirebaseAuth.getInstance().currentUser
     val userId = user?.uid ?: ""
 
     LaunchedEffect(Unit) {
-        likedMoviesViewModel.getLikedMovies { list ->
-            myListMovies = list
-            isLoadingLiked = false
-        }
+//        likedMoviesViewModel.getLogo { list ->
+//            myListMovies = list
+//            isLoadingLiked = false
+//        }
 
+        // Fetch My List
         myListViewModel.getMyList { list ->
             myList = list
             isLoadingMyList = false
         }
     }
+
     val context = LocalContext.current
     var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
     var isUploading by remember { mutableStateOf(false) }
@@ -107,10 +106,7 @@ fun Settingmainscreen(
             }
         }
     }
-
     val watchedTrailers by watchedViewModel.watchedList.collectAsState()
-
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -186,8 +182,6 @@ fun Settingmainscreen(
                         }
                     }
                 }
-
-
                 Spacer(modifier = Modifier.height(4.dp))
                 Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
