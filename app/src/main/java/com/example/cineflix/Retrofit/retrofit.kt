@@ -126,7 +126,10 @@ data class LikedMoviesResponse(
     val success: Boolean,
     val imdbIds: List<String>
 )
-
+data class GetLogoResponse(
+    val success: Boolean,
+    val logoUrl: String?
+)
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
     .addConverterFactory(GsonConverterFactory.create())
@@ -143,7 +146,9 @@ interface ApiService {
     ): Call<ResponseBody>
 
     @GET("getLogo/{companyId}")
-    suspend fun getLogo(@Path("companyId") companyId: String): Response<ResponseBody>
+    suspend fun getLogo(
+        @Path("companyId") companyId: String
+    ): Response<GetLogoResponse>
 
     @POST("likedmovies")
     suspend fun likedMovie(@Body likeRequest: LikeRequest): Response<ResponseBody>

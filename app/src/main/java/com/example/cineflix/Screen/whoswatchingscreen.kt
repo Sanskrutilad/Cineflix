@@ -37,6 +37,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -277,3 +278,23 @@ fun uploadLogo(
         onResult(false, null)
     }
 }
+
+suspend fun fetchUserLogo(
+    apiService: ApiService,
+    companyId: String,
+    onResult: (String?) -> Unit
+) {
+    try {
+        val response = apiService.getLogo(companyId)
+        if (response.isSuccessful && response.body()?.success == true) {
+            onResult(response.body()?.logoUrl)
+        } else {
+            Log.e("fetchUserLogo", "Logo not found or failed")
+            onResult(null)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onResult(null)
+    }
+}
+

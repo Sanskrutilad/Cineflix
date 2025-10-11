@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.Homescreen.BottomBar
+import com.example.cineflix.Screen.fetchUserLogo
 import com.example.cineflix.Screen.uploadLogo
 import com.example.cineflix.Viewmodel.LikedMovie
 import com.example.cineflix.Viewmodel.LikedMoviesViewModel
@@ -50,6 +51,8 @@ import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,12 +70,13 @@ fun Settingmainscreen(
     var isLoadingMyList by remember { mutableStateOf(true) }
     val user = FirebaseAuth.getInstance().currentUser
     val userId = user?.uid ?: ""
+    var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
+    var isUploading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-//        likedMoviesViewModel.getLogo { list ->
-//            myListMovies = list
-//            isLoadingLiked = false
-//        }
+        fetchUserLogo(apiService, userId) { logoUrl ->
+            uploadedLogoUrl = logoUrl
+        }
 
         // Fetch My List
         myListViewModel.getMyList { list ->
@@ -82,8 +86,7 @@ fun Settingmainscreen(
     }
 
     val context = LocalContext.current
-    var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
-    var isUploading by remember { mutableStateOf(false) }
+
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -94,17 +97,24 @@ fun Settingmainscreen(
                 context = context,
                 apiService = apiService,
                 logoUri = it,
-                userId = userId
+                userId = userId // this is your companyId
             ) { success, url ->
                 isUploading = false
-                if (success && url != null) {
-                    uploadedLogoUrl = url
+                if (success) {
                     Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+
+                    // 🔹 Fetch the latest logo again
+                    CoroutineScope(Dispatchers.IO).launch {
+                        fetchUserLogo(apiService, userId) { logoUrl ->
+                            uploadedLogoUrl = logoUrl
+                        }
+                    }
                 } else {
                     Toast.makeText(context, "Upload failed, try again.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+
     }
     val watchedTrailers by watchedViewModel.watchedList.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
