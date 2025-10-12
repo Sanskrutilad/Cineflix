@@ -130,6 +130,7 @@ data class GetLogoResponse(
     val success: Boolean,
     val logoUrl: String?
 )
+
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
     .addConverterFactory(GsonConverterFactory.create())

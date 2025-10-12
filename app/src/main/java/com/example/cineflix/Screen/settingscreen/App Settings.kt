@@ -1,7 +1,11 @@
 package com.example.cineflix.Screen.settingscreen
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,6 +24,7 @@ import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,8 +56,10 @@ fun AppSettingsScreen(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // Observe stored toggles
     val notificationToggle by SettingsDataStore.getNotificationSetting(context).collectAsState(initial = false)
     val wifiOnlyToggle by SettingsDataStore.getWiFiOnlySetting(context).collectAsState(initial = false)
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,16 +94,19 @@ fun AppSettingsScreen(navController: NavHostController) {
                 .padding(bottom = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
+
+            // --- Video Playback Section ---
             SettingsSection(title = "Video Playback") {
                 SettingsItem(
                     title = "Mobile Data Usage",
-                    subtitle = "Automatic",
+                    subtitle = if (wifiOnlyToggle) "Wi-Fi Only" else "Automatic",
                     icon = Icons.Default.DataUsage
                 )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // --- Notifications Section ---
             SettingsSection(title = "Notifications") {
                 SettingsItemWithSwitch(
                     title = "Allow notifications",
@@ -110,10 +120,14 @@ fun AppSettingsScreen(navController: NavHostController) {
                     },
                 )
             }
+
             Spacer(modifier = Modifier.height(20.dp))
+
+            // --- Downloads Section ---
             SettingsSection(title = "Downloads") {
                 SettingsItemWithSwitch(
-                    title = "Wi-Fi Only", icon = Icons.Default.Wifi,
+                    title = "Wi-Fi Only",
+                    icon = Icons.Default.Wifi,
                     checked = wifiOnlyToggle,
                     onCheckedChange = {
                         scope.launch {
@@ -121,6 +135,7 @@ fun AppSettingsScreen(navController: NavHostController) {
                         }
                     },
                 )
+
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -159,14 +174,29 @@ fun AppSettingsScreen(navController: NavHostController) {
                     netflix = 0.000018f,
                     free = 52f
                 )
-            }
-            fun openUrl(url: String) {
-                val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                context.startActivity(intent)
+
+                // Example button showing enforcement
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = {
+                    // Check if allowed to use network
+                    if (canUseNetwork(context, wifiOnlyToggle)) {
+                        Toast.makeText(context, "Network available, proceeding...", Toast.LENGTH_SHORT).show()
+                        // perform your network call here
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Wi-Fi only mode is enabled. Connect to Wi-Fi to continue.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }) {
+                    Text("Test Network Access")
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            // --- Account Section ---
             val user = FirebaseAuth.getInstance().currentUser
+            Spacer(modifier = Modifier.height(20.dp))
             SettingsRow(
                 icon = Icons.Default.Person,
                 title = "Account",
@@ -174,9 +204,9 @@ fun AppSettingsScreen(navController: NavHostController) {
                 showExternalIcon = true
             )
 
-
             Spacer(modifier = Modifier.height(20.dp))
 
+            // --- Diagnostics Section ---
             SectionHeader("Diagnostics")
             SettingsRow(icon = Icons.Default.Wifi, title = "Check network")
             SettingsRow(icon = Icons.Default.PlayCircleFilled, title = "Playback Specification")
@@ -185,27 +215,60 @@ fun AppSettingsScreen(navController: NavHostController) {
                 title = "Internet speed test",
                 showExternalIcon = true,
                 url = "https://fast.com/",
-                onExternalClick = { openUrl(it) }
+                onExternalClick = { openUrl(context, it) }
             )
+
             Spacer(modifier = Modifier.height(20.dp))
+
+            // --- Legal Section ---
             SectionHeader("Legal")
             SettingsRow(icon = Icons.Default.Description, title = "Open Source Licences")
-            SettingsRow(icon = Icons.Default.Description, title = "Privacy", showExternalIcon = true,url = "https://help.netflix.com/en/node/100628",
-                onExternalClick = { openUrl(it) })
-            SettingsRow(icon = Icons.Default.Description, title = "Cookie Preferences", showExternalIcon = true,url = "https://help.netflix.com/en/node/124516",
-                onExternalClick = { openUrl(it) })
+            SettingsRow(
+                icon = Icons.Default.Description,
+                title = "Privacy",
+                showExternalIcon = true,
+                url = "https://help.netflix.com/en/node/100628",
+                onExternalClick = { openUrl(context, it) }
+            )
+            SettingsRow(
+                icon = Icons.Default.Description,
+                title = "Cookie Preferences",
+                showExternalIcon = true,
+                url = "https://help.netflix.com/en/node/124516",
+                onExternalClick = { openUrl(context, it) }
+            )
             SettingsRow(
                 icon = Icons.Default.Description,
                 title = "Terms of Use",
                 showExternalIcon = true,
                 url = "https://brand.netflix.com/en/terms/",
-                onExternalClick = { openUrl(it) }
+                onExternalClick = { openUrl(context, it) }
             )
         }
     }
 }
+fun canUseNetwork(context: Context, wifiOnly: Boolean): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
+    val isWifi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+    val isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
 
+    // Allow only Wi-Fi if wifiOnly is true, else allow both
+    return if (wifiOnly) isWifi else (isWifi || isMobile)
+}
+private fun openUrl(context: Context, url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        // use FLAG_ACTIVITY_NEW_TASK when calling from non-activity context
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Toast.makeText(context, "Unable to open link", Toast.LENGTH_SHORT).show()
+    }
+}
 
 @Composable
 fun SettingsSection(title: String, content: @Composable ColumnScope.() -> Unit) {

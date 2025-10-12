@@ -77,8 +77,6 @@ fun Settingmainscreen(
         fetchUserLogo(apiService, userId) { logoUrl ->
             uploadedLogoUrl = logoUrl
         }
-
-        // Fetch My List
         myListViewModel.getMyList { list ->
             myList = list
             isLoadingMyList = false
@@ -86,8 +84,6 @@ fun Settingmainscreen(
     }
 
     val context = LocalContext.current
-
-
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -97,13 +93,11 @@ fun Settingmainscreen(
                 context = context,
                 apiService = apiService,
                 logoUri = it,
-                userId = userId // this is your companyId
+                userId = userId
             ) { success, url ->
                 isUploading = false
                 if (success) {
                     Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
-
-                    // 🔹 Fetch the latest logo again
                     CoroutineScope(Dispatchers.IO).launch {
                         fetchUserLogo(apiService, userId) { logoUrl ->
                             uploadedLogoUrl = logoUrl
@@ -116,6 +110,7 @@ fun Settingmainscreen(
         }
 
     }
+
     val watchedTrailers by watchedViewModel.watchedList.collectAsState()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
