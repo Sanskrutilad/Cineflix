@@ -3,6 +3,7 @@ package com.example.cineflix.Screen.settingscreen
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,6 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.Homescreen.BottomBar
@@ -54,6 +57,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +84,10 @@ fun Settingmainscreen(
         myListViewModel.getMyList { list ->
             myList = list
             isLoadingMyList = false
+        }
+        likedMoviesViewModel.getLikedMovies { list ->
+            myListMovies = list
+            isLoadingLiked = false
         }
     }
 
@@ -108,6 +116,7 @@ fun Settingmainscreen(
                 }
             }
         }
+
 
     }
 
@@ -168,16 +177,27 @@ fun Settingmainscreen(
                         }
                         !uploadedLogoUrl.isNullOrEmpty() -> {
                             AsyncImage(
-                                model = uploadedLogoUrl, // must be full URL
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(uploadedLogoUrl)
+                                    .memoryCachePolicy(CachePolicy.DISABLED)
+                                    .diskCachePolicy(CachePolicy.DISABLED)
+                                    .networkCachePolicy(CachePolicy.ENABLED)
+                                    .build(),
                                 contentDescription = "Profile",
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(12.dp)),
                                 contentScale = ContentScale.Crop,
-                                error = painterResource(R.drawable.prof) // fallback image
+                                onError = { result ->
+                                    Log.e("AsyncImage", "Image load failed: ${result.result.throwable.message}")
+                                    Log.e("AsyncImage", "URL tried: $uploadedLogoUrl")
+                                },
+                                error = painterResource(R.drawable.prof)
                             )
+
                         }
                         else -> {
+                            Log.d("AsyncImage", "Showing fallback image")
                             Image(
                                 painter = painterResource(id = R.drawable.prof),
                                 contentDescription = "Profile",
