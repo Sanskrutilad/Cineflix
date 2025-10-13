@@ -43,7 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
@@ -73,6 +72,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Games
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -415,44 +416,30 @@ data class Game(
 
 @Composable
 fun BottomBar(navController: NavHostController, selected: String = "HomeScreen") {
-    val items = listOf("HomeScreen","NewsandHot", "settingscreen")
-    val labels = listOf("Home", "New & Hot", "My Netflix")
-    val icons = listOf(Icons.Default.Home, Icons.Default.Whatshot, Icons.Default.Person)
+    val items = listOf("HomeScreen", "NewsandHot","GameHomeScreen", "settingscreen")
+    val labels = listOf("Home", "New & Hot", "Games", "My Netflix")
+    val icons = listOf(Icons.Default.Home, Icons.Default.Whatshot, Icons.Default.Games, Icons.Default.Person)
 
     BottomAppBar(containerColor = Color.Black, contentColor = Color.White) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 46.dp, vertical = 6.dp)
+                .padding(vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Home
-            BottomBarItem(
-                label = labels[0],
-                icon = icons[0],
-                isSelected = selected == items[0],
-                modifier = Modifier.align(Alignment.CenterStart),
-                onClick = { navController.navigate(items[0]) }
-            )
-            // New & Hot
-            BottomBarItem(
-                label = labels[1],
-                icon = icons[1],
-                isSelected = selected == items[1],
-                modifier = Modifier.align(Alignment.Center),
-                onClick = { navController.navigate(items[1]) }
-            )
-            // My Netflix
-            BottomBarItem(
-                label = labels[2],
-                icon = icons[2],
-                isSelected = selected == items[2],
-                modifier = Modifier.align(Alignment.CenterEnd),
-                onClick = { navController.navigate(items[2]) }
-            )
-
+            items.forEachIndexed { index, item ->
+                BottomBarItem(
+                    label = labels[index],
+                    icon = icons[index],
+                    isSelected = selected == item,
+                    onClick = { navController.navigate(item) }
+                )
+            }
         }
     }
 }
+
 
 @Composable
 fun BottomBarItem(
