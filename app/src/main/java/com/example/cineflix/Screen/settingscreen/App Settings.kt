@@ -208,7 +208,21 @@ fun AppSettingsScreen(navController: NavHostController) {
 
             // --- Diagnostics Section ---
             SectionHeader("Diagnostics")
-            SettingsRow(icon = Icons.Default.Wifi, title = "Check network")
+            SettingsRow(
+                icon = Icons.Default.Wifi,
+                title = "Check network",
+                showExternalIcon = true,
+                onExternalClick = {
+                    val isConnected = checkNetworkConnection(context)
+                    if (isConnected) {
+                        Toast.makeText(context, "Connected to Internet", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "No Internet Connection", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+
+
             SettingsRow(icon = Icons.Default.PlayCircleFilled, title = "Playback Specification")
             SettingsRow(
                 icon = Icons.Default.Speed,
@@ -222,7 +236,11 @@ fun AppSettingsScreen(navController: NavHostController) {
 
             // --- Legal Section ---
             SectionHeader("Legal")
-            SettingsRow(icon = Icons.Default.Description, title = "Open Source Licences")
+            SettingsRow(icon = Icons.Default.Description, title = "Open Source Licences",
+                showExternalIcon = true,
+                url = "https://netflix.github.io/",
+                onExternalClick = { openUrl(context, it) }
+                )
             SettingsRow(
                 icon = Icons.Default.Description,
                 title = "Privacy",
@@ -303,6 +321,13 @@ fun SettingsRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                if (onExternalClick != null && url == null) {
+                    onExternalClick("")
+                } else if (onExternalClick != null && url != null) {
+                    onExternalClick(url)
+                }
+            }
             .background(Color(0xFF1C1C1E))
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -500,3 +525,17 @@ fun StorageBar(used: Float, netflix: Float, free: Float) {
     }
 }
 
+fun checkNetworkConnection(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+    // Return true if device has either Wi-Fi, Mobile data, or Ethernet connectivity
+    return when {
+        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
+    }
+}
