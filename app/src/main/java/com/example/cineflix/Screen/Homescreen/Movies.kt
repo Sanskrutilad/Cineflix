@@ -48,7 +48,6 @@ fun MoviesScreen(
     netflixViewModel: NetflixViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    //val onlyOnNetflix = netflixViewModel.onlyOnNetflix
     val bollywood = netflixViewModel.bollywood
     val comedy = netflixViewModel.comedyMovies
     val fantasyMovies = netflixViewModel.fantasyMovies

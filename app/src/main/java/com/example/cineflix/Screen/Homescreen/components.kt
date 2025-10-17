@@ -140,6 +140,7 @@ fun TopAppBarContent(backgroundColor1: Color , navController: NavController) {
         )
     }
 }
+
 @Composable
 fun FilterChipsRow(backgroundColor: Color, navController: NavHostController) {
     Row(
@@ -195,9 +196,6 @@ fun FeaturedBanner(
 ) {
     val context = LocalContext.current
     val isInList = remember { mutableStateOf(false) }
-
-
-    // 🔍 Check on load
     LaunchedEffect(featuredMovie.Imdbid) {
         featuredMovie.Imdbid?.let { id ->
             myListViewModel.isMovieInMyList(id) { exists ->
@@ -205,7 +203,6 @@ fun FeaturedBanner(
             }
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -368,7 +365,6 @@ fun MobileGamesSection(
                             .width(140.dp)
                             .padding(end = 12.dp)
                             .clickable {
-                                // Optional: Handle click to open game.game_url
                             },
                         colors = CardDefaults.cardColors(containerColor = Color.Black),
                         shape = RoundedCornerShape(12.dp),
@@ -468,7 +464,8 @@ fun BottomBarItem(
                     modifier = Modifier.size(18.dp)
                 )
             }
-        } else {
+        }
+        else {
             Icon(
                 imageVector = icon,
                 contentDescription = label,

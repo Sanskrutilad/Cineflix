@@ -40,10 +40,9 @@ fun MovieListScreen(
 ) {
     val viewModel: NetflixViewModel = viewModel()
 
-    // Access allMovies from ViewModel
+
     val allMovies = viewModel.allMovies
 
-    // Filter based on category or language
     val filteredMovies = remember(category, allMovies) {
         allMovies.filter { movie ->
             movie.Genre.any { it.equals(category, ignoreCase = true) } ||

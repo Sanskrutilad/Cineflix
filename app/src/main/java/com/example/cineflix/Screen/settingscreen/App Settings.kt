@@ -55,11 +55,8 @@ import com.google.firebase.auth.FirebaseAuth
 fun AppSettingsScreen(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    // Observe stored toggles
     val notificationToggle by SettingsDataStore.getNotificationSetting(context).collectAsState(initial = false)
     val wifiOnlyToggle by SettingsDataStore.getWiFiOnlySetting(context).collectAsState(initial = false)
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -94,8 +91,6 @@ fun AppSettingsScreen(navController: NavHostController) {
                 .padding(bottom = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(20.dp))
-
-            // --- Video Playback Section ---
             SettingsSection(title = "Video Playback") {
                 SettingsItem(
                     title = "Mobile Data Usage",
@@ -103,10 +98,7 @@ fun AppSettingsScreen(navController: NavHostController) {
                     icon = Icons.Default.DataUsage
                 )
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // --- Notifications Section ---
             SettingsSection(title = "Notifications") {
                 SettingsItemWithSwitch(
                     title = "Allow notifications",
@@ -120,10 +112,7 @@ fun AppSettingsScreen(navController: NavHostController) {
                     },
                 )
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // --- Downloads Section ---
             SettingsSection(title = "Downloads") {
                 SettingsItemWithSwitch(
                     title = "Wi-Fi Only",
@@ -135,27 +124,23 @@ fun AppSettingsScreen(navController: NavHostController) {
                         }
                     },
                 )
-
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(2.dp)
                         .background(Color.Black)
                 )
-
                 SettingsItem(
                     title = "Download Video Quality",
                     subtitle = "Standard",
                     icon = Icons.Default.Download
                 )
-
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(2.dp)
                         .background(Color.Black)
                 )
-
                 SettingsItem(
                     title = "Download Location",
                     subtitle = "Internal Storage",
@@ -174,14 +159,10 @@ fun AppSettingsScreen(navController: NavHostController) {
                     netflix = 0.000018f,
                     free = 52f
                 )
-
-                // Example button showing enforcement
                 Spacer(modifier = Modifier.height(20.dp))
                 Button(onClick = {
-                    // Check if allowed to use network
                     if (canUseNetwork(context, wifiOnlyToggle)) {
                         Toast.makeText(context, "Network available, proceeding...", Toast.LENGTH_SHORT).show()
-                        // perform your network call here
                     } else {
                         Toast.makeText(
                             context,
@@ -193,8 +174,6 @@ fun AppSettingsScreen(navController: NavHostController) {
                     Text("Test Network Access")
                 }
             }
-
-            // --- Account Section ---
             val user = FirebaseAuth.getInstance().currentUser
             Spacer(modifier = Modifier.height(20.dp))
             SettingsRow(
@@ -206,7 +185,7 @@ fun AppSettingsScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // --- Diagnostics Section ---
+
             SectionHeader("Diagnostics")
             SettingsRow(
                 icon = Icons.Default.Wifi,
@@ -221,8 +200,6 @@ fun AppSettingsScreen(navController: NavHostController) {
                     }
                 }
             )
-
-
             SettingsRow(icon = Icons.Default.PlayCircleFilled, title = "Playback Specification")
             SettingsRow(
                 icon = Icons.Default.Speed,
@@ -231,10 +208,7 @@ fun AppSettingsScreen(navController: NavHostController) {
                 url = "https://fast.com/",
                 onExternalClick = { openUrl(context, it) }
             )
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // --- Legal Section ---
             SectionHeader("Legal")
             SettingsRow(icon = Icons.Default.Description, title = "Open Source Licences",
                 showExternalIcon = true,
