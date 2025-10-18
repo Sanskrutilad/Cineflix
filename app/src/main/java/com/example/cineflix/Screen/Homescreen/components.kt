@@ -84,10 +84,6 @@ import coil.request.ImageRequest
 import com.example.cineflix.Retrofit.GamesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
-import com.example.cineflix.Viewmodel.NetflixViewModel
-import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
-import kotlinx.coroutines.delay
-
 
 fun extractDominantColorFromUrl(
     context: Context,
