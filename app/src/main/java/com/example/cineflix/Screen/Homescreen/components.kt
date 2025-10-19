@@ -71,6 +71,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Games
 import androidx.compose.ui.Alignment
@@ -416,8 +417,8 @@ fun BottomBar(navController: NavHostController, selected: String = "HomeScreen")
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 6.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .padding(vertical = 6.dp).padding(start = 15.dp,end = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             items.forEachIndexed { index, item ->

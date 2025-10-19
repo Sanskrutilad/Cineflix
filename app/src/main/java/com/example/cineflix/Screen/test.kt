@@ -34,15 +34,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.R
+import com.example.cineflix.Viewmodel.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WhosWatchingScreen(navController: NavHostController) {
-    val profiles = listOf(
-        Profile("Shrikant", R.drawable.prof),
-        Profile("Sanskruti", R.drawable.profileicon),
-        Profile("Children", R.drawable.child) // Example children's profile
-    )
+fun WhosWatchingScreen(navController: NavHostController, profileViewModel: ProfileViewModel) {
+    val profiles = profileViewModel.profiles
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -75,22 +73,18 @@ fun WhosWatchingScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(8.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(profiles) { profile ->
-                    ProfileItem(
-                        profile = profile,
-                        onClick = { navController.navigate("HomeScreen") }
-                    )
+                    ProfileItem(profile = profile, onClick = { navController.navigate("HomeScreen") })
                 }
                 item {
                     AddProfileItem(onClick = { navController.navigate("AddProfileScreen") })
@@ -99,6 +93,7 @@ fun WhosWatchingScreen(navController: NavHostController) {
         }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -168,11 +163,5 @@ fun AddProfileItem(onClick: () -> Unit) {
 
 data class Profile(val name: String, val imageRes: Int)
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun WhosWatchingScreenPreview() {
-    val navController = rememberNavController()
-    WhosWatchingScreen(navController)
-}
 
 

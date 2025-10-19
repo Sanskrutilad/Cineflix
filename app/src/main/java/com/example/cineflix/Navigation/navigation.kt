@@ -30,12 +30,14 @@ import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
 import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 import com.example.cineflix.Viewmodel.NetflixViewModel
+import com.example.cineflix.Viewmodel.ProfileViewModel
 
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
+    val profileViewModel: ProfileViewModel = viewModel()
     NavHost(navController = navController, startDestination = "HomeScreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
@@ -59,10 +61,10 @@ fun Navigation(apiService: ApiService) {
             NetflixLoginScreen(navController)
         }
         composable("AddProfileScreen") {
-            AddProfileScreen(navController,apiService)
+            AddProfileScreen(navController,apiService,profileViewModel)
         }
         composable("WhosWatchingScreen") {
-            WhosWatchingScreen(navController)
+            WhosWatchingScreen(navController,profileViewModel)
         }
         composable("HomeScreen") {
             NetflixTopBarScreen(navController)

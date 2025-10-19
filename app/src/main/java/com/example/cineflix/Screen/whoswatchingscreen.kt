@@ -10,8 +10,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
@@ -29,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Viewmodel.ProfileViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -37,17 +40,23 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.example.cineflix.R
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddProfileScreen(navController: NavHostController, apiService: ApiService) {
+fun AddProfileScreen(
+    navController: NavHostController,
+    apiService: ApiService,
+    profileViewModel: ProfileViewModel
+) {
     val context = LocalContext.current
     var profileName by remember { mutableStateOf("") }
     var isChildrenProfile by remember { mutableStateOf(false) }
     var logoUri by remember { mutableStateOf<Uri?>(null) }
     var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
     var isUploading by remember { mutableStateOf(false) }
+
     val coroutineScope = rememberCoroutineScope()
 
     val imagePicker = rememberLauncherForActivityResult(
@@ -69,16 +78,16 @@ fun AddProfileScreen(navController: NavHostController, apiService: ApiService) {
                 actions = {
                     TextButton(
                         onClick = {
-                            // Save profile logic with uploadedLogoUrl
+                            val imageRes = if (isChildrenProfile) R.drawable.child else R.drawable.ic_launcher_foreground
+                            profileViewModel.addProfile(Profile(profileName, imageRes))
+                            navController.popBackStack() // Go back to WhosWatchingScreen
                         },
                         enabled = profileName.isNotBlank()
                     ) {
                         Text("Save", color = if (profileName.isNotBlank()) Color.White else Color.Gray)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1E1E1E)
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF1E1E1E))
             )
         }
     ) { innerPadding ->
@@ -87,7 +96,7 @@ fun AddProfileScreen(navController: NavHostController, apiService: ApiService) {
                 .fillMaxSize()
                 .background(Color(0xFF121212))
                 .padding(innerPadding)
-                .padding(24.dp),
+                .padding(24.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -149,7 +158,7 @@ fun AddProfileScreen(navController: NavHostController, apiService: ApiService) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)
+                    .height(65.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
