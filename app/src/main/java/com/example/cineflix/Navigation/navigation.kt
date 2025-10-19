@@ -29,7 +29,6 @@ import com.example.cineflix.Screen.SplashScreen
 import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
 import com.example.cineflix.Screen.settingscreen.Settingmainscreen
-import com.example.cineflix.Viewmodel.NetflixViewModel
 import com.example.cineflix.Viewmodel.ProfileViewModel
 
 

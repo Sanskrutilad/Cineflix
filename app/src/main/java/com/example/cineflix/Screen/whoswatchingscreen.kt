@@ -138,9 +138,7 @@ fun AddProfileScreen(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
-
             OutlinedTextField(
                 value = profileName,
                 onValueChange = { profileName = it },
@@ -232,7 +230,6 @@ fun AddProfileScreen(
             ) {
                 Text(if (isUploading) "Uploading..." else "Upload Logo")
             }
-
         }
     }
 }

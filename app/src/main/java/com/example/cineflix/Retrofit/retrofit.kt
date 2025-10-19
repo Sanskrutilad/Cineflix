@@ -1,5 +1,6 @@
 package com.example.cineflix.Retrofit
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -63,7 +64,9 @@ data class MovieResponse(
 
     @SerializedName("imdbID")
     val Imdbid: String = ""
+
 ) {
+
     val languages: List<String>
         get() = languageString.split(",").map { it.trim() }
 
@@ -77,6 +80,14 @@ data class MovieResponse(
         get() = GenreString.split(",").map { it.trim() }
 }
 
+data class ProfileData(
+    val logo: Uri?,
+    val userId: String,
+    val isChildrenProfile: Boolean,
+    val profileName: String,
+    val profileId: String
+)
+
 data class LikeRequest(
     val imdbId: String,
     val userId: String
@@ -86,6 +97,7 @@ data class WatchRequest(
     val imdbId: String,
     val userId: String
 )
+
 data class LikedMovie(
     val imdbId: String,
     val userId: String
@@ -131,6 +143,12 @@ data class GetLogoResponse(
     val logoUrl: String?
 )
 
+data class UploadProfileResponse(
+    val success: Boolean,
+    val profileUrl: String? = null,
+    val message: String? = null
+)
+
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
     .addConverterFactory(GsonConverterFactory.create())
@@ -145,6 +163,16 @@ interface ApiService {
         @Part logo: MultipartBody.Part,
         @Part("companyId") companyId: RequestBody
     ): Call<ResponseBody>
+
+    @Multipart
+    @POST("uploadProfile")
+    suspend fun uploadProfile(
+        @Part image: MultipartBody.Part?,
+        @Part("userId") userId: RequestBody,
+        @Part("isChildrenProfile") isChildrenProfile: RequestBody,
+        @Part("profileName") profileName: RequestBody,
+        @Part("profileId") profileId: RequestBody
+    ): Response<UploadProfileResponse>
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(
