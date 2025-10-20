@@ -41,6 +41,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.cineflix.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -304,3 +307,67 @@ suspend fun fetchUserLogo(
     }
 }
 
+fun uploadProfilePhoto(
+    context: Context,
+    apiService: ApiService,
+    imageUri: Uri?,
+    userId: String,
+    isChildrenProfile: Boolean,
+    profileName: String,
+    profileId: String,
+    onResult: (Boolean, String?) -> Unit
+) {
+    val contentResolver = context.contentResolver
+
+    try {
+        val imagePart = imageUri?.let { uri ->
+            val inputStream = contentResolver.openInputStream(uri)
+            val bytes = inputStream?.readBytes()
+            inputStream?.close()
+
+            if (bytes != null) {
+                val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
+                MultipartBody.Part.createFormData("image", "profile.jpg", requestBody)
+            } else null
+        }
+
+        val userIdPart = userId.toRequestBody("text/plain".toMediaTypeOrNull())
+        val isChildrenProfilePart = isChildrenProfile.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val profileNamePart = profileName.toRequestBody("text/plain".toMediaTypeOrNull())
+        val profileIdPart = profileId.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        Log.d("UploadProfile", "Initiating profile upload...")
+
+        // Since your API uses suspend function, run it inside a coroutine
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = apiService.uploadProfile(
+                    image = imagePart,
+                    userId = userIdPart,
+                    isChildrenProfile = isChildrenProfilePart,
+                    profileName = profileNamePart,
+                    profileId = profileIdPart
+                )
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val result = response.body()?.toString() ?: "Success"
+                        Log.d("UploadProfile", "Upload successful: $result")
+                        onResult(true, result)
+                    } else {
+                        Log.e("UploadProfile", "Upload failed: ${response.code()}, ${response.errorBody()?.string()}")
+                        onResult(false, null)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("UploadProfile", "Exception during upload: ${e.localizedMessage}", e)
+                withContext(Dispatchers.Main) {
+                    onResult(false, null)
+                }
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("UploadProfile", "Exception setting up upload: ${e.localizedMessage}", e)
+        onResult(false, null)
+    }
+}
