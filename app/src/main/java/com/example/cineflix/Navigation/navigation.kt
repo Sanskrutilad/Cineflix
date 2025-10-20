@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.Gamesscreen.GameHomeScreen
+import com.example.cineflix.Screen.Gamesscreen.GameSearchScreen
 import com.example.cineflix.Screen.HelpScreen
 import com.example.cineflix.Screen.Homescreen.Castdetailsscreen
 import com.example.cineflix.Screen.Homescreen.CategoryScreen
@@ -114,6 +115,9 @@ fun Navigation(apiService: ApiService) {
         }
         composable("mylist") {
             MyListScreen(navController = navController)
+        }
+        composable("gamesearch") {
+            GameSearchScreen(navController)
         }
 
     }

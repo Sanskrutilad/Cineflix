@@ -82,7 +82,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
-import com.example.cineflix.Retrofit.GamesViewModel
+import com.example.cineflix.Viewmodel.GamesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
 

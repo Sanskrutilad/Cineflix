@@ -46,7 +46,7 @@ fun HelpScreen(navController : NavController) {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {navController.navigate("Signupscreen") }) {
+                    IconButton(onClick = {navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",

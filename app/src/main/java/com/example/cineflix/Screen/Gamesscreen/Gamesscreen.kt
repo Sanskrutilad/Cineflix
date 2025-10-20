@@ -36,9 +36,9 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.FreeToGame
-import com.example.cineflix.Retrofit.GamesViewModel
 import com.example.cineflix.Screen.Homescreen.BottomBar
 import com.example.cineflix.Screen.Homescreen.Game
+import com.example.cineflix.Viewmodel.GamesViewModel
 import kotlin.collections.take
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,8 +58,17 @@ fun GameHomeScreen(
                     title = { Text("Games", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 25.sp) },
                     colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black),
                     actions = {
-                        Icon(Icons.Default.Search, contentDescription = "Profile", tint = Color.White, modifier=Modifier.padding(end=15.dp))
+                        IconButton(
+                            onClick = { navController.navigate("gamesearch") }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search",
+                                tint = Color.White
+                            )
+                        }
                     }
+
                 )
         },
         bottomBar = {
