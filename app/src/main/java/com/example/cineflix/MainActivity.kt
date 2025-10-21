@@ -20,22 +20,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CineflixTheme {
-                UploadProfileScreen(
-                    userId = "U124",
-                    profileId = "P124",
-                    profileName = "Shrikant",
-                    isChildrenProfile = false,
-                    apiService
-                )
+                Navigation(apiService)
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}

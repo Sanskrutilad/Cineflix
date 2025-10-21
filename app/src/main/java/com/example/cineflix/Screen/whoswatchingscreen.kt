@@ -41,10 +41,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.cineflix.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import okhttp3.RequestBody
 import java.io.File
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,11 +61,13 @@ fun AddProfileScreen(
     var profileName by remember { mutableStateOf("") }
     var isChildrenProfile by remember { mutableStateOf(false) }
     var logoUri by remember { mutableStateOf<Uri?>(null) }
-    var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
     var isUploading by remember { mutableStateOf(false) }
-
-    val coroutineScope = rememberCoroutineScope()
-
+    val scope = rememberCoroutineScope()
+    val profileId = remember { generateProfileId() }
+    var uploadedUrl by remember { mutableStateOf<String?>(null) }
+    var fetchedPhotoUrl by remember { mutableStateOf<String?>(null) }
+    var message by remember { mutableStateOf("") }
+    var userId: String = FirebaseAuth.getInstance().currentUser?.uid.toString()
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -81,6 +87,48 @@ fun AddProfileScreen(
                 actions = {
                     TextButton(
                         onClick = {
+                            scope.launch {
+                                logoUri?.let { uri ->
+                                    try {
+                                        Log.d("UploadProfile", "🚀 Upload started for userId: $userId")
+
+                                        val file = File(context.cacheDir, "temp.jpg")
+                                        context.contentResolver.openInputStream(uri)?.use { input ->
+                                            file.outputStream().use { output -> input.copyTo(output) }
+                                        }
+
+                                        val imagePart = MultipartBody.Part.createFormData(
+                                            "image", file.name,
+                                            RequestBody.create("image/*".toMediaTypeOrNull(), file)
+                                        )
+
+                                        val response = apiService.uploadProfile(
+                                            imagePart,
+                                            RequestBody.create("text/plain".toMediaTypeOrNull(), userId),
+                                            RequestBody.create("text/plain".toMediaTypeOrNull(), isChildrenProfile.toString()),
+                                            RequestBody.create("text/plain".toMediaTypeOrNull(), profileName),
+                                            RequestBody.create("text/plain".toMediaTypeOrNull(), profileId)
+                                        )
+
+                                        Log.d("UploadProfile", "📡 Upload response: ${response.raw()}")
+
+                                        if (response.isSuccessful) {
+                                            uploadedUrl = response.body()?.profileUrl
+                                            message = response.body()?.message ?: "Uploaded"
+                                            Log.d("UploadProfile", "✅ Uploaded Successfully: $uploadedUrl")
+                                        } else {
+                                            message = "Upload failed"
+                                            Log.e("UploadProfile", "❌ Upload failed: ${response.errorBody()?.string()}")
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("UploadProfile", "💥 Upload Exception: ${e.message}", e)
+                                    }
+                                } ?: run {
+                                    message = "No image selected"
+                                    Log.w("UploadProfile", "⚠️ No image selected for upload")
+                                }
+                            }
+
                             val imageRes = if (isChildrenProfile) R.drawable.child else R.drawable.ic_launcher_foreground
                             profileViewModel.addProfile(Profile(profileName, imageRes))
                             navController.popBackStack() // Go back to WhosWatchingScreen
@@ -203,7 +251,7 @@ fun AddProfileScreen(
                     if (logoUri != null) {
                         Log.d("Upload", "Starting upload...") // Log start
                         isUploading = true
-                        coroutineScope.launch {
+                        scope.launch {
                             uploadLogo(
                                 context = context,
                                 apiService = apiService,
@@ -212,7 +260,7 @@ fun AddProfileScreen(
                             ) { success, imageUrl ->
                                 isUploading = false
                                 if (success) {
-                                    uploadedLogoUrl = imageUrl
+                                    uploadedUrl = imageUrl
                                     Log.d("Upload", "Upload successful: $imageUrl")
                                     Toast.makeText(context, "Upload successful", Toast.LENGTH_SHORT).show()
                                 } else {
@@ -370,4 +418,8 @@ fun uploadProfilePhoto(
         Log.e("UploadProfile", "Exception setting up upload: ${e.localizedMessage}", e)
         onResult(false, null)
     }
+}
+
+fun generateProfileId(): String {
+    return UUID.randomUUID().toString()
 }
