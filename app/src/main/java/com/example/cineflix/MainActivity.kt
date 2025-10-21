@@ -1,5 +1,6 @@
 package com.example.cineflix
 
+import UploadProfileScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,7 +20,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CineflixTheme {
-                Navigation(apiService = apiService)
+                UploadProfileScreen(
+                    userId = "U124",
+                    profileId = "P124",
+                    profileName = "Shrikant",
+                    isChildrenProfile = false,
+                    apiService
+                )
             }
         }
     }

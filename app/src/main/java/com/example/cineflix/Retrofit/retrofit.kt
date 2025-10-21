@@ -2,7 +2,6 @@ package com.example.cineflix.Retrofit
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import okhttp3.MultipartBody
@@ -17,8 +16,6 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
-
-
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,7 +37,7 @@ data class MovieResponse(
     val duration: String,
 
     @SerializedName("Language")
-    val languageString: String,  // comma-separated string from API
+    val languageString: String,
 
     @SerializedName("Plot")
     val description: String,
@@ -79,15 +76,29 @@ data class MovieResponse(
 
     val Genre: List<String>
         get() = GenreString.split(",").map { it.trim() }
+
 }
 
-data class ProfileData(
-    val logo: Uri?,
-    val userId: String,
-    val isChildrenProfile: Boolean,
-    val profileName: String,
-    val profileId: String
+// UploadProfileResponse.kt
+data class UploadProfileResponse(
+    val success: Boolean,
+    val profileUrl: String?,
+    val message: String?
 )
+
+// GetProfileResponse.kt
+data class GetProfileResponse(
+    val success: Boolean,
+    val user: UserData?
+)
+
+data class UserData(
+    val userId: String,
+    val name: String?,
+    val email: String?,
+    val photoUrl: String?
+)
+
 
 data class LikeRequest(
     val imdbId: String,
@@ -139,16 +150,12 @@ data class LikedMoviesResponse(
     val success: Boolean,
     val imdbIds: List<String>
 )
+
 data class GetLogoResponse(
     val success: Boolean,
     val logoUrl: String?
 )
 
-data class UploadProfileResponse(
-    val success: Boolean,
-    val profileUrl: String? = null,
-    val message: String? = null
-)
 
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
@@ -174,6 +181,11 @@ interface ApiService {
         @Part("profileName") profileName: RequestBody,
         @Part("profileId") profileId: RequestBody
     ): Response<UploadProfileResponse>
+
+    @GET("getProfilePhoto/{userId}")
+    suspend fun getProfilePhoto(
+        @Path("userId") userId: String
+    ): Response<GetProfileResponse>
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(
@@ -256,3 +268,35 @@ object FreeToGameRetrofit {
 }
 
 
+class GamesViewModel : ViewModel() {
+
+    private val _shooterGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val shooterGames: StateFlow<List<FreeToGame>> = _shooterGames
+
+    private val _mmorpgGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val mmorpgGames: StateFlow<List<FreeToGame>> = _mmorpgGames
+
+    private val _pvpGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val pvpGames: StateFlow<List<FreeToGame>> = _pvpGames
+
+    private val _fantasyGames = MutableStateFlow<List<FreeToGame>>(emptyList())
+    val fantasyGames: StateFlow<List<FreeToGame>> = _fantasyGames
+
+    init {
+        fetchGamesByCategory("shooter", _shooterGames)
+        fetchGamesByCategory("mmorpg", _mmorpgGames)
+        fetchGamesByCategory("pvp", _pvpGames)
+        fetchGamesByCategory("fantasy", _fantasyGames)
+    }
+
+    private fun fetchGamesByCategory(category: String, stateFlow: MutableStateFlow<List<FreeToGame>>) {
+        viewModelScope.launch {
+            try {
+                val result = FreeToGameRetrofit.api.getGames(category = category)
+                stateFlow.value = result
+            } catch (e: Exception) {
+                Log.e("GamesViewModel", "Error fetching $category games: ${e.message}")
+            }
+        }
+    }
+}
