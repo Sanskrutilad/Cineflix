@@ -122,7 +122,7 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                         password = passwordState.value,
                         home = {
                             Log.d("LoginButton", "Navigation to HomeScreen triggered")
-                            navController.navigate("HomeScreen")
+                            navController.navigate("WhosWatchingScreen")
                         }
                     )
                     val user = FirebaseAuth.getInstance().currentUser

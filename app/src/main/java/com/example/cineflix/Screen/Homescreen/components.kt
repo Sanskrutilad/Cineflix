@@ -82,6 +82,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
 import coil.request.ImageRequest
+import com.example.cineflix.Screen.generateProfileId
 import com.example.cineflix.Viewmodel.GamesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
 import com.example.cineflix.Viewmodel.MyListViewModel
@@ -193,6 +194,8 @@ fun FeaturedBanner(
 ) {
     val context = LocalContext.current
     val isInList = remember { mutableStateOf(false) }
+    val profileId = remember { generateProfileId() }
+
     LaunchedEffect(featuredMovie.Imdbid) {
         featuredMovie.Imdbid?.let { id ->
             myListViewModel.isMovieInMyList(id) { exists ->
@@ -271,7 +274,7 @@ fun FeaturedBanner(
                         featuredMovie.Imdbid?.let { id ->
                             if (isInList.value) {
                                 // Remove
-                                myListViewModel.removeMovieFromMyList(id) { success ->
+                                myListViewModel.removeMovieFromMyList(profileId,id) { success ->
                                     if (success) {
                                         isInList.value = false
                                         Log.d("FeaturedBanner", "Movie removed ❌")
@@ -284,7 +287,7 @@ fun FeaturedBanner(
                                     title = featuredMovie.title ?: "",
                                     poster = featuredMovie.Poster ?: ""
                                 )
-                                myListViewModel.addMovieToMyList(movie) { success ->
+                                myListViewModel.addMovieToMyList(profileId,movie) { success ->
                                     if (success) {
                                         isInList.value = true
                                         Log.d("FeaturedBanner", "Movie added ✅")

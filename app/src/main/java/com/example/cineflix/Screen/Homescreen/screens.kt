@@ -82,6 +82,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Screen.generateProfileId
 import com.example.cineflix.Viewmodel.LikedMovie
 import com.example.cineflix.Viewmodel.LikedMoviesViewModel
 import com.example.cineflix.Viewmodel.MyListMovie
@@ -355,6 +356,8 @@ fun MovieDetailScreen(
     val movie = viewModel.selectedMovie
     val trailerId = viewModel.trailerId
     val isInList = remember { mutableStateOf(false) }
+    val profileId = remember { generateProfileId() }
+
 
     // Fetch movie by ID
     LaunchedEffect(Imdb) {
@@ -575,7 +578,7 @@ fun MovieDetailScreen(
                                 val imdb = movie.Imdbid ?: return@clickable
                                 if (isInList.value) {
                                     // Remove from My List
-                                    myListViewModel.removeMovieFromMyList(imdb) { success ->
+                                    myListViewModel.removeMovieFromMyList(profileId,imdb) { success ->
                                         if (success) {
                                             isInList.value = false
                                             Log.d("MovieDetailScreen", "Removed from My List ❌: ${movie.title}")
@@ -588,7 +591,7 @@ fun MovieDetailScreen(
                                         title = movie.title,
                                         poster = movie.Poster ?: ""
                                     )
-                                    myListViewModel.addMovieToMyList(movieObj) { success ->
+                                    myListViewModel.addMovieToMyList(profileId,movieObj) { success ->
                                         if (success) {
                                             isInList.value = true
                                             Log.d("MovieDetailScreen", "Added to My List ✅: ${movie.title}")

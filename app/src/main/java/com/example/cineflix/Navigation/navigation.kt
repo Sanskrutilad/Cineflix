@@ -38,7 +38,7 @@ import com.example.cineflix.Viewmodel.ProfileViewModel
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
     val profileViewModel: ProfileViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "HomeScreen") {
+    NavHost(navController = navController, startDestination = "loginscreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
         }

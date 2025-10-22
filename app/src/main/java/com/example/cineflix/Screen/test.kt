@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.R
 import com.example.cineflix.Viewmodel.ProfileViewModel
 
@@ -117,7 +118,11 @@ fun ProfileItem(profile: Profile, onClick: () -> Unit) {
                 )
         ) {
             Image(
-                painter = painterResource(id = profile.imageRes),
+                painter = when {
+                    profile.imageUrl != null -> rememberAsyncImagePainter(profile.imageUrl)
+                    profile.imageRes != null -> painterResource(id = profile.imageRes)
+                    else -> painterResource(id = R.drawable.profileicon)
+                },
                 contentDescription = profile.name,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop
@@ -160,8 +165,14 @@ fun AddProfileItem(onClick: () -> Unit) {
         Text(text = "Add Profile", color = Color.White)
     }
 }
+data class Profile(
+    val name: String,
+    val imageUrl: String? = null,
+    val imageRes: Int? = null,
+    val profileId: String = ""
+)
 
-data class Profile(val name: String, val imageRes: Int)
+
 
 
 

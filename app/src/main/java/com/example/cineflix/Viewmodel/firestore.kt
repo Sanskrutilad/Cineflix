@@ -22,7 +22,7 @@ class MyListViewModel : ViewModel() {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private fun getUserId(): String? = auth.currentUser?.uid
-    fun addMovieToMyList(movie: MyListMovie, onResult: (Boolean) -> Unit) {
+    fun addMovieToMyList(profileId: String,movie: MyListMovie, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) {
             Log.e("MyListViewModel", "User not logged in, cannot save movie")
@@ -32,7 +32,7 @@ class MyListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("users")
-                    .document(userId)
+                    .document(userId) .collection("profiles").document(profileId)
                     .collection("myList")
                     .document(movie.imdbId)
                     .set(movie)
@@ -45,7 +45,7 @@ class MyListViewModel : ViewModel() {
             }
         }
     }
-    fun removeMovieFromMyList(movieId: String, onResult: (Boolean) -> Unit) {
+    fun removeMovieFromMyList(profileId: String,movieId: String, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) {
             onResult(false)
@@ -54,7 +54,7 @@ class MyListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("users")
-                    .document(userId)
+                    .document(userId).collection("profiles").document(profileId)
                     .collection("myList")
                     .document(movieId)
                     .delete()

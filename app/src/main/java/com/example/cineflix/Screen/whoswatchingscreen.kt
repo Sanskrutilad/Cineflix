@@ -67,12 +67,35 @@ fun AddProfileScreen(
     var uploadedUrl by remember { mutableStateOf<String?>(null) }
     var fetchedPhotoUrl by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf("") }
-    var userId: String = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    val userId: String = FirebaseAuth.getInstance().currentUser?.uid.toString()
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         logoUri = uri
+        uri?.let {
+            Log.d("Upload", "Starting upload automatically...")
+            isUploading = true
+            scope.launch {
+                uploadLogo(
+                    context = context,
+                    apiService = apiService,
+                    logoUri = it,
+                    userId = userId
+                ) { success, imageUrl ->
+                    isUploading = false
+                    if (success) {
+                        uploadedUrl = imageUrl
+                        Log.d("Upload", "Upload successful: $imageUrl")
+                        Toast.makeText(context, "Upload successful", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Log.e("Upload", "Upload failed.")
+                        Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
     }
+
 
     Scaffold(
         containerColor = Color(0xFF121212),
@@ -128,10 +151,19 @@ fun AddProfileScreen(
                                     Log.w("UploadProfile", "⚠️ No image selected for upload")
                                 }
                             }
+                            val newProfile = Profile(
+                                name = profileName,
+                                imageRes = null,
+                                imageUrl = logoUri.toString(),
+                                profileId = profileId
+                            )
 
-                            val imageRes = if (isChildrenProfile) R.drawable.child else R.drawable.ic_launcher_foreground
-                            profileViewModel.addProfile(Profile(profileName, imageRes))
-                            navController.popBackStack() // Go back to WhosWatchingScreen
+                            profileViewModel.addProfile(
+                                userId = userId,
+                                profile = newProfile
+                            )
+
+                            navController.popBackStack()
                         },
                         enabled = profileName.isNotBlank()
                     ) {
@@ -245,42 +277,6 @@ fun AddProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (logoUri != null) {
-                        Log.d("Upload", "Starting upload...") // Log start
-                        isUploading = true
-                        scope.launch {
-                            uploadLogo(
-                                context = context,
-                                apiService = apiService,
-                                logoUri = logoUri!!,
-                                userId = "your_user_id_here"
-                            ) { success, imageUrl ->
-                                isUploading = false
-                                if (success) {
-                                    uploadedUrl = imageUrl
-                                    Log.d("Upload", "Upload successful: $imageUrl")
-                                    Toast.makeText(context, "Upload successful", Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Log.e("Upload", "Upload failed.")
-                                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                    } else {
-                        Log.w("Upload", "No image selected")
-                        Toast.makeText(context, "Please select an image", Toast.LENGTH_SHORT).show()
-                    }
-                },
-                enabled = logoUri != null && !isUploading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            ) {
-                Text(if (isUploading) "Uploading..." else "Upload Logo")
-            }
         }
     }
 }
@@ -354,72 +350,6 @@ suspend fun fetchUserLogo(
         onResult(null)
     }
 }
-
-fun uploadProfilePhoto(
-    context: Context,
-    apiService: ApiService,
-    imageUri: Uri?,
-    userId: String,
-    isChildrenProfile: Boolean,
-    profileName: String,
-    profileId: String,
-    onResult: (Boolean, String?) -> Unit
-) {
-    val contentResolver = context.contentResolver
-
-    try {
-        val imagePart = imageUri?.let { uri ->
-            val inputStream = contentResolver.openInputStream(uri)
-            val bytes = inputStream?.readBytes()
-            inputStream?.close()
-
-            if (bytes != null) {
-                val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("image", "profile.jpg", requestBody)
-            } else null
-        }
-
-        val userIdPart = userId.toRequestBody("text/plain".toMediaTypeOrNull())
-        val isChildrenProfilePart = isChildrenProfile.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-        val profileNamePart = profileName.toRequestBody("text/plain".toMediaTypeOrNull())
-        val profileIdPart = profileId.toRequestBody("text/plain".toMediaTypeOrNull())
-
-        Log.d("UploadProfile", "Initiating profile upload...")
-
-        // Since your API uses suspend function, run it inside a coroutine
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = apiService.uploadProfile(
-                    image = imagePart,
-                    userId = userIdPart,
-                    isChildrenProfile = isChildrenProfilePart,
-                    profileName = profileNamePart,
-                    profileId = profileIdPart
-                )
-
-                withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val result = response.body()?.toString() ?: "Success"
-                        Log.d("UploadProfile", "Upload successful: $result")
-                        onResult(true, result)
-                    } else {
-                        Log.e("UploadProfile", "Upload failed: ${response.code()}, ${response.errorBody()?.string()}")
-                        onResult(false, null)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("UploadProfile", "Exception during upload: ${e.localizedMessage}", e)
-                withContext(Dispatchers.Main) {
-                    onResult(false, null)
-                }
-            }
-        }
-    } catch (e: Exception) {
-        Log.e("UploadProfile", "Exception setting up upload: ${e.localizedMessage}", e)
-        onResult(false, null)
-    }
-}
-
 fun generateProfileId(): String {
     return UUID.randomUUID().toString()
 }
