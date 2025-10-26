@@ -168,7 +168,10 @@ data class GetProfilesResponse(
     val count: Int,
     val profiles: List<ProfileItem>
 )
-
+data class Getresponse(
+    val success:Boolean,
+    val profile: ProfileItem?
+    )
 data class ProfileItem(
     val userId: String,
     val profileId: String,
@@ -186,6 +189,10 @@ interface ApiService {
         @Part("companyId") companyId: RequestBody
     ): Call<ResponseBody>
 
+    @GET("getProfile/{profileId}")
+    suspend fun getProfileById(
+        @Path("profileId") profileId: String
+    ): Response<Getresponse>
     @Multipart
     @POST("uploadProfile")
     suspend fun uploadProfile(

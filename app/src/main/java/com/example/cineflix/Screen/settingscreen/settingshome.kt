@@ -208,7 +208,7 @@ fun Settingmainscreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Shrikant", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text("Sanskruti", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
             Spacer(modifier = Modifier.height(20.dp))
             SectionWithMovies(

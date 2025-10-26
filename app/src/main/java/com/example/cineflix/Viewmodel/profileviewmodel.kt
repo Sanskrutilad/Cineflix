@@ -84,4 +84,17 @@ class ProfileViewModel(
                 Log.e("Firestore", "Error saving profile: ${e.message}")
             }
     }
+    suspend fun fetchProfile(profileId: String) {
+        try {
+            val response = apiService.getProfileById(profileId)
+            if (response.isSuccessful && response.body()?.success == true) {
+                val profile = response.body()?.profile
+                Log.d("ProfileViewModel", "Fetched profile: $profile")
+            } else {
+                Log.e("ProfileViewModel", "Failed to fetch profile: ${response.message()}")
+            }
+        } catch (e: Exception) {
+            Log.e("ProfileViewModel", "Exception: ${e.message}")
+        }
+    }
 }
