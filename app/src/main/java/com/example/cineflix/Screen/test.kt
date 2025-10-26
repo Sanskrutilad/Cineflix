@@ -1,6 +1,5 @@
 package com.example.cineflix.Screen
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,10 +12,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,20 +26,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.R
-import com.example.cineflix.Viewmodel.ProfileViewModel
-
+import com.example.cineflix.Retrofit.ProfileItem
+import com.example.cineflix.Retrofit.ProfileViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WhosWatchingScreen(navController: NavHostController, profileViewModel: ProfileViewModel) {
-    val profiles = profileViewModel.profiles
-
+    val profiles by profileViewModel.profiles.collectAsState()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -95,10 +90,9 @@ fun WhosWatchingScreen(navController: NavHostController, profileViewModel: Profi
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProfileItem(profile: Profile, onClick: () -> Unit) {
+fun ProfileItem(profile: ProfileItem, onClick: () -> Unit) {
     var showEdit by remember { mutableStateOf(false) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -119,14 +113,14 @@ fun ProfileItem(profile: Profile, onClick: () -> Unit) {
         ) {
             Image(
                 painter = when {
-                    profile.imageUrl != null -> rememberAsyncImagePainter(profile.imageUrl)
-                    profile.imageRes != null -> painterResource(id = profile.imageRes)
+                    profile.photoUrl != null -> rememberAsyncImagePainter(profile.photoUrl)
                     else -> painterResource(id = R.drawable.profileicon)
                 },
-                contentDescription = profile.name,
+                contentDescription = profile.profileName,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop
             )
+
             if (showEdit) {
                 Icon(
                     imageVector = Icons.Default.Edit,
@@ -139,7 +133,7 @@ fun ProfileItem(profile: Profile, onClick: () -> Unit) {
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = profile.name, color = Color.White)
+        Text(text = profile.profileName, color = Color.White)
     }
 }
 

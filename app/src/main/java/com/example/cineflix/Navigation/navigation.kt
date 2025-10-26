@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Retrofit.ProfileViewModel
 import com.example.cineflix.Screen.AddProfileScreen
 import com.example.cineflix.Screen.Gamesscreen.GameHomeScreen
 import com.example.cineflix.Screen.Gamesscreen.GameSearchScreen
@@ -30,7 +31,6 @@ import com.example.cineflix.Screen.SplashScreen
 import com.example.cineflix.Screen.WhosWatchingScreen
 import com.example.cineflix.Screen.settingscreen.AppSettingsScreen
 import com.example.cineflix.Screen.settingscreen.Settingmainscreen
-import com.example.cineflix.Viewmodel.ProfileViewModel
 
 
 @OptIn(ExperimentalComposeUiApi::class)

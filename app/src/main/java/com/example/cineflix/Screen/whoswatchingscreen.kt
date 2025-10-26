@@ -27,11 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cineflix.Retrofit.ApiService
-import com.example.cineflix.Viewmodel.ProfileViewModel
+import com.example.cineflix.Retrofit.ProfileViewModel
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -40,11 +38,8 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.example.cineflix.R
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import okhttp3.RequestBody
 import java.io.File
@@ -95,8 +90,6 @@ fun AddProfileScreen(
             }
         }
     }
-
-
     Scaffold(
         containerColor = Color(0xFF121212),
         topBar = {
@@ -113,27 +106,27 @@ fun AddProfileScreen(
                             scope.launch {
                                 logoUri?.let { uri ->
                                     try {
-                                        Log.d("UploadProfile", "🚀 Upload started for userId: $userId")
-
                                         val file = File(context.cacheDir, "temp.jpg")
                                         context.contentResolver.openInputStream(uri)?.use { input ->
                                             file.outputStream().use { output -> input.copyTo(output) }
                                         }
-
+                                        Log.d("UploadProfile", "Temp file: ${file.absolutePath}, size=${file.length()}")
                                         val imagePart = MultipartBody.Part.createFormData(
                                             "image", file.name,
                                             RequestBody.create("image/*".toMediaTypeOrNull(), file)
                                         )
 
-                                        val response = apiService.uploadProfile(
-                                            imagePart,
-                                            RequestBody.create("text/plain".toMediaTypeOrNull(), userId),
-                                            RequestBody.create("text/plain".toMediaTypeOrNull(), isChildrenProfile.toString()),
-                                            RequestBody.create("text/plain".toMediaTypeOrNull(), profileName),
-                                            RequestBody.create("text/plain".toMediaTypeOrNull(), profileId)
-                                        )
+                                        val response = withContext(Dispatchers.IO) {
+                                            apiService.uploadProfile(
+                                                imagePart,
+                                                RequestBody.create("text/plain".toMediaTypeOrNull(), userId),
+                                                RequestBody.create("text/plain".toMediaTypeOrNull(), isChildrenProfile.toString()),
+                                                RequestBody.create("text/plain".toMediaTypeOrNull(), profileName),
+                                                RequestBody.create("text/plain".toMediaTypeOrNull(), profileId)
+                                            )
+                                        }
 
-                                        Log.d("UploadProfile", "📡 Upload response: ${response.raw()}")
+                                        Log.d("UploadProfile", "Upload response: ${response.raw()}")
 
                                         if (response.isSuccessful) {
                                             uploadedUrl = response.body()?.profileUrl
@@ -157,12 +150,10 @@ fun AddProfileScreen(
                                 imageUrl = logoUri.toString(),
                                 profileId = profileId
                             )
-
                             profileViewModel.addProfile(
                                 userId = userId,
                                 profile = newProfile
                             )
-
                             navController.popBackStack()
                         },
                         enabled = profileName.isNotBlank()
@@ -200,7 +191,6 @@ fun AddProfileScreen(
                 } else {
                     Text("😊", fontSize = 40.sp, modifier = Modifier.align(Alignment.Center))
                 }
-
                 Box(
                     modifier = Modifier
                         .size(32.dp)

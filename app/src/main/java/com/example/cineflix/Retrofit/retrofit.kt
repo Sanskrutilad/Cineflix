@@ -156,13 +156,27 @@ data class GetLogoResponse(
     val logoUrl: String?
 )
 
-
 val retrofit = Retrofit.Builder()
     .baseUrl("https://www.googleapis.com/youtube/v3/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
 val youtubeApi = retrofit.create(YouTubeApiService::class.java)
+
+data class GetProfilesResponse(
+    val success: Boolean,
+    val count: Int,
+    val profiles: List<ProfileItem>
+)
+
+data class ProfileItem(
+    val userId: String,
+    val profileId: String,
+    val profileName: String,
+    val isChildrenProfile: Boolean,
+    val photoUrl: String?,
+    val uploadedAt: String
+)
 
 interface ApiService {
     @Multipart
@@ -187,6 +201,11 @@ interface ApiService {
         @Path("userId") userId: String
     ): Response<GetProfileResponse>
 
+    @GET("getProfiles/{userId}")
+    suspend fun getProfiles(
+        @Path("userId") userId: String
+    ): Response<GetProfilesResponse>   // 👈 New API for all profiles
+
     @GET("getLogo/{companyId}")
     suspend fun getLogo(
         @Path("companyId") companyId: String
@@ -203,8 +222,8 @@ interface ApiService {
 
     @GET("recentlywatched/{userId}")
     suspend fun getRecentlyWatched(@Path("userId") userId: String): Response<List<WatchedMovie>>
-
 }
+
 
 interface OmdbApiService {
 
@@ -266,7 +285,6 @@ object FreeToGameRetrofit {
 
     val api: FreeToGameApiService = retrofit.create(FreeToGameApiService::class.java)
 }
-
 
 class GamesViewModel : ViewModel() {
 
