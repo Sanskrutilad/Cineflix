@@ -49,9 +49,6 @@ fun MoviesScreen(
 ) {
     val context = LocalContext.current
     val bollywood = netflixViewModel.bollywood
-    val comedy = netflixViewModel.comedyMovies
-    val fantasyMovies = netflixViewModel.fantasyMovies
-    val HollywoodMovies = netflixViewModel.hollywoodMovies
     if (bollywood.isEmpty()) {
         Box(
             modifier = Modifier
@@ -63,7 +60,6 @@ fun MoviesScreen(
         }
         return
     }
-
     var backgroundColor by remember { mutableStateOf(Color.DarkGray) }
     val featuredMovie = bollywood.first()
 

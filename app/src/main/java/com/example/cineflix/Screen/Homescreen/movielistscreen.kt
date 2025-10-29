@@ -39,8 +39,6 @@ fun MovieListScreen(
     navController: NavHostController
 ) {
     val viewModel: NetflixViewModel = viewModel()
-
-
     val allMovies = viewModel.allMovies
 
     val filteredMovies = remember(category, allMovies) {
@@ -78,7 +76,7 @@ fun MovieListScreen(
             }
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3), // Netflix-style 3 posters per row
+                columns = GridCells.Fixed(3),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
@@ -87,7 +85,7 @@ fun MovieListScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredMovies) { movie ->
-                    MoviePosterItem(movie = movie , navController)
+                    MoviePosterItem(movie = movie, navController)
                 }
             }
         }
@@ -95,11 +93,11 @@ fun MovieListScreen(
 }
 
 @Composable
-fun MoviePosterItem(movie: MovieResponse , navController : NavController) {
+fun MoviePosterItem(movie: MovieResponse, navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(0.7f) // Poster aspect ratio
+            .aspectRatio(0.7f)
             .clickable {
                 navController.navigate("MoviedetailScreen/${movie.Imdbid}")
             }
@@ -124,14 +122,13 @@ fun MyListScreen(
     var myListMovies by remember { mutableStateOf<List<MyListMovie>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Fetch My List from Firestore
+
     LaunchedEffect(Unit) {
         myListViewModel.getMyList { list ->
             myListMovies = list
             isLoading = false
         }
     }
-
     Scaffold(
         topBar = {
             TopAppBar(
