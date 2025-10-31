@@ -38,7 +38,7 @@ import com.example.cineflix.Screen.settingscreen.Settingmainscreen
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
     val profileViewModel: ProfileViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "loginscreen") {
+    NavHost(navController = navController, startDestination = "Splashscreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
         }

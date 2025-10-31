@@ -303,9 +303,10 @@ fun SectionWithMovies(
                                 .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                             contentScale = ContentScale.Crop
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+
 
                         if (showShare) {
+                            Spacer(modifier = Modifier.height(8.dp))
                             // Show share row
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -326,6 +327,7 @@ fun SectionWithMovies(
                                     }
                                 }
                             ) {
+
                                 Icon(
                                     Icons.Outlined.Share,
                                     contentDescription = "Share",
