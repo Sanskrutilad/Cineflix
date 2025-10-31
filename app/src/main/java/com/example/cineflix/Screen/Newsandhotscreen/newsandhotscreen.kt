@@ -99,14 +99,11 @@ fun NewAndHotScreen(
                     }
                 }
             }
-
-            // 🔥 Show different data depending on the selected tab
             val movieList = when (selectedTab) {
                 "Coming Soon" -> viewModel.onlyOnNetflix
                 "Everyone's Watching" -> viewModel.bollywood
                 else -> emptyList()
             }
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -155,16 +152,6 @@ fun ShowCard(imageUrl: String, ageRating: String, title: String, description: St
             ) {
                 Text(ageRating, color = Color.White, fontSize = 12.sp)
             }
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.Center)
-                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                    .padding(8.dp)
-            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -181,17 +168,6 @@ fun ShowCard(imageUrl: String, ageRating: String, title: String, description: St
             fontSize = 14.sp,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(
-            onClick = { },
-            modifier = Modifier.padding(horizontal = 8.dp),
-            shape = RectangleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-        ) {
-            Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.Black)
-            Spacer(Modifier.width(8.dp))
-            Text("Remind Me", color = Color.Black)
-        }
         Spacer(modifier = Modifier.height(12.dp))
     }
 }

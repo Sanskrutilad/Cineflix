@@ -116,8 +116,6 @@ fun Settingmainscreen(
                 }
             }
         }
-
-
     }
 
     val watchedTrailers by watchedViewModel.watchedList.collectAsState()
@@ -192,14 +190,14 @@ fun Settingmainscreen(
                                     Log.e("AsyncImage", "Image load failed: ${result.result.throwable.message}")
                                     Log.e("AsyncImage", "URL tried: $uploadedLogoUrl")
                                 },
-                                error = painterResource(R.drawable.prof)
+                                error = painterResource(R.drawable.profileicon)
                             )
 
                         }
                         else -> {
                             Log.d("AsyncImage", "Showing fallback image")
                             Image(
-                                painter = painterResource(id = R.drawable.prof),
+                                painter = painterResource(id = R.drawable.profileicon),
                                 contentDescription = "Profile",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop

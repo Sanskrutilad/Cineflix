@@ -182,6 +182,7 @@ class LikedMoviesViewModel : ViewModel() {
             }
         }
     }
+
     fun removeMovieFromLiked(movieId: String, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) { onResult(false); return }
@@ -200,8 +201,6 @@ class LikedMoviesViewModel : ViewModel() {
             }
         }
     }
-
-
     fun isMovieLiked(movieId: String, onResult: (Boolean) -> Unit) {
         val userId = getUserId()
         if (userId == null) { onResult(false); return }
