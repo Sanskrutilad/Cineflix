@@ -41,8 +41,6 @@ fun GameSearchScreen(
         if (searchQuery.isBlank()) emptyList()
         else allGames.filter { it.title.contains(searchQuery, ignoreCase = true) }
     }
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()

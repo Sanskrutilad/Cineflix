@@ -120,8 +120,7 @@ fun GameCard(game: FreeToGame, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .width(140.dp)
-            .padding(end = 12.dp)
-            .clickable { onClick() },
+            .padding(end = 12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
