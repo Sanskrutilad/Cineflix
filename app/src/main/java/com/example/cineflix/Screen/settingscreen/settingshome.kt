@@ -45,6 +45,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.cineflix.R
 import com.example.cineflix.Retrofit.ApiService
+import com.example.cineflix.Retrofit.ProfileItem
 import com.example.cineflix.Screen.Homescreen.BottomBar
 import com.example.cineflix.Screen.fetchUserLogo
 import com.example.cineflix.Screen.uploadLogo
@@ -76,10 +77,18 @@ fun Settingmainscreen(
     val userId = user?.uid ?: ""
     var uploadedLogoUrl by remember { mutableStateOf<String?>(null) }
     var isUploading by remember { mutableStateOf(false) }
+    var profileName by remember { mutableStateOf<String?>(null) }
+    var isProfileLoading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         fetchUserLogo(apiService, userId) { logoUrl ->
             uploadedLogoUrl = logoUrl
+        }
+        val response = apiService.getProfilePhoto(userId)
+        if (response.isSuccessful && response.body()?.success == true) {
+            profileName = response.body()?.profile?.profileName
+        } else {
+            Log.e("SettingsScreen", "Profile fetch failed: ${response.errorBody()?.string()}")
         }
         myListViewModel.getMyList { list ->
             myList = list
@@ -190,14 +199,14 @@ fun Settingmainscreen(
                                     Log.e("AsyncImage", "Image load failed: ${result.result.throwable.message}")
                                     Log.e("AsyncImage", "URL tried: $uploadedLogoUrl")
                                 },
-                                error = painterResource(R.drawable.profileicon)
+                                error = painterResource(R.drawable.profilee)
                             )
 
                         }
                         else -> {
                             Log.d("AsyncImage", "Showing fallback image")
                             Image(
-                                painter = painterResource(id = R.drawable.profileicon),
+                                painter = painterResource(id = R.drawable.profilee),
                                 contentDescription = "Profile",
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
@@ -206,7 +215,17 @@ fun Settingmainscreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("Sanskruti", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                if (isProfileLoading) {
+                    CircularProgressIndicator(color = Color.Red, strokeWidth = 2.dp)
+                } else {
+                    Text(
+                        text = profileName ?: "Guest",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.height(20.dp))
             SectionWithMovies(

@@ -90,6 +90,7 @@ import com.example.cineflix.Viewmodel.MyListViewModel
 import com.example.cineflix.Viewmodel.NetflixViewModel
 import com.example.cineflix.Viewmodel.WatchedTrailer
 import com.example.cineflix.Viewmodel.WatchedTrailersViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -356,7 +357,8 @@ fun MovieDetailScreen(
     val movie = viewModel.selectedMovie
     val trailerId = viewModel.trailerId
     val isInList = remember { mutableStateOf(false) }
-    val profileId = remember { generateProfileId() }
+    val user = FirebaseAuth.getInstance().currentUser
+    val userId = user?.uid ?: ""
 
 
     // Fetch movie by ID
@@ -578,7 +580,7 @@ fun MovieDetailScreen(
                                 val imdb = movie.Imdbid ?: return@clickable
                                 if (isInList.value) {
                                     // Remove from My List
-                                    myListViewModel.removeMovieFromMyList(profileId,imdb) { success ->
+                                    myListViewModel.removeMovieFromMyList(userId,imdb) { success ->
                                         if (success) {
                                             isInList.value = false
                                             Log.d("MovieDetailScreen", "Removed from My List ❌: ${movie.title}")
@@ -591,7 +593,7 @@ fun MovieDetailScreen(
                                         title = movie.title,
                                         poster = movie.Poster ?: ""
                                     )
-                                    myListViewModel.addMovieToMyList(profileId,movieObj) { success ->
+                                    myListViewModel.addMovieToMyList(userId,movieObj) { success ->
                                         if (success) {
                                             isInList.value = true
                                             Log.d("MovieDetailScreen", "Added to My List ✅: ${movie.title}")

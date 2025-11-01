@@ -32,7 +32,7 @@ class MyListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("users")
-                    .document(userId) .collection("profiles").document(profileId)
+                    .document(userId)
                     .collection("myList")
                     .document(movie.imdbId)
                     .set(movie)
@@ -54,7 +54,7 @@ class MyListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 firestore.collection("users")
-                    .document(userId).collection("profiles").document(profileId)
+                    .document(userId)
                     .collection("myList")
                     .document(movieId)
                     .delete()
