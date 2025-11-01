@@ -115,7 +115,6 @@ fun AddProfileScreen(
                                             "image", file.name,
                                             RequestBody.create("image/*".toMediaTypeOrNull(), file)
                                         )
-
                                         val response = withContext(Dispatchers.IO) {
                                             apiService.uploadProfile(
                                                 imagePart,
@@ -125,7 +124,6 @@ fun AddProfileScreen(
                                                 RequestBody.create("text/plain".toMediaTypeOrNull(), profileId)
                                             )
                                         }
-
                                         Log.d("UploadProfile", "Upload response: ${response.raw()}")
 
                                         if (response.isSuccessful) {

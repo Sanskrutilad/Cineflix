@@ -22,48 +22,7 @@ class ProfileViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
-    fun loadProfiles(userId: String) {
-        viewModelScope.launch {
-            _loading.value = true
-            try {
-                val response = apiService.getProfiles(userId)
-                if (response.isSuccessful && response.body()?.success == true) {
-                    _profiles.value = response.body()?.profiles ?: emptyList()
-                    Log.d("ProfileViewModel", "✅ Profiles loaded successfully: ${_profiles.value.size}")
-                } else {
-                    _error.value = response.message()
-                    Log.e("ProfileViewModel", "❌ Failed to load profiles: ${response.message()}")
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
-                Log.e("ProfileViewModel", "❌ Exception: ${e.message}")
-            } finally {
-                _loading.value = false
-            }
-        }
-    }
-    fun uploadProfile(
-        imagePart: okhttp3.MultipartBody.Part?,
-        userId: okhttp3.RequestBody,
-        isChildrenProfile: okhttp3.RequestBody,
-        profileName: okhttp3.RequestBody,
-        profileId: okhttp3.RequestBody
-    ) {
-        viewModelScope.launch {
-            try {
-                val response = apiService.uploadProfile(imagePart, userId, isChildrenProfile, profileName, profileId)
-                if (response.isSuccessful && response.body()?.success == true) {
-                    Log.d("ProfileViewModel", "✅ Profile uploaded successfully")
-                    // Refresh list after upload
-                    loadProfiles(userId.toString())
-                } else {
-                    Log.e("ProfileViewModel", "❌ Upload failed: ${response.message()}")
-                }
-            } catch (e: Exception) {
-                Log.e("ProfileViewModel", "❌ Upload Exception: ${e.message}")
-            }
-        }
-    }
+
     fun addProfile(userId: String, profile: Profile) {
         val firestore = FirebaseFirestore.getInstance()
 

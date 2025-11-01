@@ -131,7 +131,7 @@ fun NetflixCreateAccountScreen(
                             email,
                             password,
                             home = {
-                                navController.navigate("WhosWatchingScreen")
+                                navController.navigate("AddProfileScreen")
                             }
                         )
                     }

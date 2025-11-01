@@ -19,156 +19,119 @@ import okhttp3.RequestBody
 import java.io.File
 import com.example.cineflix.Retrofit.ApiService
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import coil.compose.AsyncImage
+import com.example.cineflix.Retrofit.ProfileItem
+import com.example.cineflix.Screen.Profile
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 @Composable
-fun UploadProfileScreen(
-    userId: String,
-    profileId: String,
-    profileName: String,
-    isChildrenProfile: Boolean,
-    apiService: ApiService
-) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+fun ProfileScreen(apiService: ApiService) {
+    val auth = FirebaseAuth.getInstance()
+    val userId = auth.currentUser?.uid
 
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var uploadedUrl by remember { mutableStateOf<String?>(null) }
-    var fetchedPhotoUrl by remember { mutableStateOf<String?>(null) }
-    var message by remember { mutableStateOf("") }
+    var profile by remember { mutableStateOf<ProfileItem?>(null) }
+    var loading by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
 
-    val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        selectedImageUri = uri
-        Log.d("UploadProfile", "📸 Image selected: $uri")
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            loading = true
+            error = null
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    apiService.getProfilePhoto(userId)
+                }
+                if (response.isSuccessful && response.body()?.success == true) {
+                    profile = response.body()?.profile
+                } else {
+                    error = "Profile not found."
+                }
+            } catch (e: Exception) {
+                error = e.localizedMessage ?: "An error occurred."
+            } finally {
+                loading = false
+            }
+        } else {
+            error = "User not logged in."
+        }
     }
 
-    Column(
+    // 🧩 UI Layout
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
+        when {
+            loading -> CircularProgressIndicator()
 
-        Text("Upload & View Profile", style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(20.dp))
-
-        selectedImageUri?.let {
-            Image(
-                painter = rememberAsyncImagePainter(it),
-                contentDescription = null,
-                modifier = Modifier.size(120.dp)
+            error != null -> Text(
+                text = "❌ $error",
+                color = Color.Red,
+                textAlign = TextAlign.Center
             )
-        }
 
-        Spacer(modifier = Modifier.height(10.dp))
+            profile != null -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    AsyncImage(
+                        model = profile!!.photoUrl,
+                        contentDescription = "Profile Photo",
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                    )
 
-        Button(
-            onClick = { imagePicker.launch("image/*") },
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text("Select Image")
-        }
+                    Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = profile!!.profileName,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-        Button(
-            onClick = {
-                scope.launch {
-                    selectedImageUri?.let { uri ->
-                        try {
-                            Log.d("UploadProfile", "🚀 Upload started for userId: $userId")
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            val file = File(context.cacheDir, "temp.jpg")
-                            context.contentResolver.openInputStream(uri)?.use { input ->
-                                file.outputStream().use { output -> input.copyTo(output) }
-                            }
+                    Text(
+                        text = "Profile ID: ${profile!!.profileId}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
 
-                            val imagePart = MultipartBody.Part.createFormData(
-                                "image", file.name,
-                                RequestBody.create("image/*".toMediaTypeOrNull(), file)
-                            )
+                    Text(
+                        text = if (profile!!.isChildrenProfile) "Children Profile" else "Adult Profile",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.Gray
+                    )
 
-                            val response = apiService.uploadProfile(
-                                imagePart,
-                                RequestBody.create("text/plain".toMediaTypeOrNull(), userId),
-                                RequestBody.create("text/plain".toMediaTypeOrNull(), isChildrenProfile.toString()),
-                                RequestBody.create("text/plain".toMediaTypeOrNull(), profileName),
-                                RequestBody.create("text/plain".toMediaTypeOrNull(), profileId)
-                            )
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                            Log.d("UploadProfile", "📡 Upload response: ${response.raw()}")
-
-                            if (response.isSuccessful) {
-                                uploadedUrl = response.body()?.profileUrl
-                                message = response.body()?.message ?: "Uploaded"
-                                Log.d("UploadProfile", "✅ Uploaded Successfully: $uploadedUrl")
-                            } else {
-                                message = "Upload failed"
-                                Log.e("UploadProfile", "❌ Upload failed: ${response.errorBody()?.string()}")
-                            }
-                        } catch (e: Exception) {
-                            Log.e("UploadProfile", "💥 Upload Exception: ${e.message}", e)
-                        }
-                    } ?: run {
-                        message = "No image selected"
-                        Log.w("UploadProfile", "⚠️ No image selected for upload")
-                    }
+                    Text(
+                        text = "Uploaded At: ${profile!!.uploadedAt}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
                 }
-            },
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text("Upload Profile")
-        }
+            }
 
-        Spacer(modifier = Modifier.height(15.dp))
-
-        uploadedUrl?.let {
-            Image(
-                painter = rememberAsyncImagePainter(it),
-                contentDescription = null,
-                modifier = Modifier.size(120.dp)
-            )
-        }
-
-        Text(message)
-        Spacer(modifier = Modifier.height(25.dp))
-
-        Button(
-            onClick = {
-                scope.launch {
-                    try {
-                        Log.d("UploadProfile", "🔍 Fetching profile for userId: $userId")
-
-                        val res = apiService.getProfilePhoto(userId)
-                        Log.d("UploadProfile", "📡 Fetch response: ${res.raw()}")
-
-                        if (res.isSuccessful) {
-                            fetchedPhotoUrl = res.body()?.user?.photoUrl
-                            message = "Fetched profile successfully"
-                            Log.d("UploadProfile", "✅ Fetched Photo URL: $fetchedPhotoUrl")
-                        } else {
-                            message = "Failed to fetch profile"
-                            Log.e("UploadProfile", "❌ Fetch failed: ${res.errorBody()?.string()}")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("UploadProfile", "💥 Fetch Exception: ${e.message}", e)
-                        message = "Fetch error"
-                    }
-                }
-            },
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Text("Get Profile Photo")
-        }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        fetchedPhotoUrl?.let {
-            Image(
-                painter = rememberAsyncImagePainter(it),
-                contentDescription = null,
-                modifier = Modifier.size(120.dp)
-            )
+            else -> Text("No profile data available.")
         }
     }
 }

@@ -87,10 +87,7 @@ data class UploadProfileResponse(
 )
 
 // GetProfileResponse.kt
-data class GetProfileResponse(
-    val success: Boolean,
-    val user: UserData?
-)
+
 
 data class UserData(
     val userId: String,
@@ -163,11 +160,11 @@ val retrofit = Retrofit.Builder()
 
 val youtubeApi = retrofit.create(YouTubeApiService::class.java)
 
-data class GetProfilesResponse(
+data class GetProfileResponse(
     val success: Boolean,
-    val count: Int,
-    val profiles: List<ProfileItem>
+    val profile: ProfileItem?
 )
+
 data class Getresponse(
     val success:Boolean,
     val profile: ProfileItem?
@@ -202,7 +199,6 @@ interface ApiService {
         @Part("profileName") profileName: RequestBody,
         @Part("profileId") profileId: RequestBody
     ): Response<UploadProfileResponse>
-
     @GET("getProfilePhoto/{userId}")
     suspend fun getProfilePhoto(
         @Path("userId") userId: String
@@ -211,7 +207,7 @@ interface ApiService {
     @GET("getProfiles/{userId}")
     suspend fun getProfiles(
         @Path("userId") userId: String
-    ): Response<GetProfilesResponse>   // 👈 New API for all profiles
+    ): Response<GetProfileResponse>   // 👈 New API for all profiles
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(
