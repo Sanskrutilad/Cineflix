@@ -117,11 +117,9 @@ fun ReadyToWatchScreen(
                             .addOnSuccessListener { result ->
                                 val signInMethods = result.signInMethods
                                 if (!signInMethods.isNullOrEmpty()) {
-                                    // Already registered → navigate to Login
                                     Log.d("READY_SCREEN", "Email exists, go to Login")
                                     navController.navigate("loginscreen")
                                 } else {
-                                    // New user → navigate to SignUp
                                     Log.d("READY_SCREEN", "New email, go to SignUp")
                                     navController.navigate("Signupscreen")
                                 }

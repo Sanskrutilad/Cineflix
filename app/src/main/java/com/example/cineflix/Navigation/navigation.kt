@@ -85,7 +85,6 @@ fun Navigation(apiService: ApiService) {
             val category = backStackEntry.arguments?.getString("category") ?: ""
             MovieListScreen(category,  navController)
         }
-
         composable("castdetailscreen/{Imbdid}") {backStackEntry->
             val Imbdid = backStackEntry.arguments?.getString("Imbdid") ?: ""
             Castdetailsscreen(Imbdid, navController)

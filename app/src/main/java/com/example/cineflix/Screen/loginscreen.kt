@@ -1,6 +1,5 @@
 package com.example.cineflix.Screen
 
-import android.R.attr.password
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -21,16 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.cineflix.R
-import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,9 +45,7 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
         ) {
             val emailState = remember { mutableStateOf("") }
             val passwordState = remember { mutableStateOf("") }
-
             Spacer(modifier = Modifier.height(48.dp))
-
             OutlinedTextField(
                 value = emailState.value,
                 onValueChange = { emailState.value = it },
@@ -71,11 +65,8 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                     .height(56.dp),
                 shape = RoundedCornerShape(8.dp)
             )
-
             Spacer(modifier = Modifier.height(12.dp))
-
             var passwordVisible by remember { mutableStateOf(false) }
-
             OutlinedTextField(
                 value = passwordState.value,
                 onValueChange = { passwordState.value = it },
@@ -116,7 +107,6 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                         .addOnSuccessListener {
                             Log.d("SIGN_METHODS", "Sign-in methods: ${it.signInMethods}")
                         }
-
                     loginViewModel.signInWithEmailAndPassword(
                         email = emailState.value,
                         password = passwordState.value,
@@ -129,7 +119,7 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                     Log.d("USER", "UID: ${user?.uid}, email: ${user?.email}, provider: ${user?.providerId}")
 
                 },
-                        modifier = Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -142,7 +132,6 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                 Text("Sign In", fontWeight = FontWeight.SemiBold)
             }
             Spacer(modifier = Modifier.height(24.dp))
-
             Text(
                 text = "Need help?",
                 color = Color.White,
@@ -150,20 +139,15 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                 fontSize = 14.sp,
                 modifier=Modifier.clickable{navController.navigate("Helpscreen")}
             )
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = "New to Netflix? Sign up now.",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 modifier=Modifier.clickable{navController.navigate("Signupscreen")}
-
             )
-
             Spacer(modifier = Modifier.height(32.dp))
-
             Text(
                 text = "Sign in is protected by Google\nreCAPTCHA to ensure you’re not a bot.\nLearn more.",
                 color = Color.Gray,
