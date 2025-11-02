@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
@@ -51,6 +52,15 @@ fun NewAndHotScreen(
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("HomeScreen") }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
                 },
                 actions = {
                     IconButton(onClick = {}) {

@@ -105,7 +105,7 @@ fun NetflixTopBarScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(Color.Gray)
+                .background(Color.Black)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             contentAlignment = Alignment.Center
         ) {

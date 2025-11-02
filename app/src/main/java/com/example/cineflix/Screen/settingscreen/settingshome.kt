@@ -136,6 +136,15 @@ fun Settingmainscreen(
         topBar = {
             TopAppBar(
                 title = { Text("My Netflix", fontWeight = FontWeight.Bold, color = Color.White) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = {}) {
                         Icon(Icons.Default.Cast, contentDescription = "Cast", tint = Color.White)

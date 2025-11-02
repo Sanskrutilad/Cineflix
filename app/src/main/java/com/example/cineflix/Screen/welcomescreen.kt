@@ -163,7 +163,7 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { navController.navigate("ReadyToWatchScreen") },
+                    onClick = { navController.navigate("Signupscreen") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

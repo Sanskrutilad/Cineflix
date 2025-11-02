@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.cineflix.R
 import com.example.cineflix.Viewmodel.LoginScreenViewModel
@@ -32,7 +33,7 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginScreenViewModel = viewModel()) {
     Scaffold(
-        topBar = { NetflixTopAppBar() },
+        topBar = { NetflixTopAppBar(navController) },
         containerColor = Color.Black
     ) { innerPadding ->
         Column(
@@ -148,13 +149,6 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
                 modifier=Modifier.clickable{navController.navigate("Signupscreen")}
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Text(
-                text = "Sign in is protected by Google\nreCAPTCHA to ensure you’re not a bot.\nLearn more.",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 16.sp
-            )
         }
     }
 }
@@ -162,7 +156,7 @@ fun NetflixLoginScreen(navController: NavHostController,  loginViewModel: LoginS
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NetflixTopAppBar() {
+fun NetflixTopAppBar(navController: NavController) {
     TopAppBar(
         title = {
             Image(
@@ -173,7 +167,7 @@ fun NetflixTopAppBar() {
             )
         },
         navigationIcon = {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = {  navController.navigate("NetflixSimpleWelcomeScreen")}) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",

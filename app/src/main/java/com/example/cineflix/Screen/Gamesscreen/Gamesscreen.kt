@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -54,21 +55,38 @@ fun GameHomeScreen(
 
     Scaffold(
         topBar = {
-                TopAppBar(
-                    title = { Text("Games", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 25.sp) },
-                    colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black),
-                    actions = {
-                        IconButton(
-                            onClick = { navController.navigate("gamesearch") }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = Color.White
-                            )
-                        }
+            TopAppBar(
+                title = {
+                    Text(
+                        "Games",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 25.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("HomeScreen") }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
                     }
-                )
+                },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black),
+                actions = {
+                    IconButton(
+                        onClick = { navController.navigate("gamesearch") }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = Color.White
+                        )
+                    }
+                }
+            )
+
         },
         bottomBar = {
             BottomBar(navController as NavHostController)
