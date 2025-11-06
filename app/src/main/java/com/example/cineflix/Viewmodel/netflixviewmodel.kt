@@ -103,25 +103,6 @@ class NetflixViewModel : ViewModel() {
             }
         }
     }
-    fun likeMovie(apiService: ApiService, movie: MovieResponse, userId: String = "guest") {
-        Log.d("LikeMovie", "Function called") // Add this
-        viewModelScope.launch {
-            try {
-                val likeRequest = LikeRequest(
-                    imdbId = movie.Imdbid,
-                    userId = userId
-                )
-                val response = apiService.likedMovie(likeRequest)
-                if (response.isSuccessful) {
-                    Log.d("LikeMovie", "Liked successfully: ${response.code()}")
-                } else {
-                    Log.e("LikeMovie", "Like failed: ${response.code()} ${response.errorBody()?.string()}")
-                }
-            } catch (e: Exception) {
-                Log.e("LikeMovie", "Failed to post liked movie", e)
-            }
-        }
-    }
     private val _likedMovieIds = mutableStateOf<List<String>>(emptyList())
 
     val likedMovieIds: androidx.compose.runtime.State<List<String>> = _likedMovieIds

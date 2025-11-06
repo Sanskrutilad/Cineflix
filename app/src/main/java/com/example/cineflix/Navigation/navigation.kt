@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.cineflix.AI.ChatScreen
 import com.example.cineflix.Retrofit.ApiService
 import com.example.cineflix.Retrofit.ProfileViewModel
 import com.example.cineflix.Screen.AddProfileScreen
@@ -117,6 +118,9 @@ fun Navigation(apiService: ApiService) {
         }
         composable("gamesearch") {
             GameSearchScreen(navController)
+        }
+        composable("aichat") {
+            ChatScreen()
         }
 
     }
