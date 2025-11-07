@@ -134,19 +134,17 @@ fun TopAppBarContent(backgroundColor1: Color , navController: NavController) {
         Spacer(modifier = Modifier.weight(1f))
         IconButton(onClick = { /* open ChatScreen */ }) {
             Image(
-                painter = painterResource(id = R.drawable.ai_bg),
+                painter = painterResource(id = R.drawable.ai_logo_transparent),
                 contentDescription = "AI Chat",
-                modifier = Modifier.size(102.dp)
+                modifier = Modifier.size(200.dp)
             )
         }
-
-
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(6.dp))
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = "Search",
             tint = Color.White,
-            modifier = Modifier.size(35.dp).clickable{navController.navigate("search")}
+            modifier = Modifier.size(25.dp).clickable{navController.navigate("search")}
         )
     }
 }
@@ -233,7 +231,6 @@ fun FeaturedBanner(
                 },
             contentAlignment = Alignment.BottomCenter
         ) {
-            // 🎬 Poster
             Crossfade(targetState = featuredMovie.Poster, label = "posterFade") { posterUrl ->
                 AsyncImage(
                     model = posterUrl,
