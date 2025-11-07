@@ -57,7 +57,7 @@ data class ChatMessage(val text: String, val isUser: Boolean)
 class ChatViewModel : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(
-        listOf(ChatMessage("🎬 Hi! Ask me about any movie. Example: *Tell me about Inception*", false))
+        listOf(ChatMessage("🎬 Hi! Ask me about any movie. Example: Tell me about Inception", false))
     )
     val messages: StateFlow<List<ChatMessage>> get() = _messages
 
@@ -103,10 +103,4 @@ ${response.Plot}
 }
 
 
-@Composable
-fun ChatScreen() {
-    val chatViewModel: ChatViewModel = viewModel()
-    val messages by chatViewModel.messages.collectAsState()
-
-}
 

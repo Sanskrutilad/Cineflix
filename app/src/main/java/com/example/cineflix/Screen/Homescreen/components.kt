@@ -70,14 +70,23 @@ import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Games
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.rounded.AllInclusive
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.palette.graphics.Palette
 import coil.ImageLoader
@@ -123,12 +132,15 @@ fun TopAppBarContent(backgroundColor1: Color , navController: NavController) {
             modifier = Modifier.size(86.dp)
         )
         Spacer(modifier = Modifier.weight(1f))
-        Icon(
-            imageVector = Icons.Default.Download,
-            contentDescription = "Downloads",
-            tint = Color.White,
-            modifier = Modifier.size(35.dp)
-        )
+        IconButton(onClick = { /* open ChatScreen */ }) {
+            Image(
+                painter = painterResource(id = R.drawable.ai_bg),
+                contentDescription = "AI Chat",
+                modifier = Modifier.size(102.dp)
+            )
+        }
+
+
         Spacer(modifier = Modifier.width(16.dp))
         Icon(
             imageVector = Icons.Default.Search,
