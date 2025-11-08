@@ -132,7 +132,7 @@ fun TopAppBarContent(backgroundColor1: Color , navController: NavController) {
             modifier = Modifier.size(86.dp)
         )
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = { /* open ChatScreen */ }) {
+        IconButton(onClick = { navController.navigate("aichat")}) {
             Image(
                 painter = painterResource(id = R.drawable.ai_logo_transparent),
                 contentDescription = "AI Chat",

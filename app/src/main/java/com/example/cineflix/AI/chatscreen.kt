@@ -61,7 +61,6 @@ fun ChatScreen() {
                 Spacer(modifier = Modifier.height(6.dp))
             }
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -71,7 +70,7 @@ fun ChatScreen() {
             TextField(
                 value = userInput,
                 onValueChange = { userInput = it },
-                placeholder = { Text("Ask about a movie...", color = Color.Gray) },
+                placeholder = { Text("Ask about a movie...", color = Color.White) },
                 colors = TextFieldDefaults.textFieldColors(
                     containerColor = Color.DarkGray,
                     focusedIndicatorColor = Color.Transparent,

@@ -68,21 +68,18 @@ dependencies {
     implementation(libs.coil.compose)
     implementation ("androidx.compose.material:material-icons-extended:1.6.0")
     implementation("io.coil-kt:coil-compose:2.5.0") // Or latest
-
     implementation("com.google.dagger:hilt-android:2.56.2")
     kapt("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
-
     implementation("androidx.palette:palette-ktx:1.0.0")
-
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.media3:media3-exoplayer:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")
-
     implementation("io.coil-kt:coil-compose:2.6.0")
-
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+
+    implementation("com.google.ai.client.generativeai:generativeai:0.6.0")
 }
