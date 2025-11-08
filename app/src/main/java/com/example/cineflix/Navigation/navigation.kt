@@ -120,7 +120,7 @@ fun Navigation(apiService: ApiService) {
             GameSearchScreen(navController)
         }
         composable("aichat") {
-            ChatScreen()
+            ChatScreen(navController)
         }
 
 
