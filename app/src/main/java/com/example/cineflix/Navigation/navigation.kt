@@ -40,7 +40,7 @@ import com.example.cineflixai.ChatScreen
 fun Navigation(apiService: ApiService) {
     val navController = rememberNavController()
     val profileViewModel: ProfileViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "HomeScreen") {
+    NavHost(navController = navController, startDestination = "Splashscreen") {
         composable("Splashscreen"){
             SplashScreen(navController)
         }
