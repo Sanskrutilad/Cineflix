@@ -84,12 +84,16 @@ fun Settingmainscreen(
         fetchUserLogo(apiService, userId) { logoUrl ->
             uploadedLogoUrl = logoUrl
         }
+
         val response = apiService.getProfilePhoto(userId)
+
         if (response.isSuccessful && response.body()?.success == true) {
             profileName = response.body()?.profile?.profileName
-        } else {
+        }
+        else {
             Log.e("SettingsScreen", "Profile fetch failed: ${response.errorBody()?.string()}")
         }
+
         myListViewModel.getMyList { list ->
             myList = list
             isLoadingMyList = false
@@ -331,8 +335,6 @@ fun SectionWithMovies(
                                 .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                             contentScale = ContentScale.Crop
                         )
-
-
                         if (showShare) {
                             Spacer(modifier = Modifier.height(8.dp))
                             // Show share row
@@ -355,7 +357,6 @@ fun SectionWithMovies(
                                     }
                                 }
                             ) {
-
                                 Icon(
                                     Icons.Outlined.Share,
                                     contentDescription = "Share",

@@ -256,7 +256,6 @@ fun FeaturedBanner(
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Button(
                     onClick = {
                         featuredMovie.Imdbid?.let { id ->
@@ -327,8 +326,6 @@ fun FeaturedBanner(
     }
 }
 
-
-
 @Composable
 fun SectionHeader(title: String) {
     Text(
@@ -353,7 +350,9 @@ fun MobileGamesSection(
                 .padding(horizontal = 2.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ) {
+        )
+
+        {
             Text("Mobile Games", color = Color.White, fontWeight = FontWeight.Bold,  style = MaterialTheme.typography.titleLarge,)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("See All", color = Color.White, modifier = Modifier.clickable{navController.navigate("GameHomeScreen")})
