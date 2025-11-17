@@ -121,11 +121,18 @@ fun NewAndHotScreen(
             ) {
                 items(movieList.size) { index ->
                     val movie = movieList[index]
+                    val onClick = if (selectedTab == "Everyone's Watching") {
+                        { navController.navigate("MoviedetailScreen/${movie.Imdbid}") }
+                    } else {
+                        { /* no-op for Coming Soon */ }
+                    }
+
                     ShowCard(
                         imageUrl = movie.Poster,
                         ageRating = movie.rating ?: "U/A",
                         title = movie.title,
-                        description = movie.description ?: "No description available"
+                        description = movie.description ?: "No description available",
+                        onClick = onClick
                     )
                 }
             }
@@ -133,14 +140,19 @@ fun NewAndHotScreen(
     }
 }
 
-
-
 @Composable
-fun ShowCard(imageUrl: String, ageRating: String, title: String, description: String) {
+fun ShowCard(
+    imageUrl: String,
+    ageRating: String,
+    title: String,
+    description: String,
+    onClick: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
             .border(BorderStroke(1.dp, Color.DarkGray), RoundedCornerShape(8.dp))
             .background(Color.Black)
             .padding(8.dp)
@@ -179,14 +191,5 @@ fun ShowCard(imageUrl: String, ageRating: String, title: String, description: St
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         Spacer(modifier = Modifier.height(12.dp))
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CineflixTheme {
-        NewAndHotScreen(rememberNavController())
     }
 }

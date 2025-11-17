@@ -105,35 +105,12 @@ class NetflixViewModel : ViewModel() {
     }
     private val _likedMovieIds = mutableStateOf<List<String>>(emptyList())
 
-    val likedMovieIds: androidx.compose.runtime.State<List<String>> = _likedMovieIds
-    fun fetchLikedMovies(apiService: ApiService,userId: String) {
-        viewModelScope.launch {
-            try {
-                val response = apiService.getLikedMovies(userId)
-                if (response.isSuccessful) {
-                    response.body()?.let { body ->
-                        if (body.success) {
-                            _likedMovieIds.value = body.imdbIds
-                        } else {
-                            Log.e("NetflixViewModel", "API returned success = false")
-                        }
-                    }
-                } else {
-                    Log.e("NetflixViewModel", "HTTP Error: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                Log.e("NetflixViewModel", "Network Exception: ${e.message}")
-            }
-        }
-    }
-
     var searchQuery by mutableStateOf("")
         private set
 
     var searchResults by mutableStateOf<List<MovieResponse>>(emptyList())
         private set
 
-    // 🔎 Update query & filter movies
     fun updateSearchQuery(query: String) {
         searchQuery = query
 

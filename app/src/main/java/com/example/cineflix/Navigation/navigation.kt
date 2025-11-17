@@ -62,12 +62,12 @@ fun Navigation(apiService: ApiService) {
         composable("loginscreen") {
             NetflixLoginScreen(navController)
         }
-        composable("AddProfileScreen") {
-            AddProfileScreen(navController,apiService,profileViewModel)
-        }
-        composable("WhosWatchingScreen") {
-            WhosWatchingScreen(navController,profileViewModel)
-        }
+//        composable("AddProfileScreen") {
+//            AddProfileScreen(navController,apiService,profileViewModel)
+//        }
+//        composable("WhosWatchingScreen") {
+//            WhosWatchingScreen(navController,profileViewModel)
+//        }
         composable("HomeScreen") {
             NetflixTopBarScreen(navController)
         }
