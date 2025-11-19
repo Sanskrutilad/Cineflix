@@ -207,7 +207,7 @@ interface ApiService {
     @GET("getProfiles/{userId}")
     suspend fun getProfiles(
         @Path("userId") userId: String
-    ): Response<GetProfileResponse>   // 👈 New API for all profiles
+    ): Response<GetProfileResponse>
 
     @GET("getLogo/{companyId}")
     suspend fun getLogo(
@@ -254,7 +254,7 @@ object OmdbRetrofitInstance {
 
 fun createApiService(): ApiService {
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:3000/")
+        .baseUrl("https://483b648fdbc1.ngrok-free.app/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     return retrofit.create(ApiService::class.java)

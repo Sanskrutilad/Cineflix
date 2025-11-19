@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.example.cineflix.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
@@ -41,15 +42,29 @@ fun NetflixSimpleWelcomeScreen(navController: NavHostController) {
         R.drawable.gs2,
         R.drawable.gs3
     )
-    val context = LocalContext.current
+
     var currentImageIndex by remember { mutableStateOf(0) }
-    // Auto change every 4s
+
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+
+    LaunchedEffect(Unit) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            navController.navigate("HomeScreen") {
+                popUpTo("WelcomeScreen") { inclusive = true }
+            }
+        }
+    }
+
+
     LaunchedEffect(Unit) {
         while (true) {
             delay(4000L)
             currentImageIndex = (currentImageIndex + 1) % imageList.size
         }
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = imageList[currentImageIndex]),
